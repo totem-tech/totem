@@ -1,0 +1,35 @@
+image: "rustlang/rust:nightly"
+
+pages:
+  stage: deploy
+  script:
+  - rustc --version && cargo --version # Print version info for debugging
+  - |
+    time RUSTDOCFLAGS='-Z unstable-options --enable-index-page --default-theme dark' \
+    cargo doc \
+    -p totem-common \
+    -p pallet-accounting \
+    -p pallet-archive \
+    -p pallet-balances \
+    -p pallet-bonsai \
+    -p pallet-funding \
+    -p pallet-orders \
+    -p pallet-prefunding \
+    -p pallet-teams \
+    -p pallet-timekeeping \
+    -p pallet-transfer \
+    --verbose
+  - cp -r target/doc public
+  # Now, setup the content of the documentation:
+  - cp assets/totem-logo.png public/rust-logo.png
+  - perl -pi -e 's/<li><a [^>]*>(?!totem_common|pallet_accounting|pallet_archive|pallet_balances|pallet_bonsai|pallet_funding|pallet_orders|pallet_prefunding|pallet_teams|pallet_timekeeping|pallet_transfer)[a-zA-Z0-9\-_]*<\/a><\/li>//g' public/index.html
+  - echo 'window.ALL_CRATES = ["totem_common","pallet_accounting","pallet_archive","pallet_balances","pallet_bonsai","pallet_funding","pallet_orders","pallet_prefunding","pallet_teams","pallet_timekeeping","pallet_transfer"];' > public/crates.js
+  artifacts:
+    paths:
+    - public
+  only:
+  - master
+
+  cache:
+    paths:
+    - target/

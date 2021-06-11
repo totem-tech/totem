@@ -1,0 +1,24 @@
+[profile.release]
+panic = 'unwind'
+
+[workspace]
+members = [
+	'lego-parachain/node',
+	'lego-parachain/runtime',
+	'totem-blockchain/node',
+	'totem-blockchain/runtime',
+	'common',
+	'pallets/accounting',
+	'pallets/archive',
+	'pallets/balances',
+	'pallets/bonsai',
+	'pallets/funding',
+	'pallets/orders',
+	'pallets/prefunding',
+	'pallets/teams',
+	'pallets/timekeeping',
+	'pallets/transfer',
+]
+
+[patch.'https://github.com/paritytech/substrate.git']
+pallet-balances = { default-features = false, path = 'pallets/balances' }

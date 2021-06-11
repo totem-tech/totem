@@ -1,0 +1,107 @@
+[package]
+name = 'totem-blockchain-runtime'
+version = '3.0.0'
+authors = ['Totem Accounting <support@totemaccounting.com>']
+description = 'The Totem blockchain runtime'
+license = 'GNU'
+homepage = 'https://totemaccounting.com'
+repository = 'https://gitlab.com/totem-tech/totem'
+edition = '2018'
+
+[package.metadata.docs.rs]
+targets = ['x86_64-unknown-linux-gnu']
+
+[build-dependencies]
+substrate-wasm-builder = { version = '4.0.0', git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.4' }
+
+[dependencies]
+# external dependencies
+codec = { default-features = false, features = ['derive'], package = 'parity-scale-codec', version = '2.0.0' }
+hex-literal = { optional = true, version = '0.3.1' }
+
+# Substrate dependencies
+frame-benchmarking = { default-features = false, optional = true, version = '3.1.0', git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.4' }
+frame-executive = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.4' }
+frame-support = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.4' }
+frame-system = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.4' }
+frame-system-benchmarking = { default-features = false, optional = true, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.4' }
+frame-system-rpc-runtime-api = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.4' }
+pallet-aura = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.4' }
+pallet-grandpa = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.4' }
+pallet-randomness-collective-flip = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.4' }
+pallet-sudo = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.4' }
+pallet-timestamp = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.4' }
+pallet-transaction-payment = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.4' }
+pallet-transaction-payment-rpc-runtime-api = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.4' }
+sp-api = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.4' }
+sp-block-builder = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.4' }
+sp-consensus-aura = { default-features = false, version = '0.9.0', git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.4' }
+sp-core = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.4' }
+sp-inherents = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.4' }
+sp-offchain = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.4' }
+sp-runtime = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.4' }
+sp-session = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.4' }
+sp-std = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.4' }
+sp-transaction-pool = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.4' }
+sp-version = { default-features = false, version = '3.0.0', git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.4' }
+
+# Totem
+totem-common = { default-features = false, path = '../../common' }
+pallet-accounting = { default-features = false, path = '../../pallets/accounting' }
+pallet-archive = { default-features = false, path = '../../pallets/archive' }
+pallet-balances = { default-features = false, path = '../../pallets/balances' }
+pallet-bonsai = { default-features = false, path = '../../pallets/bonsai' }
+pallet-funding = { default-features = false, path = '../../pallets/funding' }
+pallet-orders = { default-features = false, path = '../../pallets/orders' }
+pallet-prefunding = { default-features = false, path = '../../pallets/prefunding' }
+pallet-teams = { default-features = false, path = '../../pallets/teams' }
+pallet-timekeeping = { default-features = false, path = '../../pallets/timekeeping' }
+pallet-transfer = { default-features = false, path = '../../pallets/transfer' }
+
+[features]
+default = ['std']
+runtime-benchmarks = [
+	'frame-benchmarking',
+	'frame-support/runtime-benchmarks',
+	'frame-system-benchmarking',
+	'frame-system/runtime-benchmarks',
+	'hex-literal',
+	'pallet-timestamp/runtime-benchmarks',
+	'sp-runtime/runtime-benchmarks',
+]
+std = [
+	'codec/std',
+	'frame-executive/std',
+	'frame-support/std',
+	'frame-system-rpc-runtime-api/std',
+	'frame-system/std',
+	'pallet-aura/std',
+	'pallet-grandpa/std',
+	'pallet-randomness-collective-flip/std',
+	'pallet-sudo/std',
+	'pallet-timestamp/std',
+	'pallet-transaction-payment-rpc-runtime-api/std',
+	'pallet-transaction-payment/std',
+	'sp-api/std',
+	'sp-block-builder/std',
+	'sp-consensus-aura/std',
+	'sp-core/std',
+	'sp-inherents/std',
+	'sp-offchain/std',
+	'sp-runtime/std',
+	'sp-session/std',
+	'sp-std/std',
+	'sp-transaction-pool/std',
+	'sp-version/std',
+	'totem-common/std',
+	'pallet-accounting/std',
+	'pallet-archive/std',
+	'pallet-balances/std',
+	'pallet-bonsai/std',
+	'pallet-funding/std',
+	'pallet-orders/std',
+	'pallet-prefunding/std',
+	'pallet-teams/std',
+	'pallet-timekeeping/std',
+	'pallet-transfer/std',
+]
