@@ -37,22 +37,20 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use frame_support::{fail, pallet_prelude::*};
-use frame_system::pallet_prelude::*;
-
-use sp_std::prelude::*;
-
-use totem_common::traits::timekeeping::Validating as TimeValidating;
-use totem_common::types::RecordType;
-
-type Archival = bool;
-
 pub use pallet::*;
 
 #[frame_support::pallet]
 mod pallet {
 
-    use super::*;
+    use frame_support::{fail, pallet_prelude::*};
+    use frame_system::pallet_prelude::*;
+
+    use sp_std::prelude::*;
+
+    use totem_common::traits::timekeeping::Validating as TimeValidating;
+    use totem_common::types::RecordType;
+
+    type Archival = bool;
 
     #[pallet::pallet]
     #[pallet::generate_store(trait Store)]
@@ -84,7 +82,7 @@ mod pallet {
         /// 8000
         /// 9000
         #[pallet::weight(0/*TODO*/)]
-        fn archive_record(
+        pub fn archive_record(
             origin: OriginFor<T>,
             record_type: RecordType,
             bonsai_token: T::Hash,

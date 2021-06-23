@@ -252,7 +252,7 @@ mod pallet {
         /// The prefunded amount remains as an asset of the buyer until the order is accepted.
         /// Updates only the accounts of the buyer.
         #[pallet::weight(0/*TODO*/)]
-        fn prefund_someone(
+        pub fn prefund_someone(
             origin: OriginFor<T>,
             beneficiary: T::AccountId,
             amount: u128,
@@ -279,7 +279,7 @@ mod pallet {
         /// This invoice is associated with a prefunded order - therefore needs to provide the hash reference of the order.
         /// Updates the accounting for the vendor and the customer.
         #[pallet::weight(0/*TODO*/)]
-        fn invoice_prefunded_order(
+        pub fn invoice_prefunded_order(
             origin: OriginFor<T>,
             payer: T::AccountId,
             amount: i128,
@@ -294,7 +294,7 @@ mod pallet {
         /// Buyer pays a prefunded order. Needs to supply the correct hash reference.
         /// Updates bother the buyer and the vendor accounts.
         #[pallet::weight(0/*TODO*/)]
-        fn pay_prefunded_invoice(
+        pub fn pay_prefunded_invoice(
             origin: OriginFor<T>,
             reference: T::Hash,
             uid: T::Hash,
@@ -306,7 +306,7 @@ mod pallet {
 
         /// Is used by the buyer to recover funds if the vendor does not accept the order by the deadline.
         #[pallet::weight(0/*TODO*/)]
-        fn cancel_prefunded_closed_order(
+        pub fn cancel_prefunded_closed_order(
             origin: OriginFor<T>,
             reference: T::Hash,
             uid: T::Hash,

@@ -5,6 +5,7 @@ use sc_service::ChainType;
 use serde::{Deserialize, Serialize};
 use sp_core::{sr25519, Pair, Public};
 use sp_runtime::traits::{IdentifyAccount, Verify};
+
 use lego_parachain_runtime::FundingConfig;
 
 /// Specialized `ChainSpec` for the normal parachain runtime.
@@ -45,6 +46,11 @@ where
 }
 
 pub fn development_config(id: ParaId) -> ChainSpec {
+	// Give your base currency a unit name and decimal places
+	let mut properties = sc_chain_spec::Properties::new();
+	properties.insert("tokenSymbol".into(), "UNIT".into());
+	properties.insert("tokenDecimals".into(), 12.into());
+
 	ChainSpec::from_genesis(
 		// Name
 		"Development",
@@ -79,6 +85,11 @@ pub fn development_config(id: ParaId) -> ChainSpec {
 }
 
 pub fn local_testnet_config(id: ParaId) -> ChainSpec {
+	// Give your base currency a unit name and decimal places
+	let mut properties = sc_chain_spec::Properties::new();
+	properties.insert("tokenSymbol".into(), "UNIT".into());
+	properties.insert("tokenDecimals".into(), 12.into());
+
 	ChainSpec::from_genesis(
 		// Name
 		"Local Testnet",
@@ -127,25 +138,25 @@ fn testnet_genesis(
 	id: ParaId,
 ) -> lego_parachain_runtime::GenesisConfig {
 	lego_parachain_runtime::GenesisConfig {
-		frame_system: lego_parachain_runtime::SystemConfig {
+		system: lego_parachain_runtime::SystemConfig {
 			code: lego_parachain_runtime::WASM_BINARY
 				.expect("WASM binary was not build, please build it!")
 				.to_vec(),
 			changes_trie_config: Default::default(),
 		},
-		pallet_balances: lego_parachain_runtime::BalancesConfig {
+		balances: lego_parachain_runtime::BalancesConfig {
 			balances: endowed_accounts
 				.iter()
 				.cloned()
 				.map(|k| (k, 1 << 60))
 				.collect(),
 		},
-		pallet_sudo: lego_parachain_runtime::SudoConfig { key: root_key },
+		sudo: lego_parachain_runtime::SudoConfig { key: root_key },
 		parachain_info: lego_parachain_runtime::ParachainInfoConfig { parachain_id: id },
-		pallet_aura: lego_parachain_runtime::AuraConfig {
+		aura: lego_parachain_runtime::AuraConfig {
 			authorities: initial_authorities,
 		},
-		cumulus_pallet_aura_ext: Default::default(),
-		pallet_funding: FundingConfig::default(),
+		aura_ext: Default::default(),
+		funding: FundingConfig::default(),
 	}
 }

@@ -68,7 +68,7 @@ pub fn new_partial(config: &Configuration) -> Result<sc_service::PartialComponen
 		config.transaction_pool.clone(),
 		config.role.is_authority().into(),
 		config.prometheus_registry(),
-		task_manager.spawn_handle(),
+		task_manager.spawn_essential_handle(),
 		client.clone(),
 	);
 
@@ -220,7 +220,7 @@ pub fn new_full(mut config: Configuration) -> Result<TaskManager, ServiceError> 
 		let slot_duration = sc_consensus_aura::slot_duration(&*client)?;
 		let raw_slot_duration = slot_duration.slot_duration();
 
-		let aura = sc_consensus_aura::start_aura::<AuraPair, _, _, _, _, _, _, _, _, _, _>(
+		let aura = sc_consensus_aura::start_aura::<AuraPair, _, _, _, _, _, _, _, _, _, _, _>(
 			StartAuraParams {
 				slot_duration,
 				client: client.clone(),
@@ -243,6 +243,7 @@ pub fn new_full(mut config: Configuration) -> Result<TaskManager, ServiceError> 
 				keystore: keystore_container.sync_keystore(),
 				can_author_with,
 				sync_oracle: network.clone(),
+				justification_sync_link: network.clone(),
 				block_proposal_slot_portion: SlotProportion::new(2f32 / 3f32),
 				telemetry: telemetry.as_ref().map(|x| x.handle()),
 			},
@@ -331,12 +332,12 @@ pub fn new_light(mut config: Configuration) -> Result<TaskManager, ServiceError>
 	let transaction_pool = Arc::new(sc_transaction_pool::BasicPool::new_light(
 		config.transaction_pool.clone(),
 		config.prometheus_registry(),
-		task_manager.spawn_handle(),
+		task_manager.spawn_essential_handle(),
 		client.clone(),
 		on_demand.clone(),
 	));
 
-	let (grandpa_block_import, _grandpa_link) = sc_finality_grandpa::block_import(
+	let (grandpa_block_import, grandpa_link) = sc_finality_grandpa::block_import(
 		client.clone(),
 		&(client.clone() as Arc<_>),
 		select_chain.clone(),
@@ -383,6 +384,26 @@ pub fn new_light(mut config: Configuration) -> Result<TaskManager, ServiceError>
 	if config.offchain_worker.enabled {
 		sc_service::build_offchain_workers(
 			&config, task_manager.spawn_handle(), client.clone(), network.clone(),
+		);
+	}
+
+	let enable_grandpa = !config.disable_grandpa;
+	if enable_grandpa {
+		let name = config.network.node_name.clone();
+
+		let config = sc_finality_grandpa::Config {
+			gossip_duration: std::time::Duration::from_millis(333),
+			justification_period: 512,
+			name: Some(name),
+			observer_enabled: false,
+			keystore: None,
+			local_role: config.role.clone(),
+			telemetry: telemetry.as_ref().map(|x| x.handle()),
+		};
+
+		task_manager.spawn_handle().spawn_blocking(
+			"grandpa-observer",
+			sc_finality_grandpa::run_grandpa_observer(config, grandpa_link, network.clone())?,
 		);
 	}
 

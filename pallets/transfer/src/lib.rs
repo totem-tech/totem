@@ -81,7 +81,7 @@ mod pallet {
     impl<T: Config> Pallet<T> {
         /// Transfers funds!
         #[pallet::weight(0/*TODO*/)]
-        fn transfer(
+        pub fn transfer(
             origin: OriginFor<T>,
             to: T::AccountId,
             #[pallet::compact] payment_amount: T::Balance,

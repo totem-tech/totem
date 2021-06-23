@@ -144,7 +144,7 @@ mod pallet {
     #[pallet::call]
     impl<T: Config> Pallet<T> {
         #[pallet::weight(0/*TODO*/)]
-        fn add_new_project(
+        pub fn add_new_project(
             origin: OriginFor<T>,
             project_hash: T::Hash,
         ) -> DispatchResultWithPostInfo {
@@ -177,7 +177,7 @@ mod pallet {
         }
 
         #[pallet::weight(0/*TODO*/)]
-        fn remove_project(
+        pub fn remove_project(
             origin: OriginFor<T>,
             project_hash: T::Hash,
         ) -> DispatchResultWithPostInfo {
@@ -235,7 +235,7 @@ mod pallet {
         }
 
         #[pallet::weight(0/*TODO*/)]
-        fn reassign_project(
+        pub fn reassign_project(
             origin: OriginFor<T>,
             new_owner: T::AccountId,
             project_hash: T::Hash,
@@ -280,7 +280,7 @@ mod pallet {
         }
 
         #[pallet::weight(0/*TODO*/)]
-        fn close_project(
+        pub fn close_project(
             origin: OriginFor<T>,
             project_hash: T::Hash,
         ) -> DispatchResultWithPostInfo {
@@ -310,7 +310,7 @@ mod pallet {
         }
 
         #[pallet::weight(0/*TODO*/)]
-        fn reopen_project(
+        pub fn reopen_project(
             origin: OriginFor<T>,
             project_hash: T::Hash,
         ) -> DispatchResultWithPostInfo {
@@ -342,7 +342,7 @@ mod pallet {
         }
 
         #[pallet::weight(0/*TODO*/)]
-        fn set_status_project(
+        pub fn set_status_project(
             origin: OriginFor<T>,
             project_hash: T::Hash,
             project_status: ProjectStatus,

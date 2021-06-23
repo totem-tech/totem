@@ -198,12 +198,12 @@ mod pallet {
     #[pallet::call]
     impl<T: Config> Pallet<T> {
         #[pallet::weight(0/*TODO*/)]
-        fn opening_balance(_origin: OriginFor<T>) -> DispatchResultWithPostInfo {
+        pub fn opening_balance(_origin: OriginFor<T>) -> DispatchResultWithPostInfo {
             todo!()
         }
 
         #[pallet::weight(0/*TODO*/)]
-        fn adjustment(_origin: OriginFor<T>) -> DispatchResultWithPostInfo {
+        pub fn adjustment(_origin: OriginFor<T>) -> DispatchResultWithPostInfo {
             todo!()
         }
     }

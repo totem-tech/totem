@@ -147,7 +147,7 @@ mod pallet {
         /// * 5000 Orders
         ///
         #[pallet::weight(0/*TODO*/)]
-        fn update_record(
+        pub fn update_record(
             origin: OriginFor<T>,
             record_type: RecordType,
             key: T::Hash,
@@ -162,7 +162,7 @@ mod pallet {
         }
 
         #[pallet::weight(0/*TODO*/)]
-        fn on_finalize_example(origin: OriginFor<T>) -> DispatchResultWithPostInfo {
+        pub fn on_finalize_example(origin: OriginFor<T>) -> DispatchResultWithPostInfo {
             let _who = ensure_signed(origin)?;
             let current_block: T::BlockNumber = frame_system::Pallet::<T>::block_number();
             let current: u32 = T::BonsaiConverter::convert(current_block);

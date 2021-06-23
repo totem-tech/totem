@@ -136,7 +136,7 @@ mod pallet {
     impl<T: Config> Pallet<T> {
         /// Super User sets the controller account.
         #[pallet::weight(0/*TODO*/)]
-        fn set_controller_account(
+        pub fn set_controller_account(
             origin: OriginFor<T>,
             controller: T::AccountId,
         ) -> DispatchResultWithPostInfo {
@@ -156,7 +156,7 @@ mod pallet {
 
         /// Super User sets the transfers to open or closed.
         #[pallet::weight(0/*TODO*/)]
-        fn set_transfer_status(origin: OriginFor<T>) -> DispatchResultWithPostInfo {
+        pub fn set_transfer_status(origin: OriginFor<T>) -> DispatchResultWithPostInfo {
             let _who = ensure_root(origin)?;
 
             if Self::transfer_status() {
@@ -172,7 +172,7 @@ mod pallet {
 
         /// Super User can only mint coins if transfers are disabled.
         #[pallet::weight(0/*TODO*/)]
-        fn mint_coins(origin: OriginFor<T>, quantity: u128) -> DispatchResultWithPostInfo {
+        pub fn mint_coins(origin: OriginFor<T>, quantity: u128) -> DispatchResultWithPostInfo {
             let _who = ensure_root(origin)?;
 
             if Self::transfer_status() {
@@ -196,7 +196,7 @@ mod pallet {
 
         /// Super User can move from unissued to issued coins if transfers are disabled.
         #[pallet::weight(0/*TODO*/)]
-        fn rebalance_issued_coins(
+        pub fn rebalance_issued_coins(
             origin: OriginFor<T>,
             amount: u128,
         ) -> DispatchResultWithPostInfo {
@@ -222,7 +222,7 @@ mod pallet {
 
         /// Only the controller can do the initial distribution
         #[pallet::weight(0/*TODO*/)]
-        fn distribute(
+        pub fn distribute(
             origin: OriginFor<T>,
             to: T::AccountId,
             amount: u128,
@@ -263,7 +263,7 @@ mod pallet {
 
         /// This function transfers funds between accounts (only when opened)
         #[pallet::weight(0/*TODO*/)]
-        fn transfer(
+        pub fn transfer(
             origin: OriginFor<T>,
             to: T::AccountId,
             amount: u128,

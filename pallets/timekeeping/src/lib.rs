@@ -254,7 +254,7 @@ mod pallet {
     impl<T: Config> Pallet<T> {
         /// Project owner invites worker/team member to project.
         #[pallet::weight(0/*TODO*/)]
-        fn notify_project_worker(
+        pub fn notify_project_worker(
             origin: OriginFor<T>,
             worker: T::AccountId,
             project_hash: T::Hash,
@@ -316,7 +316,7 @@ mod pallet {
 
         /// Worker accepts to join the project.
         #[pallet::weight(0/*TODO*/)]
-        fn worker_acceptance_project(
+        pub fn worker_acceptance_project(
             origin: OriginFor<T>,
             project_hash: T::Hash,
             accepted: AcceptAssignedStatus,
@@ -381,7 +381,7 @@ mod pallet {
 
         /// Worker submits/resubmits time record.
         #[pallet::weight(0/*TODO*/)]
-        fn submit_time(
+        pub fn submit_time(
             origin: OriginFor<T>,
             project_hash: T::Hash,
             input_time_hash: T::Hash,
@@ -620,7 +620,7 @@ mod pallet {
 
         /// Project owner sets authorisation status of time record.
         #[pallet::weight(0/*TODO*/)]
-        fn authorise_time(
+        pub fn authorise_time(
             origin: OriginFor<T>,
             _worker: T::AccountId,
             project_hash: T::Hash,
@@ -695,8 +695,7 @@ mod pallet {
 
         /// Worker invoices the time record.
         #[pallet::weight(0/*TODO*/)]
-        // TODO: The following functions are placeholders for future functionality
-        fn invoice_time(
+        pub fn invoice_time(
             origin: OriginFor<T>,
             _project_hash: T::Hash,
             _input_time_hash: T::Hash,
@@ -715,7 +714,7 @@ mod pallet {
 
         /// Project owner pays invoice.
         #[pallet::weight(0/*TODO*/)]
-        fn pay_time(
+        pub fn pay_time(
             origin: OriginFor<T>,
             _project_hash: T::Hash,
             _input_time_hash: T::Hash,
@@ -731,7 +730,7 @@ mod pallet {
 
         /// Full payment triggers locked record.
         #[pallet::weight(0/*TODO*/)]
-        fn lock_time_record(
+        pub fn lock_time_record(
             _origin: OriginFor<T>,
             _project_hash: T::Hash,
             _input_time_hash: T::Hash,
@@ -743,7 +742,7 @@ mod pallet {
 
         /// In case of error unlock record.
         #[pallet::weight(0/*TODO*/)]
-        fn unlock_time_record(
+        pub fn unlock_time_record(
             _origin: OriginFor<T>,
             _project_hash: T::Hash,
             _input_time_hash: T::Hash,
@@ -755,7 +754,7 @@ mod pallet {
 
         /// Worker or team member is banned from submitting time against this project.
         #[pallet::weight(0/*TODO*/)]
-        fn ban_worker(
+        pub fn ban_worker(
             _origin: OriginFor<T>,
             _project_hash: T::Hash,
             _worker: T::AccountId,
@@ -768,7 +767,7 @@ mod pallet {
 
         /// Worker or team member is released from ban from submitting time against this project.
         #[pallet::weight(0/*TODO*/)]
-        fn unban_worker(
+        pub fn unban_worker(
             _origin: OriginFor<T>,
             _project_hash: T::Hash,
             _worker: T::AccountId,

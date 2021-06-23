@@ -207,7 +207,7 @@ mod pallet {
     impl<T: Config> Pallet<T> {
         /// Only the owner of an order can delete it provided no work has been done on it.
         #[pallet::weight(0/*TODO*/)]
-        fn delete_order(
+        pub fn delete_order(
             origin: OriginFor<T>,
             tx_keys_medium: TXKeysM<T::Hash>,
         ) -> DispatchResultWithPostInfo {
@@ -249,7 +249,7 @@ mod pallet {
         /// Creates either a sales order or a purchase order with multi-line items and a parent order.
         /// Will be used for the marketplace in order to set up open orders.
         #[pallet::weight(0/*TODO*/)]
-        fn create_order(
+        pub fn create_order(
             origin: OriginFor<T>,
             approver: T::AccountId,
             fulfiller: T::AccountId,
@@ -344,7 +344,7 @@ mod pallet {
         /// Create Simple Prefunded Service Order.
         /// Can specify an approver. If the approver is the same as the sender then the order is considered approved by default.
         #[pallet::weight(0/*TODO*/)]
-        fn create_spfso(
+        pub fn create_spfso(
             origin: OriginFor<T>,
             approver: T::AccountId,
             fulfiller: T::AccountId,
@@ -392,7 +392,7 @@ mod pallet {
         /// Can only be changed by the original ordering party,
         /// and only before it is accepted and the deadline or due date is not passed.
         #[pallet::weight(0/*TODO*/)]
-        fn change_spfso(
+        pub fn change_spfso(
             origin: OriginFor<T>,
             approver: T::AccountId,
             fulfiller: T::AccountId,
@@ -428,7 +428,7 @@ mod pallet {
         /// Sets the approval status of an order.
         /// Can only be used by the nominated approver (must be known to the ordering party).
         #[pallet::weight(0/*TODO*/)]
-        fn change_approval(
+        pub fn change_approval(
             origin: OriginFor<T>,
             h: T::Hash,
             s: ApprovalStatus,
@@ -448,7 +448,7 @@ mod pallet {
         /// Buyer - Used by the buyer to accept or reject (TODO) the invoice that was raised by the seller.
         /// Seller - Used to accept, reject or invoice the order.
         #[pallet::weight(0/*TODO*/)]
-        fn handle_spfso(
+        pub fn handle_spfso(
             origin: OriginFor<T>,
             h: T::Hash,
             s: OrderStatus,
