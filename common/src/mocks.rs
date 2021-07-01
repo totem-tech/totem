@@ -35,7 +35,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Totem.  If not, see <http://www.gnu.org/licenses/>.
 
-use crate::types::{accounting::Record, traits::accounting::Posting};
+use crate::types::{
+    accounting::Record, traits::accounting::Posting, traits::teams::Validating as TeamsValidating,
+    traits::timekeeping::Validating as TimekeepingValidating,
+};
 use frame_support::dispatch::DispatchResultWithPostInfo;
 use sp_std::vec::Vec;
 
@@ -61,6 +64,30 @@ impl<AccountId, Hash, BlockNumber, CoinAmount> Posting<AccountId, Hash, BlockNum
     }
 
     fn get_pseudo_random_hash(_s: AccountId, _r: AccountId) -> Hash {
+        unimplemented!("Used as a mock, shouldn't be called")
+    }
+}
+
+impl<AccountId, Hash> TeamsValidating<AccountId, Hash> for () {
+    fn is_project_owner(_o: AccountId, _h: Hash) -> bool {
+        unimplemented!("Used as a mock, shouldn't be called")
+    }
+
+    fn is_project_valid(_h: Hash) -> bool {
+        unimplemented!("Used as a mock, shouldn't be called")
+    }
+
+    fn is_owner_and_project_valid(_o: AccountId, _h: Hash) -> bool {
+        unimplemented!("Used as a mock, shouldn't be called")
+    }
+}
+
+impl<AccountId, Hash> TimekeepingValidating<AccountId, Hash> for () {
+    fn is_time_record_owner(_o: AccountId, _h: Hash) -> bool {
+        unimplemented!("Used as a mock, shouldn't be called")
+    }
+
+    fn validate_and_archive(_o: AccountId, _h: Hash, _a: bool) -> bool {
         unimplemented!("Used as a mock, shouldn't be called")
     }
 }

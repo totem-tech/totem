@@ -30,7 +30,7 @@ use frame_support::weights::{Weight, DispatchInfo, IdentityFee};
 use pallet_transaction_payment::CurrencyAdapter;
 use crate::{
 	self as pallet_balances,
-	Pallet, Config,// decl_tests,
+	Pallet, Config, decl_tests,
 };
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
@@ -87,6 +87,10 @@ impl pallet_transaction_payment::Config for Test {
 	type FeeMultiplierUpdate = ();
 }
 
+parameter_types! {
+	pub const MaxReserves: u32 = 2;
+}
+
 impl Config for Test {
 	type Balance = u64;
 	type DustRemoval = ();
@@ -94,6 +98,8 @@ impl Config for Test {
 	type ExistentialDeposit = ExistentialDeposit;
 	type AccountStore = frame_system::Pallet<Test>;
 	type MaxLocks = ();
+	type MaxReserves = MaxReserves;
+	type ReserveIdentifier = [u8; 8];
 	type WeightInfo = ();
 	type Accounting = ();
 }

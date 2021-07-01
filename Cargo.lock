@@ -4726,6 +4726,7 @@ dependencies = [
  "pallet-timestamp",
  "parity-scale-codec",
  "sp-arithmetic",
+ "sp-core",
  "sp-io",
  "sp-runtime",
  "sp-std",
@@ -4739,6 +4740,9 @@ dependencies = [
  "frame-support",
  "frame-system",
  "parity-scale-codec",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
  "sp-std",
  "totem-common",
 ]
@@ -5284,6 +5288,9 @@ dependencies = [
  "frame-support",
  "frame-system",
  "parity-scale-codec",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
  "sp-std",
  "totem-common",
 ]

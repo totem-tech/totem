@@ -50,7 +50,9 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-mod tests;
+pub mod benchmarking;
+pub mod mock;
+pub mod tests;
 
 pub use pallet::*;
 

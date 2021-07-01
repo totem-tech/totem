@@ -37,7 +37,7 @@
 
 #![cfg(any(test, feature = "mock"))]
 
-use crate as pallet_accounting;
+use crate as pallet_timekeeping;
 use frame_support::parameter_types;
 use frame_system as system;
 use sp_core::H256;
@@ -45,8 +45,6 @@ use sp_runtime::{
     testing::Header,
     traits::{BlakeTwo256, IdentityLookup},
 };
-use totem_common::traits::accounting::Posting;
-use totem_common::types::accounting::Record;
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
@@ -59,39 +57,15 @@ frame_support::construct_runtime!(
         UncheckedExtrinsic = UncheckedExtrinsic,
     {
         System: frame_system::{Pallet, Call, Config, Storage, Event<T>},
-        Accounting: pallet_accounting::{Pallet, Call, Storage, Event<T>},
-        Balances: pallet_balances::{Pallet, Call, Storage, Event<T>},
+        Timekeeping: pallet_timekeeping::{Pallet, Call, Storage, Event<T>},
     }
 );
-
-impl Posting for Test {
-    type Account = totem_common::types::Account;
-    type PostingIndex = totem_common::types::PostingIndex;
-    type LedgerBalance = totem_common::types::LedgerBalance;
-
-    fn handle_multiposting_amounts(
-        keys: Vec<Record<AccountId, Hash, BlockNumber, Self::Account, Self::LedgerBalance>>,
-    ) -> DispatchResultWithPostInfo {
-        unimplemented!()
-    }
-
-    fn account_for_fees(f: CoinAmount, p: AccountId) -> DispatchResultWithPostInfo {
-        unimplemented!()
-    }
-
-    fn get_escrow_account() -> AccountId {
-        unimplemented!()
-    }
-
-    fn get_pseudo_random_hash(s: AccountId, r: AccountId) -> Hash {
-        unimplemented!()
-    }
-}
 
 parameter_types! {
     pub const BlockHashCount: u64 = 250;
     pub const SS58Prefix: u8 = 42;
 }
+
 impl system::Config for Test {
     type BaseCallFilter = ();
     type BlockWeights = ();
@@ -110,7 +84,7 @@ impl system::Config for Test {
     type BlockHashCount = BlockHashCount;
     type Version = ();
     type PalletInfo = PalletInfo;
-    type AccountData = pallet_balances::AccountData<u64>;
+    type AccountData = ();
     type OnNewAccount = ();
     type OnKilledAccount = ();
     type SystemWeightInfo = ();
@@ -118,31 +92,9 @@ impl system::Config for Test {
     type OnSetCode = ();
 }
 
-parameter_types! {
-    pub BlockWeights: frame_system::limits::BlockWeights =
-        frame_system::limits::BlockWeights::simple_max(1024);
-    pub static ExistentialDeposit: u64 = 0;
-}
-
-parameter_types! {
-    pub const MaxReserves: u32 = 2;
-}
-impl pallet_balances::Config for Test {
-    type Balance = u64;
-    type DustRemoval = ();
+impl pallet_timekeeping::Config for Test {
     type Event = Event;
-    type ExistentialDeposit = ExistentialDeposit;
-    type AccountStore = system::Pallet<Test>;
-    type MaxLocks = ();
-    type MaxReserves = MaxReserves;
-    type ReserveIdentifier = [u8; 8];
-    type WeightInfo = ();
-    type Accounting = Test;
-}
-
-impl pallet_accounting::Config for Test {
-    type Event = Event;
-    type AccountingConverter = totem_common::converter::Converter;
+    type Projects = ();
 }
 
 // Build genesis storage according to the mock runtime.

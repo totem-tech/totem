@@ -87,7 +87,9 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-pub mod mock;
+//pub mod benchmarking;
+//pub mod mock;
+//pub mod tests;
 
 pub use pallet::*;
 
