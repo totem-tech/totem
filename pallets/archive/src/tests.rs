@@ -3,7 +3,7 @@
 use crate::{mock::*, Error};
 use frame_support::{assert_noop, assert_ok};
 use sp_core::H256;
-use totem_common::types::RecordType;
+use totem_primitives::RecordType;
 
 #[test]
 fn it_works_for_default_value() {

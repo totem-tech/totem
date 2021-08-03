@@ -46,7 +46,7 @@ mod pallet {
 
     use frame_support::{fail, pallet_prelude::*};
     use frame_system::pallet_prelude::*;
-    use totem_common::types::Set;
+    use totem_primitives::Set;
 
     #[pallet::pallet]
     #[pallet::generate_store(trait Store)]
