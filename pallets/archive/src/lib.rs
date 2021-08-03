@@ -51,8 +51,7 @@ mod pallet {
 
     use sp_std::prelude::*;
 
-    use totem_common::traits::timekeeping::Validating as TimeValidating;
-    use totem_common::types::RecordType;
+    use totem_primitives::{timekeeping::Validating as TimeValidating, RecordType};
 
     type Archival = bool;
 

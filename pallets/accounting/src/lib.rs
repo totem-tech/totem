@@ -96,20 +96,21 @@ pub use pallet::*;
 #[frame_support::pallet]
 mod pallet {
 
-    use frame_support::{fail, pallet_prelude::*};
+    use frame_support::{fail, pallet_prelude::*, traits::Currency};
     use frame_system::pallet_prelude::*;
 
     use sp_runtime::traits::{Convert, Hash};
     use sp_std::{prelude::*, vec};
 
-    use totem_common::traits::accounting::Posting;
-    use totem_common::types::{
-        accounting::Record,
-        Account,
-        Indicator::{self, *},
-        LedgerBalance, PostingIndex,
-    };
     use totem_common::{StorageMapExt, TryConvert};
+    use totem_primitives::accounting::{
+        Indicator::{self, *},
+        Posting, Record,
+    };
+    use totem_primitives::{Account, LedgerBalance, PostingIndex};
+
+    type CurrencyBalanceOf<T> =
+        <<T as Config>::Currency as Currency<<T as frame_system::Config>::AccountId>>::Balance;
 
     #[pallet::pallet]
     #[pallet::generate_store(trait Store)]
@@ -169,11 +170,12 @@ mod pallet {
     // Depreciation (calculated everytime there is a transaction so as not to overwork the runtime) - sets "last seen block" to calculate the delta for depreciation
 
     #[pallet::config]
-    pub trait Config: frame_system::Config + pallet_balances::Config {
+    pub trait Config: frame_system::Config {
         type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
 
-        type AccountingConverter: TryConvert<Self::Balance, LedgerBalance>
+        type AccountingConverter: TryConvert<CurrencyBalanceOf<Self>, LedgerBalance>
             + Convert<[u8; 32], Self::AccountId>;
+        type Currency: Currency<Self::AccountId>;
     }
 
     #[pallet::error]
@@ -283,7 +285,7 @@ mod pallet {
         }
     }
 
-    impl<T: Config> Posting<T::AccountId, T::Hash, T::BlockNumber, T::Balance> for Pallet<T>
+    impl<T: Config> Posting<T::AccountId, T::Hash, T::BlockNumber, CurrencyBalanceOf<T>> for Pallet<T>
     where
         T: pallet_timestamp::Config,
     {
@@ -343,7 +345,10 @@ mod pallet {
         /// This function takes the transaction fee and prepares to account for it in accounting.
         /// This is one of the few functions that will set the ledger accounts to be updated here. Fees
         /// are native to the Substrate Framework, and there may be other use cases.
-        fn account_for_fees(fee: T::Balance, payer: T::AccountId) -> DispatchResultWithPostInfo {
+        fn account_for_fees(
+            fee: CurrencyBalanceOf<T>,
+            payer: T::AccountId,
+        ) -> DispatchResultWithPostInfo {
             // Take the fee amount and convert for use with accounting. Fee is of type T::Balance which is u128.
             // As amount will always be positive, convert for use in accounting
             let fee_converted: LedgerBalance =

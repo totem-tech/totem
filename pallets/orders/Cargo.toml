@@ -14,15 +14,13 @@ targets = ['x86_64-unknown-linux-gnu']
 [dependencies]
 codec = { package = 'parity-scale-codec', version = '2.0.0', default-features = false }
 totem-common = { path = '../../common', default-features = false }
+totem-primitives = { path = '../../primitives', default-features = false }
 # primitives
-sp-runtime = { git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.5', default-features = false }
-sp-std = { git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.5', default-features = false }
+sp-runtime = { git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.8', default-features = false }
+sp-std = { git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.8', default-features = false }
 # frame
-frame-support = { git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.5', default-features = false }
-frame-system = { git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.5', default-features = false }
-# totem pallets
-pallet-accounting = { path = '../accounting', default-features = false }
-pallet-balances = { path = '../balances', default-features = false }
+frame-support = { git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.8', default-features = false }
+frame-system = { git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.8', default-features = false }
 
 [dev-dependencies]
 
@@ -31,10 +29,9 @@ default = ['std']
 std = [
     'codec/std',
     'totem-common/std',
+    'totem-primitives/std',
     'sp-runtime/std',
     'sp-std/std',
     'frame-support/std',
     'frame-system/std',
-    'pallet-balances/std',
-    'pallet-accounting/std',
 ]

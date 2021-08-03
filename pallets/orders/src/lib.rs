@@ -71,20 +71,24 @@ pub use pallet::*;
 #[frame_support::pallet]
 mod pallet {
 
-    use frame_support::{fail, pallet_prelude::*};
+    use frame_support::{fail, pallet_prelude::*, traits::Currency};
     use frame_system::pallet_prelude::*;
 
     use sp_runtime::traits::Convert;
     use sp_std::{prelude::*, vec};
 
-    use totem_common::traits::{
-        accounting::Posting, bonsai::Storing, orders::Validating, prefunding::Encumbrance,
-    };
-    use totem_common::types::{
-        orders::{ApprovalStatus, OrderHeader, OrderItem, OrderStatus, TXKeysL, TXKeysM},
-        prefunding::LockStatus,
-    };
     use totem_common::{StorageMapExt, TryConvert};
+    use totem_primitives::{
+        accounting::Posting,
+        bonsai::Storing,
+        orders::{
+            ApprovalStatus, OrderHeader, OrderItem, OrderStatus, TxKeysL, TxKeysM, Validating,
+        },
+        prefunding::{Encumbrance, LockStatus},
+    };
+
+    type CurrencyBalanceOf<T> =
+        <<T as Config>::Currency as Currency<<T as frame_system::Config>::AccountId>>::Balance;
 
     #[pallet::pallet]
     #[pallet::generate_store(trait Store)]
@@ -117,15 +121,21 @@ mod pallet {
         StorageMap<_, Blake2_128Concat, T::Hash, Vec<OrderItem<T::Hash>>>;
 
     #[pallet::config]
-    pub trait Config: frame_system::Config + pallet_accounting::Config {
+    pub trait Config: frame_system::Config {
         type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
 
-        type Accounting: Posting<Self::AccountId, Self::Hash, Self::BlockNumber, Self::Balance>;
-        type Prefunding: Encumbrance<Self::AccountId, Self::Hash, Self::BlockNumber>;
+        type Accounting: Posting<
+            Self::AccountId,
+            Self::Hash,
+            Self::BlockNumber,
+            CurrencyBalanceOf<Self>,
+        >;
         type Bonsai: Storing<Self::Hash>;
+        type Currency: Currency<Self::AccountId>;
         type OrdersConverter: TryConvert<i128, u128>
             + Convert<u32, Self::BlockNumber>
             + Convert<Self::BlockNumber, u32>;
+        type Prefunding: Encumbrance<Self::AccountId, Self::Hash, Self::BlockNumber>;
     }
 
     #[pallet::error]
@@ -209,7 +219,7 @@ mod pallet {
         #[pallet::weight(0/*TODO*/)]
         pub fn delete_order(
             origin: OriginFor<T>,
-            tx_keys_medium: TXKeysM<T::Hash>,
+            tx_keys_medium: TxKeysM<T::Hash>,
         ) -> DispatchResultWithPostInfo {
             let who = ensure_signed(origin)?;
             <T::Bonsai as Storing<T::Hash>>::start_tx(tx_keys_medium.tx_uid)?;
@@ -260,7 +270,7 @@ mod pallet {
             deadline: u32,
             due_date: u32,
             order_items: Vec<OrderItem<T::Hash>>,
-            tx_keys_large: TXKeysL<T::Hash>,
+            tx_keys_large: TxKeysL<T::Hash>,
         ) -> DispatchResultWithPostInfo {
             let who = ensure_signed(origin)?;
             <T::Bonsai as Storing<T::Hash>>::start_tx(tx_keys_large.tx_uid)?;

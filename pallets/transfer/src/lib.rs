@@ -55,8 +55,7 @@ mod pallet {
         traits::{Currency, ExistenceRequirement},
     };
     use frame_system::pallet_prelude::*;
-    use sp_runtime::traits::Convert;
-    use totem_common::traits::bonsai::Storing;
+    use totem_primitives::bonsai::Storing;
 
     // Other trait types
     type CurrencyBalanceOf<T> =
@@ -66,12 +65,11 @@ mod pallet {
     pub struct Pallet<T>(_);
 
     #[pallet::config]
-    pub trait Config: frame_system::Config + pallet_balances::Config {
+    pub trait Config: frame_system::Config {
         type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
 
         type Currency: Currency<Self::AccountId>;
         type Bonsai: Storing<Self::Hash>;
-        type TransferConverter: Convert<Self::Balance, CurrencyBalanceOf<Self>>;
     }
 
     #[pallet::hooks]
@@ -84,13 +82,14 @@ mod pallet {
         pub fn transfer(
             origin: OriginFor<T>,
             to: T::AccountId,
-            #[pallet::compact] payment_amount: T::Balance,
+            #[pallet::compact] payment_amount: CurrencyBalanceOf<T>,
             tx_uid: T::Hash,
         ) -> DispatchResultWithPostInfo {
             let from = ensure_signed(origin)?;
             T::Bonsai::start_tx(tx_uid)?;
             // Convert incoming amount to currency for transfer
-            let amount: CurrencyBalanceOf<T> = T::TransferConverter::convert(payment_amount);
+            //let amount: CurrencyBalanceOf<T> = T::TransferConverter::convert(payment_amount);
+            let amount = payment_amount;
 
             if let Err(_) =
                 T::Currency::transfer(&from, &to, amount, ExistenceRequirement::KeepAlive)

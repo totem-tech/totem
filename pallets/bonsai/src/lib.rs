@@ -83,12 +83,12 @@ mod pallet {
     use sp_runtime::traits::{Convert, Hash};
     use sp_std::prelude::*;
 
-    use totem_common::traits::{
+    use totem_common::StorageMapExt;
+    use totem_primitives::{
         bonsai::Storing, orders::Validating as OrderValidating,
         teams::Validating as TeamsValidating, timekeeping::Validating as TimeValidating,
+        RecordType,
     };
-    use totem_common::types::RecordType;
-    use totem_common::StorageMapExt;
 
     #[pallet::pallet]
     #[pallet::generate_store(trait Store)]

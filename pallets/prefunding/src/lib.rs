@@ -61,33 +61,38 @@ mod pallet {
     use frame_support::{
         fail,
         pallet_prelude::*,
-        traits::{Currency, ExistenceRequirement, LockIdentifier, WithdrawReasons},
+        traits::{Currency, ExistenceRequirement, LockIdentifier},
     };
     use frame_system::pallet_prelude::*;
-    use pallet_balances::totem::TotemLockableCurrency;
 
     use sp_runtime::traits::{Convert, Hash};
     use sp_std::{prelude::*, vec};
 
-    use totem_common::traits::{accounting::Posting, prefunding::Encumbrance};
-    use totem_common::types::{
-        accounting::Record as PostingRecord, prefunding::*, ComparisonAmounts, Indicator::*,
-    };
     use totem_common::{StorageMapExt, TryConvert};
+    use totem_primitives::{
+        accounting::{Indicator::*, Posting, Record as PostingRecord},
+        escrow::{EscrowableCurrency, Reason},
+        prefunding::*,
+        ComparisonAmounts,
+    };
 
-    type AccountOf<T> = <<T as pallet_balances::Config>::Accounting as Posting<
+    type AccountOf<T> = <<T as Config>::Accounting as Posting<
         <T as frame_system::Config>::AccountId,
         <T as frame_system::Config>::Hash,
         <T as frame_system::Config>::BlockNumber,
-        <T as pallet_balances::Config>::Balance,
+        CurrencyBalanceOf<T>,
     >>::Account;
 
-    type AccountBalanceOf<T> = <<T as pallet_balances::Config>::Accounting as Posting<
+    type AccountBalanceOf<T> = <<T as Config>::Accounting as Posting<
         <T as frame_system::Config>::AccountId,
         <T as frame_system::Config>::Hash,
         <T as frame_system::Config>::BlockNumber,
-        <T as pallet_balances::Config>::Balance,
+        CurrencyBalanceOf<T>,
     >>::LedgerBalance;
+
+    type EscrowableBalanceOf<T> = <<<T as Config>::Escrowable as EscrowableCurrency<
+        <T as frame_system::Config>::AccountId,
+    >>::Currency as Currency<<T as frame_system::Config>::AccountId>>::Balance;
 
     type CurrencyBalanceOf<T> =
         <<T as Config>::Currency as Currency<<T as frame_system::Config>::AccountId>>::Balance;
@@ -126,16 +131,11 @@ mod pallet {
     pub type ReferenceStatus<T: Config> = StorageMap<_, Blake2_128Concat, T::Hash, Status>;
 
     #[pallet::config]
-    pub trait Config:
-        frame_system::Config
-        + pallet_balances::Config
-        + pallet_timestamp::Config
-        + pallet_accounting::Config
-    {
+    pub trait Config: frame_system::Config + pallet_timestamp::Config {
         type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
 
-        type Currency: Currency<Self::AccountId>
-            + TotemLockableCurrency<Self::AccountId, Moment = Self::BlockNumber>;
+        type Currency: Currency<Self::AccountId>;
+        type Escrowable: EscrowableCurrency<Self::AccountId, Moment = Self::BlockNumber>;
         type PrefundingConverter: TryConvert<AccountBalanceOf<Self>, u128>
             + TryConvert<AccountBalanceOf<Self>, CurrencyBalanceOf<Self>>
             + TryConvert<CurrencyBalanceOf<Self>, AccountBalanceOf<Self>>
@@ -145,7 +145,14 @@ mod pallet {
             + Convert<i128, AccountBalanceOf<Self>>
             + TryConvert<u128, AccountBalanceOf<Self>>
             + Convert<AccountBalanceOf<Self>, i128>
-            + Convert<CurrencyBalanceOf<Self>, u128>;
+            + Convert<CurrencyBalanceOf<Self>, u128>
+            + TryConvert<AccountBalanceOf<Self>, EscrowableBalanceOf<Self>>;
+        type Accounting: Posting<
+            Self::AccountId,
+            Self::Hash,
+            Self::BlockNumber,
+            CurrencyBalanceOf<Self>,
+        >;
     }
 
     #[pallet::error]
@@ -351,15 +358,14 @@ mod pallet {
             let minimum_amount = min_balance + prefund_amount;
 
             if current_balance >= minimum_amount {
-                let converted_amount: CurrencyBalanceOf<T> =
-                    T::PrefundingConverter::try_convert(c).ok_or(Error::<T>::Overflow)?;
+                let amount = T::PrefundingConverter::try_convert(c).ok_or(Error::<T>::Overflow)?;
                 // Lock the amount from the sender and set deadline
-                T::Currency::totem_set_lock(
+                T::Escrowable::set_lock(
                     Self::get_prefunding_id(h),
                     &s,
-                    converted_amount,
+                    amount,
                     d,
-                    WithdrawReasons::RESERVE,
+                    Reason::Escrowing,
                 )
                 .or(Err(Error::<T>::LockFailed))?;
             } else {
@@ -423,7 +429,7 @@ mod pallet {
             // convert hash to lock identifyer
             let prefunding_id = Self::get_prefunding_id(h);
             // unlock the funds
-            T::Currency::totem_remove_lock(prefunding_id, &o).or(Err(Error::<T>::LockFailed))?;
+            T::Escrowable::remove_lock(prefunding_id, &o).or(Err(Error::<T>::LockFailed))?;
             // perform cleanup removing all reference hashes. No accounting posting have been made, so no cleanup needed there
             Prefunding::<T>::remove(&h);
             PrefundingHashOwner::<T>::remove(&h);

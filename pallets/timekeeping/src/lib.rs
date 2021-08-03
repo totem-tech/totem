@@ -64,9 +64,8 @@ mod pallet {
 
     use sp_std::prelude::*;
 
-    use totem_common::traits::{teams::Validating as ProjectValidating, timekeeping::Validating};
-    use totem_common::types::timekeeping::*;
     use totem_common::StorageMapExt;
+    use totem_primitives::{teams::Validating as ProjectValidating, timekeeping::*};
 
     #[pallet::pallet]
     #[pallet::generate_store(trait Store)]

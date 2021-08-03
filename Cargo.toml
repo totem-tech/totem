@@ -3,15 +3,16 @@ panic = 'unwind'
 
 [workspace]
 members = [
-	'lego-parachain/node',
-	'lego-parachain/runtime',
-	'totem-blockchain/node',
-	'totem-blockchain/runtime',
+	'totem-lego-parachain/node',
+	'totem-lego-parachain/runtime',
+	'totem-mainnet/node',
+	'totem-mainnet/runtime',
 	'common',
+	'primitives',
 	'pallets/accounting',
 	'pallets/archive',
-	'pallets/balances',
 	'pallets/bonsai',
+	'pallets/escrow',
 	'pallets/funding',
 	'pallets/orders',
 	'pallets/prefunding',
@@ -19,6 +20,3 @@ members = [
 	'pallets/timekeeping',
 	'pallets/transfer',
 ]
-
-[patch.'https://github.com/paritytech/substrate.git']
-pallet-balances = { default-features = false, path = 'pallets/balances' }

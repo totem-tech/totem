@@ -35,33 +35,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Totem.  If not, see <http://www.gnu.org/licenses/>.
 
-//! This is the Totem Orders Module
-//!
-//! ## Overview
-//!
-//! The orders module supports creation of purchase orders and tasks and other types of market order.
-//! A basic workflow is as follows:
-//!
-//! * In general orders are assigned to a partner that the ordering identity already knows and is required to be accepted by that party to become active.
-//! * Orders can be made without already knowing the seller - these are called market orders
-//! * The order can be prefunded by calling into the prefunding module, which updates the accounting ledgers.
-//! * Once the order is accepted, the work must begin, and once completed, the vendor sets the state to completed.
-//! * The completion state also generates the invoice, and relevant accounting postings for both the buyer and the seller.
-//! * The completed work is then approved by the buyer (or disputed or rejected). An approval triggers the release of prefunds and
-//! the invoice is marked as settled in the accounts for both parties
-//!
-//! The main types used in this module are:
-//!
-//! * Product = Hash;
-//! * UnitPrice = i128; // This does not need a unit of currency because it is allways the internal functional currency
-//! * Quantity = u128;
-//! * UnitOfMeasure = u16;
-//! * buy_or_sell: u16, // 0: buy, 1: sell, extensible
-//! * amount: AccountBalanceOf<T>, // amount should be the sum of all the items untiprices * quantities
-//! * open_closed: bool, // 0: open(true) 1: closed(false)
-//! * order_type: u16, // 0 Services, 1 Goods, 2 Inventory
-//! * deadline: u64, // prefunding acceptance deadline
-//! * due_date: u64, // due date is the future delivery date (in blocks)
+//! Totem Teams module.
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
@@ -75,9 +49,8 @@ mod pallet {
 
     use sp_std::prelude::*;
 
-    use totem_common::traits::teams::Validating;
-    use totem_common::types::teams::*;
     use totem_common::StorageMapExt;
+    use totem_primitives::teams::{DeletedProject, ProjectStatus, Validating};
 
     #[pallet::pallet]
     #[pallet::generate_store(trait Store)]

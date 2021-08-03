@@ -39,21 +39,14 @@
 //!
 //! Contains:
 //! - The [converter](converter) that handles all the conversions in the Totem pallets,
-//! - The types used inside of Totem,
 //! - Some helpers to keep the life easy.
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
 pub mod converter;
-mod helpers {
-    pub(crate) mod storage_map;
-    pub(crate) mod try_convert;
-}
-pub mod types;
 
-pub use helpers::storage_map::StorageMapExt;
-pub use helpers::try_convert::TryConvert;
-pub use types::traits;
+pub(crate) mod storage_map;
+pub use storage_map::StorageMapExt;
 
-#[cfg(any(test, feature = "mock"))]
-pub mod mocks;
+pub(crate) mod try_convert;
+pub use try_convert::TryConvert;
