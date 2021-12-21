@@ -37,6 +37,7 @@
 
 use frame_support::{dispatch::EncodeLike, pallet_prelude::*};
 use sp_std::prelude::*;
+use scale_info::TypeInfo;
 
 pub trait Encumbrance<AccountId, Hash, BlockNumber> {
     fn prefunding_for(
@@ -73,7 +74,7 @@ pub trait Encumbrance<AccountId, Hash, BlockNumber> {
 }
 
 #[repr(u8)]
-#[derive(Clone, Copy, Debug, Decode, Encode, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Decode, Encode, PartialEq, Eq, TypeInfo)]
 pub enum LockStatus {
     Unlocked = 0,
     Locked = 1,

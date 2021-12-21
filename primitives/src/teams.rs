@@ -36,6 +36,7 @@
 // along with Totem.  If not, see <http://www.gnu.org/licenses/>.
 
 use frame_support::pallet_prelude::*;
+use scale_info::TypeInfo;
 
 pub trait Validating<AccountId, Hash> {
     fn is_project_owner(o: AccountId, h: Hash) -> bool;
@@ -49,7 +50,7 @@ pub trait Validating<AccountId, Hash> {
 //TODO make an enum
 pub type ProjectStatus = u16;
 
-#[derive(PartialEq, Eq, Clone, Debug, Encode, Decode)]
+#[derive(PartialEq, Eq, Clone, Debug, Encode, Decode, TypeInfo)]
 pub struct DeletedProject<AccountId, ProjectStatus> {
     pub owned_by: AccountId,
     pub deleted_by: AccountId,

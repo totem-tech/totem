@@ -44,14 +44,12 @@ pub use pallet::*;
 #[frame_support::pallet]
 mod pallet {
 
-    use codec::{Decode, Encode};
+    use codec::{Decode, Encode, MaxEncodedLen};
+    use scale_info::TypeInfo;
     use frame_support::{
         fail,
         pallet_prelude::*,
-        traits::{
-            Currency, ExistenceRequirement::KeepAlive, LockIdentifier, MaxEncodedLen,
-            WithdrawReasons,
-        },
+        traits::{Currency, ExistenceRequirement::KeepAlive, LockIdentifier, WithdrawReasons},
     };
     use frame_system::pallet_prelude::*;
 
@@ -101,7 +99,7 @@ mod pallet {
     /// The Totem version of single lock on a balance.
     /// There can be many of these on an account and they "overlap",
     /// so the same balance is frozen by multiple locks.
-    #[derive(Encode, Decode, Clone, PartialEq, Eq, Debug, MaxEncodedLen)]
+    #[derive(Encode, Decode, Clone, PartialEq, Eq, Debug, MaxEncodedLen, TypeInfo)]
     pub struct EscrowedAmount<Balance, BlockNumber> {
         /// The amount which the free balance may not drop below when this lock is in effect.
         pub amount: Balance,

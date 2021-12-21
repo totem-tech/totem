@@ -50,6 +50,7 @@ pub mod transfer;
 
 use frame_support::{dispatch::EncodeLike, pallet_prelude::*};
 use sp_std::vec::Vec;
+use scale_info::TypeInfo;
 
 /// Balance on an account can be negative.
 pub type LedgerBalance = i128;
@@ -64,7 +65,7 @@ pub type PostingIndex = u128;
 pub type ComparisonAmounts = u128;
 
 #[repr(u8)]
-#[derive(Decode, Encode, Debug, Clone, Copy, PartialEq)]
+#[derive(Decode, Encode, Debug, Clone, Copy, PartialEq, TypeInfo)]
 pub enum RecordType {
     Teams,
     Timekeeping,

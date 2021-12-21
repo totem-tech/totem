@@ -3,8 +3,12 @@ panic = 'unwind'
 
 [workspace]
 members = [
-	'totem-lego-parachain/node',
-	'totem-lego-parachain/runtime',
+	'parachain-totem-kapex/node',
+	'parachain-totem-kapex/runtime',
+	'parachain-totem-wapex/node',
+	'parachain-totem-wapex/runtime',
+	'parachain-totem-lego/node',
+	'parachain-totem-lego/runtime',
 	'totem-mainnet/node',
 	'totem-mainnet/runtime',
 	'common',
@@ -18,5 +22,6 @@ members = [
 	'pallets/prefunding',
 	'pallets/teams',
 	'pallets/timekeeping',
+	'pallets/transaction-payment',
 	'pallets/transfer',
 ]

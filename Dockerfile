@@ -9,17 +9,37 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Usage
 
-# Totem Lego Parachain
+# Totem Lego Test Parachain
 
 # docker build \ 
-# --build-arg chain=totem-lego-parachain-node \
+# --build-arg chain=parachain-totem-lego-node \
 # --build-arg buildtype=check .
 
 # docker build \
-# --build-arg chain=totem-lego-parachain-node \
+# --build-arg chain=parachain-totem-lego-node \
 # --build-arg buildtype=build .
 
-# Totem Mainnet 
+# Totem KAPEX Parachain
+
+# docker build \ 
+# --build-arg chain=parachain-totem-kapex-node \
+# --build-arg buildtype=check .
+
+# docker build \
+# --build-arg chain=parachain-totem-kapex-node \
+# --build-arg buildtype=build .
+
+# Totem WAPEX Westend Parachain
+
+# docker build \ 
+# --build-arg chain=parachain-totem-wapex-node \
+# --build-arg buildtype=check .
+
+# docker build \
+# --build-arg chain=parachain-totem-wapex-node \
+# --build-arg buildtype=build .
+
+# Totem Pre-MainNet 
 
 # docker build \
 # --build-arg chain=totem-mainnet-node \ 
@@ -32,7 +52,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ARG PROFILE=release
 ARG CHAINPATH=p
 
-## Use totem-lego-parachain-node or totem-mainnet-node
+## select node type (see example above)
 ARG chain
 
 ## Use check or build
