@@ -36,6 +36,7 @@
 // along with Totem.  If not, see <http://www.gnu.org/licenses/>.
 
 use frame_support::pallet_prelude::*;
+use scale_info::TypeInfo;
 
 pub trait Validating<AccountId, Hash> {
     fn is_time_record_owner(o: AccountId, h: Hash) -> bool;
@@ -74,7 +75,7 @@ pub type ReasonCodeType = u16;
 /// Ban status (default is false).
 pub type BanStatus = bool;
 
-#[derive(Clone, Copy, Debug, PartialEq, Encode, Decode)]
+#[derive(Clone, Copy, Debug, PartialEq, Encode, Decode, TypeInfo)]
 pub enum StatusOfTimeRecord {
     Draft,
     Submitted,
@@ -86,15 +87,15 @@ pub enum StatusOfTimeRecord {
 }
 
 /// Reason why the code changes.
-#[derive(PartialEq, Eq, Clone, Debug, Encode, Decode, Default)]
+#[derive(PartialEq, Eq, Clone, Debug, Encode, Decode, Default, TypeInfo)]
 pub struct ReasonCodeStruct(pub ReasonCode, pub ReasonCodeType);
 
 /// Status of the code changes.
-#[derive(PartialEq, Eq, Clone, Debug, Encode, Decode, Default)]
+#[derive(PartialEq, Eq, Clone, Debug, Encode, Decode, Default, TypeInfo)]
 pub struct BannedStruct(BanStatus, ReasonCodeStruct);
 
 /// The individual time record.
-#[derive(PartialEq, Eq, Copy, Clone, Debug, Encode, Decode, Default)]
+#[derive(PartialEq, Eq, Copy, Clone, Debug, Encode, Decode, Default, TypeInfo)]
 pub struct Timekeeper<
     AccountId,
     ReferenceHash,

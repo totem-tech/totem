@@ -35,12 +35,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Totem.  If not, see <http://www.gnu.org/licenses/>.
 
+use codec::MaxEncodedLen;
 use frame_support::{
     pallet_prelude::*,
-    traits::{Currency, LockIdentifier, MaxEncodedLen},
+    traits::{Currency, LockIdentifier},
 };
+use scale_info::TypeInfo;
 
-#[derive(Encode, Decode, Clone, PartialEq, Eq, Debug, MaxEncodedLen)]
+#[derive(Encode, Decode, Clone, PartialEq, Eq, Debug, MaxEncodedLen, TypeInfo)]
 pub enum Reason {
     Escrowing,
 }

@@ -96,18 +96,25 @@ pub use pallet::*;
 #[frame_support::pallet]
 mod pallet {
 
-    use frame_support::{fail, pallet_prelude::*, traits::Currency};
+    use codec::{Decode, Encode};
+    use frame_support::{
+        fail,
+        pallet_prelude::*,
+        storage::{Key, KeyPrefixIterator},
+        traits::Currency,
+    };
     use frame_system::pallet_prelude::*;
+    use scale_info::TypeInfo;
 
     use sp_runtime::traits::{Convert, Hash};
-    use sp_std::{prelude::*, vec};
+    use sp_std::prelude::*;
 
-    use totem_common::{StorageMapExt, TryConvert};
+    use totem_common::TryConvert;
     use totem_primitives::accounting::{
         Indicator::{self, *},
         Posting, Record,
     };
-    use totem_primitives::{Account, LedgerBalance, PostingIndex};
+    use totem_primitives::{accounting::Ledger, LedgerBalance, PostingIndex};
 
     type CurrencyBalanceOf<T> =
         <<T as Config>::Currency as Currency<<T as frame_system::Config>::AccountId>>::Balance;
@@ -119,45 +126,41 @@ mod pallet {
     /// Every accounting post gets an index.
     #[pallet::storage]
     #[pallet::getter(fn posting_number)]
-    pub type PostingNumber<T: Config> = StorageValue<_, u128, ValueQuery>;
-
-    /// Associate the posting index with the identity.
-    #[pallet::storage]
-    #[pallet::getter(fn id_account_posting_id_list)]
-    pub type IdAccountPostingIdList<T: Config> =
-        StorageMap<_, Blake2_128Concat, (T::AccountId, Account), Vec<u128>>;
-
-    /// Convenience list of Accounts used by an identity. Useful for UI read performance.
-    #[pallet::storage]
-    #[pallet::getter(fn accounts_by_id)]
-    pub type AccountsById<T: Config> = StorageMap<_, Blake2_128Concat, T::AccountId, Vec<Account>>;
+    pub type PostingNumber<T: Config> = StorageValue<_, PostingIndex, ValueQuery>;
 
     /// Accounting Balances.
     #[pallet::storage]
     #[pallet::getter(fn balance_by_ledger)]
     pub type BalanceByLedger<T: Config> =
-        StorageMap<_, Blake2_128Concat, (T::AccountId, Account), LedgerBalance>;
+        StorageMap<_, Blake2_128Concat, (T::AccountId, Ledger), LedgerBalance>;
 
     /// Detail of the accounting posting (for Audit).
     #[pallet::storage]
     #[pallet::getter(fn posting_detail)]
-    pub type PostingDetail<T: Config> = StorageMap<
+    pub type PostingDetail<T: Config> = StorageNMap<
         _,
-        Blake2_128Concat,
-        (T::AccountId, Account, u128),
         (
-            T::BlockNumber,
-            LedgerBalance,
-            Indicator,
-            T::Hash,
-            T::BlockNumber,
+            Key<Blake2_128Concat, T::AccountId>,
+            Key<Blake2_128Concat, Ledger>,
+            Key<Twox64Concat, PostingIndex>,
         ),
+        PostingItem<T>,
     >;
+
+    #[derive(Decode, Encode, TypeInfo)]
+    #[scale_info(skip_type_params(T))]
+    pub struct PostingItem<T: frame_system::Config> {
+        changed_on_blocknumber: T::BlockNumber,
+        amount: LedgerBalance,
+        debit_credit: Indicator,
+        reference_hash: T::Hash,
+        applicable_period_blocknumber: T::BlockNumber,
+    }
 
     /// Yay! Totem!
     #[pallet::storage]
     #[pallet::getter(fn global_ledger)]
-    pub type GlobalLedger<T: Config> = StorageMap<_, Blake2_128Concat, Account, LedgerBalance>;
+    pub type GlobalLedger<T: Config> = StorageMap<_, Blake2_128Concat, Ledger, LedgerBalance>;
 
     /// Address to book the sales tax to and the tax jurisdiction (Experimental, may be deprecated in future).
     #[pallet::storage]
@@ -217,7 +220,7 @@ mod pallet {
     pub enum Event<T: Config> {
         LegderUpdate(
             <T as frame_system::Config>::AccountId,
-            Account,
+            Ledger,
             LedgerBalance,
             PostingIndex,
         ),
@@ -232,19 +235,19 @@ mod pallet {
         /// The Totem Accounting Recipes are constructed using this simple function.
         /// The second Blocknumber is for re-targeting the entry in the accounts, i.e. for adjustments prior to or after the current period (generally accruals).
         fn post_amounts(
-            key: Record<T::AccountId, T::Hash, T::BlockNumber, Account, LedgerBalance>,
-            posting_index: u128,
+            key: Record<T::AccountId, T::Hash, T::BlockNumber, LedgerBalance>,
+            posting_index: PostingIndex,
         ) -> DispatchResultWithPostInfo {
             let ab: LedgerBalance = key.amount.abs();
-            let balance_key = (key.primary_party.clone(), key.ledger_account);
-            let posting_key = (key.primary_party.clone(), key.ledger_account, posting_index);
-            let detail = (
-                key.changed_on_blocknumber,
-                ab,
-                key.debit_credit,
-                key.reference_hash,
-                key.applicable_period_blocknumber,
-            );
+            let balance_key = (key.primary_party.clone(), key.ledger);
+            let posting_key = (key.primary_party.clone(), key.ledger, posting_index);
+            let detail = PostingItem {
+                changed_on_blocknumber: key.changed_on_blocknumber,
+                amount: ab,
+                debit_credit: key.debit_credit,
+                reference_hash: key.reference_hash,
+                applicable_period_blocknumber: key.applicable_period_blocknumber,
+            };
             // !! Warning !!
             // Values could feasibly overflow, with no visibility on other accounts. In this event this function returns an error.
             // Reversals must occur in the parent function (i.e. that calls this function).
@@ -254,34 +257,52 @@ mod pallet {
                 .ok_or(Error::<T>::BalanceByLedgerFetching)?
                 .checked_add(key.amount)
                 .ok_or(Error::<T>::BalanceValueOverflow)?;
-            let new_global_balance = Self::global_ledger(&key.ledger_account)
+            let new_global_balance = Self::global_ledger(&key.ledger)
                 .ok_or(Error::<T>::GlobalLedgerFetching)?
                 .checked_add(key.amount)
                 .ok_or(Error::<T>::GlobalBalanceValueOverflow)?;
 
             PostingNumber::<T>::put(posting_index);
-            IdAccountPostingIdList::<T>::mutate_or_err(&balance_key, |list| {
-                list.push(posting_index)
-            })?;
-            //TODO Use a set?
-            AccountsById::<T>::mutate_or_err(&key.primary_party, |accounts_by_id| {
-                accounts_by_id.retain(|h| h != &key.ledger_account)
-            })?;
-            AccountsById::<T>::mutate_or_err(&key.primary_party, |accounts_by_id| {
-                accounts_by_id.push(key.ledger_account)
-            })?;
+            // Todo?
             BalanceByLedger::<T>::insert(&balance_key, new_balance);
             PostingDetail::<T>::insert(&posting_key, detail);
-            GlobalLedger::<T>::insert(&key.ledger_account, new_global_balance);
+            GlobalLedger::<T>::insert(&key.ledger, new_global_balance);
 
             Self::deposit_event(Event::LegderUpdate(
                 key.primary_party,
-                key.ledger_account,
+                key.ledger,
                 key.amount,
                 posting_index,
             ));
 
             Ok(().into())
+        }
+
+        pub fn get_accounts(_account_id: T::AccountId) -> KeyPrefixIterator<Ledger> {
+            //<PostingDetail<T>>::iter_key_prefix((&account_id,))
+            todo!("See https://github.com/paritytech/substrate/issues/5319")
+        }
+
+        pub fn get_posting_item(
+            account_id: T::AccountId,
+            account: Ledger,
+        ) -> KeyPrefixIterator<PostingIndex> {
+            <PostingDetail<T>>::iter_key_prefix((&account_id, &account))
+        }
+
+        /// Return a pair of:
+        /// - The amount given as a parameter, but signed.
+        /// - The opposite of that amount.
+        fn increase_decrease_amounts(
+            amount: CurrencyBalanceOf<T>,
+        ) -> Result<(LedgerBalance, LedgerBalance), Error<T>> {
+            let increase_amount: LedgerBalance =
+                T::AccountingConverter::try_convert(amount).ok_or(Error::<T>::AmountOverflow)?;
+            let decrease_amount = increase_amount
+                .checked_neg()
+                .ok_or(Error::<T>::AmountOverflow)?;
+
+            Ok((increase_amount, decrease_amount))
         }
     }
 
@@ -289,7 +310,6 @@ mod pallet {
     where
         T: pallet_timestamp::Config,
     {
-        type Account = Account;
         type LedgerBalance = LedgerBalance;
         type PostingIndex = PostingIndex;
 
@@ -300,36 +320,28 @@ mod pallet {
         /// Therefore the recipes that are passed as arguments need to be be accompanied with a reversal
         /// Obviously the last posting does not need a reversal for if it errors, then it was not posted in the first place.
         fn handle_multiposting_amounts(
-            forward: Vec<Record<T::AccountId, T::Hash, T::BlockNumber, Account, LedgerBalance>>,
+            keys: &[Record<T::AccountId, T::Hash, T::BlockNumber, LedgerBalance>],
         ) -> DispatchResultWithPostInfo {
             let posting_index = Self::posting_number()
                 .checked_add(1)
                 .ok_or(Error::<T>::PostingIndexOverflow)?;
-            let reverse = {
-                let mut reverse = Vec::new();
-                for key in forward.iter().cloned() {
-                    reverse.push(Record {
-                        amount: key.amount.checked_neg().ok_or(Error::<T>::AmountOverflow)?,
-                        debit_credit: key.debit_credit.reverse(),
-                        ..key
-                    })
-                }
-                reverse
-            };
-            let mut tracking = Vec::with_capacity(forward.len());
 
-            // Iterate over forward keys. If Ok add reversal key to tracking, if error, then reverse out prior postings.
-            for (fwd, rev) in forward.into_iter().zip(reverse) {
-                if let Err(e) = Self::post_amounts(fwd, posting_index) {
+            // Iterate over forward keys. If error, then reverse out prior postings.
+            for (idx, key) in keys.iter().cloned().enumerate() {
+                if let Err(e) = Self::post_amounts(key, posting_index) {
                     // Error before the value was updated. Need to reverse-out the earlier debit amount and account combination
                     // as this has already changed in storage.
-                    for trk in tracking.into_iter() {
-                        Self::post_amounts(trk, posting_index)
+                    for key in keys.iter().cloned().take(idx) {
+                        let reversed = Record {
+                            amount: key.amount.checked_neg().ok_or(Error::<T>::AmountOverflow)?,
+                            debit_credit: key.debit_credit.reverse(),
+                            ..key
+                        };
+                        Self::post_amounts(reversed, posting_index)
                             .or(Err(Error::<T>::SystemFailure))?;
                     }
                     fail!(e)
                 }
-                tracking.push(rev)
             }
 
             Ok(().into())
@@ -342,6 +354,43 @@ mod pallet {
             T::AccountingConverter::convert(escrow_account)
         }
 
+        /// Adds a new accounting entry in the ledger in case of a transfer
+        fn account_for_simple_transfer(
+            from: T::AccountId,
+            to: T::AccountId,
+            amount: CurrencyBalanceOf<T>,
+        ) -> DispatchResultWithPostInfo {
+            let reference_hash = Self::get_pseudo_random_hash(from.clone(), to.clone());
+            let current_block = frame_system::Pallet::<T>::block_number(); // For audit on change
+            let current_block_dupe = current_block; // Applicable period for accounting
+            let (increase_amount, decrease_amount) = Self::increase_decrease_amounts(amount)?;
+
+            let keys = [
+                Record {
+                    primary_party: from.clone(),
+                    counterparty: to.clone(),
+                    ledger: Ledger::B1010004_0000000, // Internal Address Balance (Network Currency).
+                    amount: decrease_amount,
+                    debit_credit: Indicator::Credit,
+                    reference_hash,
+                    changed_on_blocknumber: current_block,
+                    applicable_period_blocknumber: current_block_dupe,
+                },
+                Record {
+                    primary_party: to.clone(),
+                    counterparty: from.clone(),
+                    ledger: Ledger::B1010004_0000000, // Internal Address Balance (Network Currency).
+                    amount: increase_amount,
+                    debit_credit: Indicator::Debit,
+                    reference_hash,
+                    changed_on_blocknumber: current_block,
+                    applicable_period_blocknumber: current_block_dupe,
+                },
+            ];
+
+            Self::handle_multiposting_amounts(&keys)
+        }
+
         /// This function takes the transaction fee and prepares to account for it in accounting.
         /// This is one of the few functions that will set the ledger accounts to be updated here. Fees
         /// are native to the Substrate Framework, and there may be other use cases.
@@ -351,12 +400,7 @@ mod pallet {
         ) -> DispatchResultWithPostInfo {
             // Take the fee amount and convert for use with accounting. Fee is of type T::Balance which is u128.
             // As amount will always be positive, convert for use in accounting
-            let fee_converted: LedgerBalance =
-                T::AccountingConverter::try_convert(fee).ok_or(Error::<T>::AmountOverflow)?;
-            // Convert this for the inversion
-            let inverted: LedgerBalance = -1 * fee_converted.clone();
-            let increase_amount: LedgerBalance = fee_converted.into();
-            let decrease_amount: LedgerBalance = inverted.into();
+            let (increase_amount, decrease_amount) = Self::increase_decrease_amounts(fee)?;
             // This sets the change block and the applicable posting period. For this context they will always be
             // the same.
             let current_block = frame_system::Pallet::<T>::block_number(); // For audit on change
@@ -364,29 +408,30 @@ mod pallet {
 
             // Generate dummy Hash reference (it has no real bearing but allows posting to happen)
             let fee_hash: T::Hash = Self::get_pseudo_random_hash(payer.clone(), payer.clone());
-            let keys = vec![
-                Record::new(
-                    payer.clone(),
-                    payer.clone(),
-                    250_50029000_0000_u64, // debit  increase 250500290000000 Totem Transaction Fees
-                    increase_amount,
-                    Credit,
-                    fee_hash,
-                    current_block,
-                    current_block_dupe,
-                ),
-                Record::new(
-                    payer.clone(),
-                    payer.clone(),
-                    110_10004000_0000_u64, // credit decrease 110100040000000 XTX Balance
-                    decrease_amount,
-                    Debit,
-                    fee_hash,
-                    current_block,
-                    current_block_dupe,
-                ),
+            let keys = [
+                Record {
+                    primary_party: payer.clone(),
+                    counterparty: payer.clone(),
+                    ledger: Ledger::P5050030_0000000, // Network Transaction Fees.
+                    amount: increase_amount,
+                    debit_credit: Debit,
+                    reference_hash: fee_hash,
+                    changed_on_blocknumber: current_block,
+                    applicable_period_blocknumber: current_block_dupe,
+                },
+                Record {
+                    primary_party: payer.clone(),
+                    counterparty: payer.clone(),
+                    ledger: Ledger::B1010004_0000000, // Internal Address Balance (Network Currency).
+                    amount: decrease_amount,
+                    debit_credit: Credit,
+                    reference_hash: fee_hash,
+                    changed_on_blocknumber: current_block,
+                    applicable_period_blocknumber: current_block_dupe,
+                },
             ];
-            Self::handle_multiposting_amounts(keys)
+
+            Self::handle_multiposting_amounts(&keys)
         }
 
         fn get_pseudo_random_hash(sender: T::AccountId, recipient: T::AccountId) -> T::Hash {

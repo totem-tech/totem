@@ -36,8 +36,9 @@
 // along with Totem.  If not, see <http://www.gnu.org/licenses/>.
 
 use frame_support::pallet_prelude::*;
+use scale_info::TypeInfo;
 
-#[derive(PartialEq, Eq, Clone, Encode, Decode, Default)]
+#[derive(PartialEq, Eq, Clone, Encode, Decode, Default, TypeInfo)]
 #[cfg_attr(feature = "std", derive(Debug))]
 pub struct TxKeysT<Hash> {
     pub tx_uid: Hash,

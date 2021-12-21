@@ -37,6 +37,7 @@
 
 use frame_support::{dispatch::EncodeLike, pallet_prelude::*};
 use sp_std::prelude::*;
+use scale_info::TypeInfo;
 
 pub trait Validating<AccountId, Hash> {
     fn is_order_party(o: AccountId, r: Hash) -> bool;
@@ -46,7 +47,7 @@ pub trait Validating<AccountId, Hash> {
 pub type OrderStatus = u16; // Generic Status for whatever the HashReference refers to
 
 #[repr(u8)]
-#[derive(Debug, Decode, Encode, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Decode, Encode, Clone, Copy, PartialEq, Eq, TypeInfo)]
 pub enum ApprovalStatus {
     Submitted = 0,
     Accepted = 1,
@@ -54,7 +55,7 @@ pub enum ApprovalStatus {
 }
 
 /// The order header: contains common values for all items.
-#[derive(PartialEq, Eq, Copy, Clone, Debug, Encode, Decode, Default)]
+#[derive(PartialEq, Eq, Copy, Clone, Debug, Encode, Decode, Default, TypeInfo)]
 pub struct OrderHeader<AccountId> {
     pub commander: AccountId,
     pub fulfiller: AccountId,
@@ -69,7 +70,7 @@ pub struct OrderHeader<AccountId> {
     pub due_date: u32,
 }
 
-#[derive(PartialEq, Eq, Clone, Debug, Encode, Decode, Default)]
+#[derive(PartialEq, Eq, Clone, Debug, Encode, Decode, Default, TypeInfo)]
 pub struct OrderItem<Hash> {
     pub product: Hash,
     pub unit_price: i128,
@@ -77,7 +78,7 @@ pub struct OrderItem<Hash> {
     pub unit_of_measure: u16,
 }
 
-#[derive(PartialEq, Eq, Clone, Debug, Encode, Decode, Default)]
+#[derive(PartialEq, Eq, Clone, Debug, Encode, Decode, Default, TypeInfo)]
 pub struct TxKeysL<Hash> {
     pub record_id: Hash,
     pub parent_id: Hash,
@@ -85,14 +86,14 @@ pub struct TxKeysL<Hash> {
     pub tx_uid: Hash,
 }
 
-#[derive(PartialEq, Eq, Clone, Debug, Encode, Decode, Default)]
+#[derive(PartialEq, Eq, Clone, Debug, Encode, Decode, Default, TypeInfo)]
 pub struct TxKeysM<Hash> {
     pub record_id: Hash,
     pub bonsai_token: Hash,
     pub tx_uid: Hash,
 }
 
-#[derive(PartialEq, Eq, Clone, Debug, Encode, Decode, Default)]
+#[derive(PartialEq, Eq, Clone, Debug, Encode, Decode, Default, TypeInfo)]
 pub struct TxKeysS<Hash> {
     pub bonsai_token: Hash,
     pub tx_uid: Hash,

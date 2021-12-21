@@ -6,24 +6,28 @@ description = 'Escrow mechanism to lock token amounts'
 license = 'GNU'
 homepage = 'https://totemaccounting.com'
 repository = 'https://gitlab.com/totem-tech/totem'
-edition = '2018'
+edition = '2021'
 
 [package.metadata.docs.rs]
 targets = ['x86_64-unknown-linux-gnu']
 
 [dependencies]
-codec = { package = 'parity-scale-codec', version = '2.0.0', default-features = false }
+# external dependencies
+codec = { package = "parity-scale-codec", version = "2.2.0", default-features = false, features = [
+	"derive",
+	"max-encoded-len",
+] }
 log = { version = '0.4.14', default-features = false }
-max-encoded-len = { git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.8', version = "3.0.0", default-features = false, features = [ "derive" ] }
+scale-info = { version = "1.0", default-features = false, features = ["derive"] }
 totem-common = { path = '../../common', default-features = false }
 totem-primitives = { path = '../../primitives', default-features = false }
 # primitives
-sp-core = { git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.8', default-features = false }
-sp-runtime = { git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.8', default-features = false }
-sp-std = { git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.8', default-features = false }
+sp-core = { git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.13', default-features = false }
+sp-runtime = { git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.13', default-features = false }
+sp-std = { git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.13', default-features = false }
 # frame
-frame-support = { git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.8', default-features = false }
-frame-system = { git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.8', default-features = false }
+frame-support = { git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.13', default-features = false }
+frame-system = { git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.13', default-features = false }
 
 [dev-dependencies]
 
@@ -36,6 +40,7 @@ std = [
 	'sp-core/std',
 	'sp-runtime/std',
 	'sp-std/std',
+	'scale-info/std',
 	'frame-support/std',
 	'frame-system/std',
 ]
