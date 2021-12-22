@@ -6,7 +6,7 @@ description = 'The Totem LEGO Parachain runtime'
 license = "Apache-2.0"
 homepage = 'https://totemaccounting.com'
 repository = 'https://gitlab.com/totem-tech/totem'
-edition = '2021'
+edition = '2018'
 
 [package.metadata.docs.rs]
 targets = ['x86_64-unknown-linux-gnu']

@@ -6,7 +6,7 @@ description = 'A Totem KAPEX node'
 license = 'GNU'
 homepage = 'https://totemaccounting.com'
 repository = 'https://gitlab.com/totem-tech/totem'
-edition = '2021'
+edition = '2018'
 build = 'build.rs'
 
 [package.metadata.docs.rs]
