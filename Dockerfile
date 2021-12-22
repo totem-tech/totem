@@ -15,9 +15,9 @@ ENV DEBIAN_FRONTEND=noninteractive
 # --build-arg chain=parachain-totem-lego-node \
 # --build-arg buildtype=check .
 
-docker build \
---build-arg chain=parachain-totem-lego-node \
---build-arg buildtype=build .
+# docker build \
+# --build-arg chain=parachain-totem-lego-node \
+# --build-arg buildtype=build .
 
 # Totem KAPEX Parachain
 
