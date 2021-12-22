@@ -1,3 +1,5 @@
+cargo-features = ["edition2021"]
+
 [package]
 name = "pallet-transaction-payment-totem"
 version = "4.0.0-dev"
@@ -9,7 +11,6 @@ description = "A wrapper around the standard FRAME pallet to manage transaction 
 readme = "README.md"
 edition = "2021"
 
-cargo-features = ["edition2021"]
 
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
