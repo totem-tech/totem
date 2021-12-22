@@ -1,3 +1,4 @@
+cargo-features = ["edition2021"]
 [package]
 name = 'totem-mainnet-node'
 version = '3.0.0'
@@ -6,7 +7,7 @@ description = 'A Totem blockchain node'
 license = 'GNU'
 homepage = 'https://totemaccounting.com'
 repository = 'https://gitlab.com/totem-tech/totem'
-edition = '2018'
+edition = '2021' 
 build = 'build.rs'
 
 [[bin]]

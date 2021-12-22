@@ -1,3 +1,4 @@
+cargo-features = ["edition2021"]
 [package]
 name = 'parachain-totem-wapex-runtime'
 version = '1.0.0'
@@ -6,7 +7,7 @@ description = 'The Totem WAPEX Parachain runtime'
 license = "Apache-2.0"
 homepage = 'https://totemaccounting.com'
 repository = 'https://gitlab.com/totem-tech/totem'
-edition = '2018'
+edition = '2021' 
 
 [package.metadata.docs.rs]
 targets = ['x86_64-unknown-linux-gnu']
