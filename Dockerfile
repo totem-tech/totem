@@ -15,9 +15,9 @@ ENV DEBIAN_FRONTEND=noninteractive
 # --build-arg chain=parachain-totem-lego-node \
 # --build-arg buildtype=check .
 
-# docker build \
-# --build-arg chain=parachain-totem-lego-node \
-# --build-arg buildtype=build .
+docker build \
+--build-arg chain=parachain-totem-lego-node \
+--build-arg buildtype=build .
 
 # Totem KAPEX Parachain
 
@@ -68,9 +68,9 @@ RUN apt-get update && \
 
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y && \
 	export PATH="$PATH:$HOME/.cargo/bin" && \
-	rustup toolchain install nightly-2021-03-01 && \
-	rustup target add wasm32-unknown-unknown --toolchain nightly-2021-03-01 && \
-	rustup default nightly-2021-03-01 && \
+	rustup toolchain install nightly-2021-12-01 && \
+	rustup target add wasm32-unknown-unknown --toolchain nightly-2021-12-01 && \
+	rustup default nightly-2021-12-01 && \
     cargo "$buildtype" "--$PROFILE" "-$CHAINPATH" "$chain"
 
 # ===== SECOND STAGE ======
