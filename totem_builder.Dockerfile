@@ -90,17 +90,21 @@ COPY --from=builder /totem/target/release/"$chain" /usr/local/bin/
 RUN useradd -m -u 1000 -U -s /bin/sh -d /totem totem && \
 	mkdir -p /data /totem/.local/share/"$chain" && \
 	chown -R totem:totem /data && \
-	ln -s /data /totem/.local/share/"$chain"
+	ln -s /totem/.local/share/"$chain" /data
+	# ln -s /data /totem/.local/share/"$chain"
+
 # unclutter and minimize the attack surface
 RUN	rm -rf /usr/bin /usr/sbin
+
 # Sanity checks
 RUN	ldd /usr/local/bin/"$chain" && \
 	/usr/local/bin/"$chain" --version
 
 USER totem
-# default substrate
+# default substrate/parachain
 EXPOSE 30333 9933 9944 9615
 
-# parachain
-EXPOSE 30334 9934 9945 9616
+# polkadot internal to parachain
+EXPOSE 40333 9934 9945 9616
+
 VOLUME ["/data"]
