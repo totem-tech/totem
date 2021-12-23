@@ -4,41 +4,57 @@ FROM docker.io/paritytech/ci-linux:production as builder
 
 # Totem Lego Test Parachain
 
-# docker build \ 
+# docker build \
+# -f totem_builder.Dockerfile \
+# -t totemlive/totem_lego_node:local \
 # --build-arg chain=parachain-totem-lego-node \
 # --build-arg buildtype=check .
 
 # docker build \
+# -f totem_builder.Dockerfile \
+# -t totemlive/totem_lego_node:local \
 # --build-arg chain=parachain-totem-lego-node \
 # --build-arg buildtype=build .
 
 # Totem KAPEX Parachain
 
-# docker build \ 
+# docker build \
+# -f totem_builder.Dockerfile \
+# -t totemlive/totem_lego_node:local \
 # --build-arg chain=parachain-totem-kapex-node \
 # --build-arg buildtype=check .
 
 # docker build \
+# -f totem_builder.Dockerfile \
+# -t totemlive/totem_lego_node:local \
 # --build-arg chain=parachain-totem-kapex-node \
 # --build-arg buildtype=build .
 
 # Totem WAPEX Westend Parachain
 
-# docker build \ 
+# docker build \
+# -f totem_builder.Dockerfile \
+# -t totemlive/totem_lego_node:local \
 # --build-arg chain=parachain-totem-wapex-node \
 # --build-arg buildtype=check .
 
 # docker build \
+# -f totem_builder.Dockerfile \
+# -t totemlive/totem_lego_node:local \
 # --build-arg chain=parachain-totem-wapex-node \
 # --build-arg buildtype=build .
 
 # Totem Pre-MainNet 
 
 # docker build \
+# -f totem_builder.Dockerfile \
+# -t totemlive/totem_lego_node:local \
 # --build-arg chain=totem-mainnet-node \ 
 # --build-arg buildtype=check .
 
 # docker build \
+# -f totem_builder.Dockerfile \
+# -t totemlive/totem_lego_node:local \
 # --build-arg chain=totem-mainnet-node \
 # --build-arg buildtype=build .
 
@@ -74,11 +90,11 @@ COPY --from=builder /totem/target/release/"$chain" /usr/local/bin/
 RUN useradd -m -u 1000 -U -s /bin/sh -d /totem totem && \
 	mkdir -p /data /totem/.local/share/"$chain" && \
 	chown -R totem:totem /data && \
-	ln -s /data /totem/.local/share/"$chain" && \
+	ln -s /data /totem/.local/share/"$chain"
 # unclutter and minimize the attack surface
-	rm -rf /usr/bin /usr/sbin && \
+RUN	rm -rf /usr/bin /usr/sbin
 # Sanity checks
-	ldd /usr/local/bin/"$chain" && \
+RUN	ldd /usr/local/bin/"$chain" && \
 	/usr/local/bin/"$chain" --version
 
 USER totem
