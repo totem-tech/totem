@@ -6,13 +6,11 @@ FROM docker.io/paritytech/ci-linux:production as builder
 
 # docker build \
 # -f totem_builder.Dockerfile \
-# -t totemlive/totem_lego_node:local \
 # --build-arg chain=parachain-totem-lego-node \
 # --build-arg buildtype=check .
 
 # docker build \
 # -f totem_builder.Dockerfile \
-# -t totemlive/totem_lego_node:local \
 # --build-arg chain=parachain-totem-lego-node \
 # --build-arg buildtype=build .
 
@@ -20,13 +18,11 @@ FROM docker.io/paritytech/ci-linux:production as builder
 
 # docker build \
 # -f totem_builder.Dockerfile \
-# -t totemlive/totem_lego_node:local \
 # --build-arg chain=parachain-totem-kapex-node \
 # --build-arg buildtype=check .
 
 # docker build \
 # -f totem_builder.Dockerfile \
-# -t totemlive/totem_lego_node:local \
 # --build-arg chain=parachain-totem-kapex-node \
 # --build-arg buildtype=build .
 
@@ -34,13 +30,11 @@ FROM docker.io/paritytech/ci-linux:production as builder
 
 # docker build \
 # -f totem_builder.Dockerfile \
-# -t totemlive/totem_lego_node:local \
 # --build-arg chain=parachain-totem-wapex-node \
 # --build-arg buildtype=check .
 
 # docker build \
 # -f totem_builder.Dockerfile \
-# -t totemlive/totem_lego_node:local \
 # --build-arg chain=parachain-totem-wapex-node \
 # --build-arg buildtype=build .
 
@@ -48,18 +42,13 @@ FROM docker.io/paritytech/ci-linux:production as builder
 
 # docker build \
 # -f totem_builder.Dockerfile \
-# -t totemlive/totem_lego_node:local \
 # --build-arg chain=totem-mainnet-node \ 
 # --build-arg buildtype=check .
 
 # docker build \
 # -f totem_builder.Dockerfile \
-# -t totemlive/totem_lego_node:local \
 # --build-arg chain=totem-mainnet-node \
 # --build-arg buildtype=build .
-
-ARG PROFILE=release
-ARG CHAINPATH=p
 
 ## select node type (see example above)
 ARG chain
@@ -67,14 +56,19 @@ ARG chain
 ## Use check or build
 ARG buildtype
 
+ARG PROFILE=release
+ARG CHAINPATH=p
+
 WORKDIR /totem
 COPY . /totem
 
 RUN cargo "$buildtype" "--locked" "--$PROFILE" "-$CHAINPATH" "$chain"
-# RUN cargo build --locked --release
 
 # This is the 2nd stage: a very small image where we copy the Totem binary."
 FROM docker.io/library/ubuntu:20.04
+
+ARG chain
+
 LABEL description="Multistage Docker image for Totem Live Accounting: a platform for web3" \
 	totem.live.image.type="builder" \
 	totem.live.image.authors="chris.dcosta@totemaccounting.com" \
@@ -83,16 +77,12 @@ LABEL description="Multistage Docker image for Totem Live Accounting: a platform
 	totem.live.image.source="https://gitlab.com/totem-tech/totem/totem_builder.Dockerfile" \
 	totem.live.image.documentation="https://gitlab.com/totem-tech/totem"
 
-ARG chain
-
 COPY --from=builder /totem/target/release/"$chain" /usr/local/bin/
 
 RUN useradd -m -u 1000 -U -s /bin/sh -d /totem totem && \
 	mkdir -p /data /totem/.local/share/"$chain" && \
 	chown -R totem:totem /data && \
 	ln -s /totem/.local/share/"$chain" /data
-	# ln -s /data /totem/.local/share/"$chain"
-
 
 # Sanity checks
 RUN	ldd /usr/local/bin/"$chain" && \
