@@ -93,12 +93,13 @@ RUN useradd -m -u 1000 -U -s /bin/sh -d /totem totem && \
 	ln -s /totem/.local/share/"$chain" /data
 	# ln -s /data /totem/.local/share/"$chain"
 
-# unclutter and minimize the attack surface
-RUN	rm -rf /usr/bin /usr/sbin
 
 # Sanity checks
 RUN	ldd /usr/local/bin/"$chain" && \
 	/usr/local/bin/"$chain" --version
+
+# unclutter and minimize the attack surface
+RUN	rm -rf /usr/bin /usr/sbin /usr/share/man
 
 USER totem
 # default substrate/parachain
@@ -108,3 +109,5 @@ EXPOSE 30333 9933 9944 9615
 EXPOSE 40333 9934 9945 9616
 
 VOLUME ["/data"]
+
+CMD ["/usr/local/bin/$chain"]
