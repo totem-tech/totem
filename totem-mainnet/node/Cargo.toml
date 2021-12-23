@@ -1,4 +1,3 @@
-cargo-features = ["edition2021"]
 [package]
 name = 'totem-mainnet-node'
 version = '3.0.0'

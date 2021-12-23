@@ -1,4 +1,3 @@
-cargo-features = ["edition2021"]
 [package]
 name = 'pallet-timekeeping'
 version = '1.0.0'

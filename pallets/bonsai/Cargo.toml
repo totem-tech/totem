@@ -1,4 +1,3 @@
-cargo-features = ["edition2021"]
 [package]
 name = 'pallet-bonsai'
 version = '1.0.0'

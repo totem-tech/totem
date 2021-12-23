@@ -1,4 +1,3 @@
-cargo-features = ["edition2021"]
 [package]
 name = 'pallet-orders'
 version = '1.0.0'

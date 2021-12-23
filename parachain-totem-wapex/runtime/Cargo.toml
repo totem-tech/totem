@@ -1,4 +1,3 @@
-cargo-features = ["edition2021"]
 [package]
 name = 'parachain-totem-wapex-runtime'
 version = '1.0.0'
