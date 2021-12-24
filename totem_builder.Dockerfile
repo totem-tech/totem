@@ -80,7 +80,7 @@ COPY --from=builder /totem/target/release/"${chain}" /usr/local/bin/
 
 RUN useradd -m -u 1000 -U -s /bin/sh -d /totem totem && \
 	mkdir -p /data /totem/.local/share/"${chain}" && \
-	chown -R totem:totem /data && \
+	chown -R totem:totem /totem/.local && \
 	ln -s /totem/.local/share/"${chain}" /data
 
 # Sanity checks
