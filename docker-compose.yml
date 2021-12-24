@@ -1,17 +1,24 @@
-version: "3.2"
+version: "3.3"
 
 services:
   dev:
-    container_name: totem-node
-    image: paritytech/ci-linux:974ba3ac-20201006
-    working_dir: /var/www/totem-node
+    container_name: parachain-totem-lego-node
+    image: paritytech/ci-linux:production
+    working_dir: /var/www/parachain-totem-lego-node
     ports:
+      - "30333:30333"
+      - "40333:40333"
       - "9944:9944"
+      - "9933:9933"
+      - "9615:9615"
+      - "9945:9945"
+      - "9934:9934"
+      - "9616:9616"
     environment:
-      - CARGO_HOME=/var/www/totem-node/.cargo
+      - CARGO_HOME=/var/www/parachain-totem-lego-node/.cargo
     volumes:
-      - .:/var/www/totem-node
+      - .:/var/www/parachain-totem-lego-node
       - type: bind
         source: ./.local
         target: /root/.local
-    command: bash -c "cargo build --release && ./target/release/totem-node --dev --ws-external"
+    command: bash -c "cargo build --release -p parachain-totem-lego-node && ./target/release/parachain-totem-lego-node --dev --tmp"
