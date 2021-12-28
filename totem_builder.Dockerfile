@@ -1,5 +1,13 @@
+## select node type (see example above)
+ARG chain
+
+## Use check or build
+ARG buildtype
+
 # This is the build stage for Totem. Here we create the binary.
 FROM docker.io/paritytech/ci-linux:production as builder
+ARG chain
+ARG buildtype
 # Usage
 
 # Totem Lego Test Parachain
@@ -50,14 +58,9 @@ FROM docker.io/paritytech/ci-linux:production as builder
 # --build-arg chain=totem-mainnet-node \
 # --build-arg buildtype=build .
 
-## select node type (see example above)
-ARG chain
-
-## Use check or build
-ARG buildtype
-
 ## constants
 ARG PROFILE=release
+
 ARG CHAINPATH=p
 
 WORKDIR /totem
@@ -67,7 +70,9 @@ RUN cargo "${buildtype}" "--locked" "--${PROFILE}" "-${CHAINPATH}" "${chain}"
 
 # This is the 2nd stage: a very small image where we copy the Totem binary."
 FROM docker.io/library/ubuntu:20.04
+
 ARG chain
+
 LABEL description="Multistage Docker image for Totem Live Accounting: a platform for web3" \
 	totem.live.image.type="builder" \
 	totem.live.image.authors="chris.dcosta@totemaccounting.com" \
