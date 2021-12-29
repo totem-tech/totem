@@ -18,6 +18,7 @@ codec = { package = "parity-scale-codec", version = "2.2.0", default-features = 
 	"derive",
 	"max-encoded-len",
 ] }
+scale-info = { version = "1.0", default-features = false, features = ["derive"] }
 totem-common = { path = '../../common', default-features = false }
 totem-primitives = { path = '../../primitives', default-features = false }
 # primitives

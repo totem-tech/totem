@@ -76,13 +76,6 @@ mod pallet {
         ComparisonAmounts,
     };
 
-    type AccountOf<T> = <<T as Config>::Accounting as Posting<
-        <T as frame_system::Config>::AccountId,
-        <T as frame_system::Config>::Hash,
-        <T as frame_system::Config>::BlockNumber,
-        CurrencyBalanceOf<T>,
-    >>::Account;
-
     type AccountBalanceOf<T> = <<T as Config>::Accounting as Posting<
         <T as frame_system::Config>::AccountId,
         <T as frame_system::Config>::Hash,
@@ -140,7 +133,6 @@ mod pallet {
             + TryConvert<AccountBalanceOf<Self>, CurrencyBalanceOf<Self>>
             + TryConvert<CurrencyBalanceOf<Self>, AccountBalanceOf<Self>>
             + Convert<Vec<u8>, LockIdentifier>
-            + Convert<u64, AccountOf<Self>>
             + Convert<u32, Self::BlockNumber>
             + Convert<i128, AccountBalanceOf<Self>>
             + TryConvert<u128, AccountBalanceOf<Self>>

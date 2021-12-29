@@ -11,6 +11,7 @@ pages:
       -p totem-primitives \
       -p pallet-accounting \
       -p pallet-archive \
+      -p pallet-balances-totem \
       -p pallet-bonsai \
       -p pallet-escrow \
       -p pallet-funding \
@@ -18,13 +19,14 @@ pages:
       -p pallet-prefunding \
       -p pallet-teams \
       -p pallet-timekeeping \
+      -p pallet-transaction-payment-totem \
       -p pallet-transfer \
       --verbose
     - cp -r target/doc public
     # Now, setup the content of the documentation:
     - cp assets/totem-logo.png public/rust-logo.png
-    - perl -pi -e 's/<li><a [^>]*>(?!totem_common|totem_primitives|pallet_accounting|pallet_archive|pallet_bonsai|pallet_escrow|pallet_funding|pallet_orders|pallet_prefunding|pallet_teams|pallet_timekeeping|pallet_transfer)[a-zA-Z0-9\-_]*<\/a><\/li>//g' public/index.html
-    - echo 'window.ALL_CRATES = ["totem_common","totem_primitives","pallet_accounting","pallet_archive","pallet_bonsai","pallet_escrow","pallet_funding","pallet_orders","pallet_prefunding","pallet_teams","pallet_timekeeping","pallet_transfer"];' > public/crates.js
+    - perl -pi -e 's/<li><a [^>]*>(?!totem_common|totem_primitives|pallet_accounting|pallet_archive|pallet_balances_totem|pallet_bonsai|pallet_escrow|pallet_funding|pallet_orders|pallet_prefunding|pallet_teams|pallet_timekeeping|pallet_transaction_payment_totem|pallet_transfer)[a-zA-Z0-9\-_]*<\/a><\/li>//g' public/index.html
+    - echo 'window.ALL_CRATES = ["totem_common","totem_primitives","pallet_accounting","pallet_archive","pallet_balances_totem","pallet_bonsai","pallet_escrow","pallet_funding","pallet_orders","pallet_prefunding","pallet_teams","pallet_timekeeping","pallet_transaction_payment_totem","pallet_transfer"];' > public/crates.js
   artifacts:
     paths:
       - public
