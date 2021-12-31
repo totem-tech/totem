@@ -10,7 +10,7 @@
   "properties": {
     "ss58Format": 2007,
     "tokenDecimals": 12,
-    "tokenSymbol": "KAPEX"
+    "tokenSymbol": "WAPEX"
   },
   "relay_chain": "westend",
   "para_id": 2107,

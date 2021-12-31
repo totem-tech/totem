@@ -3,7 +3,7 @@
   "id": "totem_lego",
   "chainType": "Local",
   "bootNodes": [
-    "/ipv4/159.89.1.153/tcp/30436/p2p/12D3KooWBsMTJeHCa9Mgq4qQECkfxJ6P9WyajEFF8gEzSaC9npVm",
+    "/ip4/159.89.1.153/tcp/30436/p2p/12D3KooWBsMTJeHCa9Mgq4qQECkfxJ6P9WyajEFF8gEzSaC9npVm"
   ],
   "telemetryEndpoints": null,
   "protocolId": "lego",
