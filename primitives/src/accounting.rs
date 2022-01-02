@@ -49,7 +49,7 @@ pub trait Posting<AccountId, Hash, BlockNumber, CoinAmount> {
     type LedgerBalance: Member + Copy + Into<i128> + Encode + Decode + Eq;
 
     fn handle_multiposting_amounts(
-        keys: &[Record<AccountId, Hash, BlockNumber, Self::LedgerBalance>],
+        keys: &[Record<AccountId, Ledger, Self::LedgerBalance, Indicator, Hash, BlockNumber>],
     ) -> DispatchResultWithPostInfo;
 
     fn account_for_simple_transfer(
@@ -65,8 +65,16 @@ pub trait Posting<AccountId, Hash, BlockNumber, CoinAmount> {
     fn get_pseudo_random_hash(s: AccountId, r: AccountId) -> Hash;
 }
 
+/// Note: Debit and Credit balances are account specific - see chart of accounts.
+#[repr(u8)]
+#[derive(Decode, Encode, Clone, Copy, TypeInfo)]
+pub enum Indicator {
+    Debit = 0,
+    Credit = 1,
+}
+
 #[derive(Clone, TypeInfo)]
-pub struct Record<AccountId, Hash, BlockNumber, LedgerBalance> {
+pub struct Record<AccountId, Ledger, LedgerBalance, Indicator, Hash, BlockNumber> {
     pub primary_party: AccountId,
     pub counterparty: AccountId,
     pub ledger: Ledger,
@@ -75,14 +83,6 @@ pub struct Record<AccountId, Hash, BlockNumber, LedgerBalance> {
     pub reference_hash: Hash,
     pub changed_on_blocknumber: BlockNumber,
     pub applicable_period_blocknumber: BlockNumber,
-}
-
-/// Note: Debit and Credit balances are account specific - see chart of accounts.
-#[repr(u8)]
-#[derive(Decode, Encode, Clone, Copy, TypeInfo)]
-pub enum Indicator {
-    Debit = 0,
-    Credit = 1,
 }
 
 // Implementations
@@ -106,7 +106,7 @@ impl<AccountId, Hash, BlockNumber, CoinAmount> Posting<AccountId, Hash, BlockNum
     type LedgerBalance = i128;
 
     fn handle_multiposting_amounts(
-        _fwd: &[Record<AccountId, Hash, BlockNumber, Self::LedgerBalance>],
+        _fwd: &[Record<AccountId, Ledger, Self::LedgerBalance, Indicator, Hash, BlockNumber>],
     ) -> DispatchResultWithPostInfo {
         unimplemented!("Used as a mock, shouldn't be called")
     }

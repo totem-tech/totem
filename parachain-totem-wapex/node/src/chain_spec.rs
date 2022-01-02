@@ -13,7 +13,7 @@ pub type ChainSpec = sc_service::GenericChainSpec<parachain_totem_wapex_runtime:
 
 /// Totem Kapex on Westend generator
 pub fn totem_wapex_config() -> Result<ChainSpec, String> {
-	ChainSpec::from_json_bytes(&include_bytes!("../../../res/totem-wapex-readable.json")[..])
+	ChainSpec::from_json_bytes(&include_bytes!("../../../res/totem-wapex-raw.json")[..])
 }
 
 /// Helper function to generate a crypto pair from seed
@@ -69,7 +69,7 @@ pub fn development_config() -> ChainSpec {
 	let mut properties = sc_chain_spec::Properties::new();
 	properties.insert("tokenSymbol".into(), "WAPEX".into());
 	properties.insert("tokenDecimals".into(), 12.into());
-	properties.insert("ss58Format".into(), 14.into());
+	properties.insert("ss58Format".into(), 2007.into());
 
 	ChainSpec::from_genesis(
 		// Name
@@ -124,7 +124,7 @@ pub fn local_testnet_config() -> ChainSpec {
 	let mut properties = sc_chain_spec::Properties::new();
 	properties.insert("tokenSymbol".into(), "WAPEX".into());
 	properties.insert("tokenDecimals".into(), 12.into());
-	properties.insert("ss58Format".into(), 14.into());
+	properties.insert("ss58Format".into(), 2007.into());
 
 	ChainSpec::from_genesis(
 		// Name

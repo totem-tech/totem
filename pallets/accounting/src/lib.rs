@@ -112,9 +112,9 @@ mod pallet {
     use totem_common::TryConvert;
     use totem_primitives::accounting::{
         Indicator::{self, *},
-        Posting, Record,
+        Posting, Record, Ledger,
     };
-    use totem_primitives::{accounting::Ledger, LedgerBalance, PostingIndex};
+    use totem_primitives::{LedgerBalance, PostingIndex};
 
     type CurrencyBalanceOf<T> =
         <<T as Config>::Currency as Currency<<T as frame_system::Config>::AccountId>>::Balance;
@@ -235,7 +235,7 @@ mod pallet {
         /// The Totem Accounting Recipes are constructed using this simple function.
         /// The second Blocknumber is for re-targeting the entry in the accounts, i.e. for adjustments prior to or after the current period (generally accruals).
         fn post_amounts(
-            key: Record<T::AccountId, T::Hash, T::BlockNumber, LedgerBalance>,
+            key: Record<T::AccountId, Ledger, LedgerBalance, Indicator, T::Hash, T::BlockNumber>,
             posting_index: PostingIndex,
         ) -> DispatchResultWithPostInfo {
             let ab: LedgerBalance = key.amount.abs();
@@ -320,7 +320,7 @@ mod pallet {
         /// Therefore the recipes that are passed as arguments need to be be accompanied with a reversal
         /// Obviously the last posting does not need a reversal for if it errors, then it was not posted in the first place.
         fn handle_multiposting_amounts(
-            keys: &[Record<T::AccountId, T::Hash, T::BlockNumber, LedgerBalance>],
+            keys: &[Record<T::AccountId, Ledger, LedgerBalance, Indicator, T::Hash, T::BlockNumber>],
         ) -> DispatchResultWithPostInfo {
             let posting_index = Self::posting_number()
                 .checked_add(1)

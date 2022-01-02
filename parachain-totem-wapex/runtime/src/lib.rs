@@ -188,9 +188,9 @@ impl_opaque_keys! {
 pub const VERSION: RuntimeVersion = RuntimeVersion {
 	spec_name: create_runtime_str!("parachain-totem-wapex"),
 	impl_name: create_runtime_str!("parachain-totem-wapex"),
-	authoring_version: 1,
-	spec_version: 1,
-	impl_version: 0,
+	authoring_version: 0,
+	spec_version: 0,
+	impl_version: 1,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 1,
 };

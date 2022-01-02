@@ -65,12 +65,13 @@ frame_support::construct_runtime!(
 );
 
 impl Posting for Test {
-    type Account = totem_common::types::Account;
+    // type Account = totem_common::types::Account;
     type PostingIndex = totem_common::types::PostingIndex;
     type LedgerBalance = totem_common::types::LedgerBalance;
 
     fn handle_multiposting_amounts(
-        keys: Vec<Record<AccountId, Hash, BlockNumber, Self::Account, Self::LedgerBalance>>,
+        // keys: Vec<Record<AccountId, Hash, BlockNumber, Self::Account, Self::LedgerBalance>>,
+        keys: Vec<Record<AccountId, Ledger, Self::LedgerBalance, Indicator, Hash, BlockNumber>>,
     ) -> DispatchResultWithPostInfo {
         unimplemented!()
     }

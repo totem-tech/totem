@@ -13,7 +13,7 @@ pub type ChainSpec = sc_service::GenericChainSpec<parachain_totem_lego_runtime::
 
 /// Totem Kapex on Local Polkadot generator
 pub fn totem_lego_config() -> Result<ChainSpec, String> {
-	ChainSpec::from_json_bytes(&include_bytes!("../../../res/totem-lego-readable.json")[..])
+	ChainSpec::from_json_bytes(&include_bytes!("../../../res/totem-lego-raw.json")[..])
 }
 
 /// Helper function to generate a crypto pair from seed
@@ -69,7 +69,7 @@ pub fn development_config() -> ChainSpec {
 	let mut properties = sc_chain_spec::Properties::new();
 	properties.insert("tokenSymbol".into(), "LEGO".into());
 	properties.insert("tokenDecimals".into(), 12.into());
-	properties.insert("ss58Format".into(), 14.into());
+	properties.insert("ss58Format".into(), 2007.into());
 
 	ChainSpec::from_genesis(
 		// Name
@@ -124,7 +124,7 @@ pub fn local_testnet_config() -> ChainSpec {
 	let mut properties = sc_chain_spec::Properties::new();
 	properties.insert("tokenSymbol".into(), "LEGO".into());
 	properties.insert("tokenDecimals".into(), 12.into());
-	properties.insert("ss58Format".into(), 14.into());
+	properties.insert("ss58Format".into(), 2007.into());
 
 	ChainSpec::from_genesis(
 		// Name

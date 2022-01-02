@@ -1,7 +1,7 @@
 
 [package]
 name = 'pallet-balances-totem'
-version = '1.0.0'
+version = '0.0.1'
 authors = ['Substrate, Totem Accounting <support@totemaccounting.com>']
 description = 'FRAME pallet to manage balances'
 license = 'Apache-2.0'

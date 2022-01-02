@@ -1,6 +1,6 @@
 [package]
 name = 'totem-common'
-version = '1.0.0'
+version = '0.0.1'
 authors = ['Totem Accounting <support@totemaccounting.com>']
 description = 'Code that is common to all the Totem Pallets'
 license = 'GNU'

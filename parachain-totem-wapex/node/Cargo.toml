@@ -1,6 +1,6 @@
 [package]
 name = 'parachain-totem-wapex-node'
-version = '1.0.0'
+version = '0.0.1'
 authors = ['Totem Accounting <support@totemaccounting.com>']
 description = 'A Totem KAPEX node'
 license = 'GNU'
