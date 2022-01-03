@@ -3,7 +3,7 @@
   "id": "totem_wapex",
   "chainType": "Live",
   "bootNodes": [
-    "/dns4/w-boot-1.kapex.network/tcp/30333/p2p/12D3KooWDAu2WpmipvUkuE4535LBTzfc37KJPjK46on45Widn7ud"
+    "/dns4/w-boot-1.kapex.network/tcp/30333/ws/p2p/12D3KooWDAu2WpmipvUkuE4535LBTzfc37KJPjK46on45Widn7ud"
   ],
   "telemetryEndpoints": null,
   "protocolId": "wapex",

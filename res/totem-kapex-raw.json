@@ -3,9 +3,9 @@
   "id": "totem_kapex",
   "chainType": "Live",
   "bootNodes": [
-    "/dns4/l-boot-1.kapex.network/tcp/30333/p2p/12D3KooWEFd1cZEKAV76y9Uv3kE3eBJGnBeEDMrs7vFDYy5VgRPK",
-    "/dns4/l-boot-2.kapex.network/tcp/30333/p2p/12D3KooWEcnVLou4oqPJUstYDT91JbPrFaYj7MFJPV6Nz4m3BNn6",
-    "/dns4/l-boot-3.kapex.network/tcp/30333/p2p/12D3KooWJySWN9YdTcvBDXjwhoEMKnHg88LMfBWh2FXYDWFV6LdJ"
+    "/dns4/l-boot-1.kapex.network/tcp/30333/ws/p2p/12D3KooWEFd1cZEKAV76y9Uv3kE3eBJGnBeEDMrs7vFDYy5VgRPK",
+    "/dns4/l-boot-2.kapex.network/tcp/30333/ws/p2p/12D3KooWEcnVLou4oqPJUstYDT91JbPrFaYj7MFJPV6Nz4m3BNn6",
+    "/dns4/l-boot-3.kapex.network/tcp/30333/ws/p2p/12D3KooWJySWN9YdTcvBDXjwhoEMKnHg88LMfBWh2FXYDWFV6LdJ"
   ],
   "telemetryEndpoints": null,
   "protocolId": "kapex",
