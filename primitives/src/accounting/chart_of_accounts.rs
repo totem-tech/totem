@@ -1,8 +1,5 @@
 use codec::{Decode, Encode, EncodeLike, Error, Input};
-use scale_info::{
-    build::{state::PathAssigned, FieldsBuilder, TypeBuilder, UnnamedFields},
-    Type, TypeInfo,
-};
+use scale_info::{build::Fields, Path, Type, TypeInfo};
 use strum::FromRepr;
 
 #[allow(non_camel_case_types)]
@@ -1170,10 +1167,9 @@ impl TypeInfo for Ledger {
     type Identity = Self;
 
     fn type_info() -> Type {
-        TypeBuilder::<PathAssigned>::default().composite(
-            FieldsBuilder::<UnnamedFields>::default()
-                .field(|f| f.compact::<u16>().type_name("u16")),
-        )
+        Type::builder()
+            .path(Path::new(stringify!(Ledger), module_path!()))
+            .composite(Fields::unnamed().field(|f| f.compact::<u16>().type_name("u16")))
     }
 }
 
