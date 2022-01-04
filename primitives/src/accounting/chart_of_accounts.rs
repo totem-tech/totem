@@ -1,9 +1,12 @@
 use codec::{Decode, Encode, EncodeLike, Error, Input};
-use scale_info::TypeInfo;
+use scale_info::{
+    build::{state::PathAssigned, FieldsBuilder, TypeBuilder, UnnamedFields},
+    Type, TypeInfo,
+};
 use strum::FromRepr;
 
 #[allow(non_camel_case_types)]
-#[derive(Debug, Copy, Clone, Eq, PartialEq, FromRepr, TypeInfo)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, FromRepr)]
 #[repr(u16)]
 pub enum Ledger {
     /// Bank Current Account.
@@ -1160,6 +1163,17 @@ impl Decode for Ledger {
 
     fn encoded_fixed_size() -> Option<usize> {
         Some(2)
+    }
+}
+
+impl TypeInfo for Ledger {
+    type Identity = Self;
+
+    fn type_info() -> Type {
+        TypeBuilder::<PathAssigned>::default().composite(
+            FieldsBuilder::<UnnamedFields>::default()
+                .field(|f| f.compact::<u16>().type_name("u16")),
+        )
     }
 }
 
