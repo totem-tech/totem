@@ -1,6 +1,6 @@
 [package]
 name = 'pallet-bonsai'
-version = '0.0.1'
+version = '1.1.0'
 authors = ['Totem Accounting <support@totemaccounting.com>']
 description = 'Decentralised 2FA for Offchain Data Storage'
 license = 'GNU'

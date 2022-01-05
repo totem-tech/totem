@@ -1,6 +1,6 @@
 [package]
 name = 'pallet-prefunding'
-version = '0.0.1'
+version = '1.1.0'
 authors = ['Totem Accounting <support@totemaccounting.com>']
 description = 'Companion to Prefund Orders Pallet'
 license = 'GNU'

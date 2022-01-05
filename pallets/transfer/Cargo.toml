@@ -1,6 +1,6 @@
 [package]
 name = 'pallet-transfer'
-version = '0.0.1'
+version = '1.1.0'
 authors = ['Totem Accounting <support@totemaccounting.com>']
 description = 'Funds Transfer Wrapper Pallet (replaces Balances Transfer)'
 license = 'GNU'

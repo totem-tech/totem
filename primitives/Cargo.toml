@@ -1,6 +1,6 @@
 [package]
 name = 'totem-primitives'
-version = '0.0.1'
+version = '1.1.0'
 authors = ['Totem Accounting <support@totemaccounting.com>']
 description = 'Types used to communicates with the clients'
 license = 'GNU'
