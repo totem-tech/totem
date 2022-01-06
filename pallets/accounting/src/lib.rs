@@ -96,7 +96,6 @@ pub use pallet::*;
 #[frame_support::pallet]
 mod pallet {
 
-    use codec::{Decode, Encode};
     use frame_support::{
         fail,
         pallet_prelude::*,
@@ -104,7 +103,6 @@ mod pallet {
         traits::Currency,
     };
     use frame_system::pallet_prelude::*;
-    use scale_info::TypeInfo;
 
     use sp_runtime::traits::{Convert, Hash};
     use sp_std::prelude::*;
@@ -112,7 +110,7 @@ mod pallet {
     use totem_common::TryConvert;
     use totem_primitives::accounting::{
         Indicator::{self, *},
-        Posting, Record, Ledger,
+        Ledger, Posting, Record,
     };
     use totem_primitives::{LedgerBalance, PostingIndex};
 
@@ -144,18 +142,8 @@ mod pallet {
             Key<Blake2_128Concat, Ledger>,
             Key<Twox64Concat, PostingIndex>,
         ),
-        PostingItem<T>,
+        Record<T::AccountId, T::Hash, T::BlockNumber>,
     >;
-
-    #[derive(Decode, Encode, TypeInfo)]
-    #[scale_info(skip_type_params(T))]
-    pub struct PostingItem<T: frame_system::Config> {
-        changed_on_blocknumber: T::BlockNumber,
-        amount: LedgerBalance,
-        debit_credit: Indicator,
-        reference_hash: T::Hash,
-        applicable_period_blocknumber: T::BlockNumber,
-    }
 
     /// Yay! Totem!
     #[pallet::storage]
@@ -235,19 +223,11 @@ mod pallet {
         /// The Totem Accounting Recipes are constructed using this simple function.
         /// The second Blocknumber is for re-targeting the entry in the accounts, i.e. for adjustments prior to or after the current period (generally accruals).
         fn post_amounts(
-            key: Record<T::AccountId, Ledger, LedgerBalance, Indicator, T::Hash, T::BlockNumber>,
+            key: Record<T::AccountId, T::Hash, T::BlockNumber>,
             posting_index: PostingIndex,
         ) -> DispatchResultWithPostInfo {
-            let ab: LedgerBalance = key.amount.abs();
             let balance_key = (key.primary_party.clone(), key.ledger);
             let posting_key = (key.primary_party.clone(), key.ledger, posting_index);
-            let detail = PostingItem {
-                changed_on_blocknumber: key.changed_on_blocknumber,
-                amount: ab,
-                debit_credit: key.debit_credit,
-                reference_hash: key.reference_hash,
-                applicable_period_blocknumber: key.applicable_period_blocknumber,
-            };
             // !! Warning !!
             // Values could feasibly overflow, with no visibility on other accounts. In this event this function returns an error.
             // Reversals must occur in the parent function (i.e. that calls this function).
@@ -265,7 +245,7 @@ mod pallet {
             PostingNumber::<T>::put(posting_index);
             // Todo?
             BalanceByLedger::<T>::insert(&balance_key, new_balance);
-            PostingDetail::<T>::insert(&posting_key, detail);
+            PostingDetail::<T>::insert(&posting_key, key.clone());
             GlobalLedger::<T>::insert(&key.ledger, new_global_balance);
 
             Self::deposit_event(Event::LegderUpdate(
@@ -310,7 +290,6 @@ mod pallet {
     where
         T: pallet_timestamp::Config,
     {
-        type LedgerBalance = LedgerBalance;
         type PostingIndex = PostingIndex;
 
         /// The Totem Accounting Recipes are constructed using this function which handles posting to multiple accounts.
@@ -320,7 +299,7 @@ mod pallet {
         /// Therefore the recipes that are passed as arguments need to be be accompanied with a reversal
         /// Obviously the last posting does not need a reversal for if it errors, then it was not posted in the first place.
         fn handle_multiposting_amounts(
-            keys: &[Record<T::AccountId, Ledger, LedgerBalance, Indicator, T::Hash, T::BlockNumber>],
+            keys: &[Record<T::AccountId, T::Hash, T::BlockNumber>],
         ) -> DispatchResultWithPostInfo {
             let posting_index = Self::posting_number()
                 .checked_add(1)

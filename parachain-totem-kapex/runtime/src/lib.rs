@@ -649,7 +649,7 @@ construct_runtime!(
 		// RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Pallet, Storage} = 2,
 		Timestamp: pallet_timestamp::{Pallet, Call, Storage, Inherent} = 3,
 		ParachainInfo: parachain_info::{Pallet, Storage, Config} = 4,
-		Sudo: pallet_sudo::{Pallet, Event<T>, Config<T>} = 5,
+		Sudo: pallet_sudo::{Pallet, Call, Storage, Event<T>, Config<T>} = 5,
 
 		// Monetary stuff.
 		Balances: pallet_balances_totem::{Pallet, Call, Storage, Config<T>, Event<T>} = 10,
