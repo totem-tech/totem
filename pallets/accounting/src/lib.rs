@@ -332,6 +332,13 @@ mod pallet {
 
             T::AccountingConverter::convert(escrow_account)
         }
+        
+        /// This function simply returns the Totem network fees account address
+        fn get_netfees_account() -> T::AccountId {
+            let netfees_account: [u8; 32] = *b"TotemAccountingNetworkFeeAddress";
+
+            T::AccountingConverter::convert(netfees_account)
+        }
 
         /// Adds a new accounting entry in the ledger in case of a transfer
         fn account_for_simple_transfer(
@@ -348,7 +355,7 @@ mod pallet {
                 Record {
                     primary_party: from.clone(),
                     counterparty: to.clone(),
-                    ledger: Ledger::B1010004_0000000, // Internal Address Balance (Network Currency).
+                    ledger: Ledger::B1010004_0000000D, // Internal Address Balance (Network Currency).
                     amount: decrease_amount,
                     debit_credit: Indicator::Credit,
                     reference_hash,
@@ -356,11 +363,31 @@ mod pallet {
                     applicable_period_blocknumber: current_block_dupe,
                 },
                 Record {
-                    primary_party: to.clone(),
-                    counterparty: from.clone(),
-                    ledger: Ledger::B1010004_0000000, // Internal Address Balance (Network Currency).
+                    primary_party: from.clone(),
+                    counterparty: to.clone(),
+                    ledger: Ledger::B1010008_0000000D, // Director's loan account (asset until repaid).
                     amount: increase_amount,
                     debit_credit: Indicator::Debit,
+                    reference_hash,
+                    changed_on_blocknumber: current_block,
+                    applicable_period_blocknumber: current_block_dupe,
+                },
+                Record {
+                    primary_party: to.clone(),
+                    counterparty: from.clone(),
+                    ledger: Ledger::B1010004_0000000D, // Internal Address Balance (Network Currency).
+                    amount: increase_amount,
+                    debit_credit: Indicator::Debit,
+                    reference_hash,
+                    changed_on_blocknumber: current_block,
+                    applicable_period_blocknumber: current_block_dupe,
+                },
+                Record {
+                    primary_party: to.clone(),
+                    counterparty: from.clone(),
+                    ledger: Ledger::P4040001_0000000C, // Sales of services.
+                    amount: increase_amount,
+                    debit_credit: Indicator::Credit,
                     reference_hash,
                     changed_on_blocknumber: current_block,
                     applicable_period_blocknumber: current_block_dupe,
@@ -387,23 +414,48 @@ mod pallet {
 
             // Generate dummy Hash reference (it has no real bearing but allows posting to happen)
             let fee_hash: T::Hash = Self::get_pseudo_random_hash(payer.clone(), payer.clone());
+
+            // Get the dummy address for fees. Note this does not identify the receipients of fees (validators)
+            // It is used just for generic self-referential accounting 
+            let netfee_address: T::AccountId = Self::get_netfees_account();
+
             let keys = [
                 Record {
                     primary_party: payer.clone(),
-                    counterparty: payer.clone(),
-                    ledger: Ledger::P5050030_0000000, // Network Transaction Fees.
-                    amount: increase_amount,
-                    debit_credit: Debit,
+                    counterparty: netfee_address.clone(),
+                    ledger: Ledger::B1010004_0000000D, // Internal Address Balance (Network Currency).
+                    amount: decrease_amount,
+                    debit_credit: Indicator::Credit,
                     reference_hash: fee_hash,
                     changed_on_blocknumber: current_block,
                     applicable_period_blocknumber: current_block_dupe,
                 },
                 Record {
                     primary_party: payer.clone(),
+                    counterparty: netfee_address.clone(),
+                    ledger: Ledger::P5050030_0000000D, // Network Transaction Fees.
+                    amount: increase_amount,
+                    debit_credit: Indicator::Debit,
+                    reference_hash: fee_hash,
+                    changed_on_blocknumber: current_block,
+                    applicable_period_blocknumber: current_block_dupe,
+                },
+                Record {
+                    primary_party: netfee_address.clone(),
                     counterparty: payer.clone(),
-                    ledger: Ledger::B1010004_0000000, // Internal Address Balance (Network Currency).
-                    amount: decrease_amount,
-                    debit_credit: Credit,
+                    ledger: Ledger::B1010004_0000000D, // Internal Address Balance (Network Currency).
+                    amount: increase_amount,
+                    debit_credit: Indicator::Debit,
+                    reference_hash: fee_hash,
+                    changed_on_blocknumber: current_block,
+                    applicable_period_blocknumber: current_block_dupe,
+                },
+                Record {
+                    primary_party: netfee_address.clone(),
+                    counterparty: payer.clone(),
+                    ledger: Ledger::P4040001_0000000C, // Sales of services.
+                    amount: increase_amount,
+                    debit_credit: Indicator::Credit,
                     reference_hash: fee_hash,
                     changed_on_blocknumber: current_block,
                     applicable_period_blocknumber: current_block_dupe,

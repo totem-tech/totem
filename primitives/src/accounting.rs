@@ -61,6 +61,8 @@ pub trait Posting<AccountId, Hash, BlockNumber, CoinAmount> {
     fn account_for_fees(fee: CoinAmount, payer: AccountId) -> DispatchResultWithPostInfo;
 
     fn get_escrow_account() -> AccountId;
+    
+    fn get_netfees_account() -> AccountId;
 
     fn get_pseudo_random_hash(s: AccountId, r: AccountId) -> Hash;
 }
@@ -122,6 +124,10 @@ impl<AccountId, Hash, BlockNumber, CoinAmount> Posting<AccountId, Hash, BlockNum
     }
 
     fn get_escrow_account() -> AccountId {
+        unimplemented!("Used as a mock, shouldn't be called")
+    }
+
+    fn get_netfees_account() -> AccountId {
         unimplemented!("Used as a mock, shouldn't be called")
     }
 

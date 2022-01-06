@@ -74,6 +74,7 @@ mod pallet {
         escrow::{EscrowableCurrency, Reason},
         prefunding::*,
         ComparisonAmounts,
+        LedgerBalance,
     };
 
     type AccountBalanceOf<T> = <<T as Config>::Accounting as Posting<

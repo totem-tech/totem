@@ -1614,15 +1614,15 @@ where
             },
         )?;
 
+        T::Accounting::account_for_simple_transfer(transactor.clone(), dest.clone(), value)
+        .map_err(|_| ArithmeticError::Overflow)?;
+        
         // Emit transfer event.
         Self::deposit_event(Event::Transfer {
             from: transactor.clone(),
             to: dest.clone(),
             amount: value,
         });
-
-        T::Accounting::account_for_simple_transfer(transactor.clone(), dest.clone(), value)
-            .map_err(|_| ArithmeticError::Overflow)?;
 
         Ok(())
     }
