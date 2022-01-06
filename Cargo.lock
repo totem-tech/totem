@@ -42,7 +42,7 @@ version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0b613b8e1e3cf911a086f53f03bf286f52fd7a7258e4fa606f0ef220d39d8877"
 dependencies = [
- "generic-array 0.14.4",
+ "generic-array 0.14.5",
 ]
 
 [[package]]
@@ -621,7 +621,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4152116fd6e9dadb291ae18fc1ec3575ed6d84c29642d97890f4b4a3417297e4"
 dependencies = [
  "block-padding 0.2.1",
- "generic-array 0.14.4",
+ "generic-array 0.14.5",
 ]
 
 [[package]]
@@ -854,7 +854,7 @@ version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7ee52072ec15386f770805afd189a01c8841be8696bed250fa2f13c4c0d6dfb7"
 dependencies = [
- "generic-array 0.14.4",
+ "generic-array 0.14.5",
 ]
 
 [[package]]
@@ -1120,7 +1120,7 @@ version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b584a330336237c1eecd3e94266efb216c56ed91225d634cb2991c5f3fd1aeab"
 dependencies = [
- "generic-array 0.14.4",
+ "generic-array 0.14.5",
  "subtle",
 ]
 
@@ -1130,7 +1130,7 @@ version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b1d1a86f49236c215f271d40892d5fc950490551400b02ef360692c29815c714"
 dependencies = [
- "generic-array 0.14.4",
+ "generic-array 0.14.5",
  "subtle",
 ]
 
@@ -1626,7 +1626,7 @@ version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d3dd60d1080a57a05ab032377049e0591415d2b31afd7028356dbf3cc6dcb066"
 dependencies = [
- "generic-array 0.14.4",
+ "generic-array 0.14.5",
 ]
 
 [[package]]
@@ -2396,9 +2396,9 @@ dependencies = [
 
 [[package]]
 name = "generic-array"
-version = "0.14.4"
+version = "0.14.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "501466ecc8a30d1d3b7fc9229b122b2ce8ed6e9d9223f1138d4babb253e51817"
+checksum = "fd48d33ec7f05fbfa152300fdad764757cbded343c1aa1cff2fbaf4134851803"
 dependencies = [
  "typenum",
  "version_check",
@@ -2508,9 +2508,9 @@ dependencies = [
 
 [[package]]
 name = "handlebars"
-version = "4.1.6"
+version = "4.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "167fa173496c9eadd8749cca6f8339ac88e248f3ad2442791d0b743318a94fc0"
+checksum = "2483bce82dd3ed52509d0117e4a30a488bd608be250ed7a0185301314239ed31"
 dependencies = [
  "log",
  "pest",
@@ -2607,7 +2607,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "17ea0a1394df5b6574da6e0c1ade9e78868c9fb0a4e5ef4428e32da4676b85b1"
 dependencies = [
  "digest 0.9.0",
- "generic-array 0.14.4",
+ "generic-array 0.14.5",
  "hmac 0.8.1",
 ]
 
@@ -4182,7 +4182,7 @@ dependencies = [
  "blake2s_simd",
  "blake3",
  "digest 0.9.0",
- "generic-array 0.14.4",
+ "generic-array 0.14.5",
  "multihash-derive",
  "sha2 0.9.8",
  "sha3",
@@ -4196,7 +4196,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "752a61cd890ff691b4411423d23816d5866dd5621e4d1c5687a53b94b5a979d8"
 dependencies = [
  "digest 0.9.0",
- "generic-array 0.14.4",
+ "generic-array 0.14.5",
  "multihash-derive",
  "sha2 0.9.8",
  "unsigned-varint 0.7.1",
@@ -4468,7 +4468,7 @@ dependencies = [
 
 [[package]]
 name = "pallet-accounting"
-version = "0.0.1"
+version = "1.1.0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4487,7 +4487,7 @@ dependencies = [
 
 [[package]]
 name = "pallet-archive"
-version = "0.0.1"
+version = "1.1.0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4603,7 +4603,7 @@ dependencies = [
 
 [[package]]
 name = "pallet-balances-totem"
-version = "0.0.1"
+version = "1.1.0"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4663,7 +4663,7 @@ dependencies = [
 
 [[package]]
 name = "pallet-bonsai"
-version = "0.0.1"
+version = "1.1.0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4785,7 +4785,7 @@ dependencies = [
 
 [[package]]
 name = "pallet-escrow"
-version = "0.0.1"
+version = "1.1.0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4801,7 +4801,7 @@ dependencies = [
 
 [[package]]
 name = "pallet-funding"
-version = "0.0.1"
+version = "1.1.0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -5003,7 +5003,7 @@ dependencies = [
 
 [[package]]
 name = "pallet-orders"
-version = "0.0.1"
+version = "1.1.0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -5017,7 +5017,7 @@ dependencies = [
 
 [[package]]
 name = "pallet-prefunding"
-version = "0.0.1"
+version = "1.1.0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -5144,7 +5144,7 @@ dependencies = [
 
 [[package]]
 name = "pallet-teams"
-version = "0.0.1"
+version = "1.1.0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -5157,7 +5157,7 @@ dependencies = [
 
 [[package]]
 name = "pallet-timekeeping"
-version = "0.0.1"
+version = "1.1.0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -5274,7 +5274,7 @@ dependencies = [
 
 [[package]]
 name = "pallet-transfer"
-version = "0.0.1"
+version = "1.1.0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -5363,7 +5363,7 @@ dependencies = [
 
 [[package]]
 name = "parachain-totem-kapex-node"
-version = "0.0.1"
+version = "1.1.0"
 dependencies = [
  "cumulus-client-cli",
  "cumulus-client-collator",
@@ -5424,7 +5424,7 @@ dependencies = [
 
 [[package]]
 name = "parachain-totem-kapex-runtime"
-version = "0.0.1"
+version = "1.1.0"
 dependencies = [
  "cumulus-pallet-aura-ext",
  "cumulus-pallet-dmp-queue",
@@ -5482,7 +5482,7 @@ dependencies = [
 
 [[package]]
 name = "parachain-totem-lego-node"
-version = "0.0.1"
+version = "1.1.0"
 dependencies = [
  "cumulus-client-cli",
  "cumulus-client-collator",
@@ -5543,7 +5543,7 @@ dependencies = [
 
 [[package]]
 name = "parachain-totem-lego-runtime"
-version = "0.0.1"
+version = "1.1.0"
 dependencies = [
  "cumulus-pallet-aura-ext",
  "cumulus-pallet-dmp-queue",
@@ -5601,7 +5601,7 @@ dependencies = [
 
 [[package]]
 name = "parachain-totem-wapex-node"
-version = "0.0.1"
+version = "1.1.0"
 dependencies = [
  "cumulus-client-cli",
  "cumulus-client-collator",
@@ -5662,7 +5662,7 @@ dependencies = [
 
 [[package]]
 name = "parachain-totem-wapex-runtime"
-version = "0.0.1"
+version = "1.1.0"
 dependencies = [
  "cumulus-pallet-aura-ext",
  "cumulus-pallet-dmp-queue",
@@ -9133,9 +9133,9 @@ dependencies = [
 
 [[package]]
 name = "signature"
-version = "1.4.0"
+version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "02658e48d89f2bec991f9a78e69cfa4c316f8d6a6c4ec12fae1aeb263d486788"
+checksum = "f054c6c1a6e95179d6f23ed974060dcefb2d9388bb7256900badad682c499de4"
 
 [[package]]
 name = "simba"
@@ -10430,7 +10430,7 @@ dependencies = [
 
 [[package]]
 name = "totem-common"
-version = "0.0.1"
+version = "1.1.0"
 dependencies = [
  "frame-support",
  "parity-scale-codec",
@@ -10524,7 +10524,7 @@ dependencies = [
 
 [[package]]
 name = "totem-primitives"
-version = "0.0.1"
+version = "1.1.0"
 dependencies = [
  "frame-support",
  "parity-scale-codec",
@@ -10810,7 +10810,7 @@ version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9f214e8f697e925001e66ec2c6e37a4ef93f0f78c2eed7814394e10c62025b05"
 dependencies = [
- "generic-array 0.14.4",
+ "generic-array 0.14.5",
  "subtle",
 ]
 

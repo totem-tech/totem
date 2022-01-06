@@ -14,17 +14,17 @@
 # This will provide ther WASM blob that needs to be added to the readable chainspec
 #______________________________________________________________#
 
-# ./target/release/parachain-totem-lego-node build-spec --chain local > ./res/lego-local.json
-# ./target/release/parachain-totem-wapex-node build-spec --chain local > ./res/wapex-local.json
+# ./target/release/parachain-totem-lego-node build-spec --chain local > ./res/lego-local.json && \
+# ./target/release/parachain-totem-wapex-node build-spec --chain local > ./res/wapex-local.json && \
 # ./target/release/parachain-totem-kapex-node build-spec --chain local > ./res/kapex-local.json
 
 #______________________________________________________________#
 # Once added the next step is to convert the readable chainspec to raw format for inclusion in the runtime.
 #______________________________________________________________#
 
-# ./target/release/parachain-totem-lego-node build-spec --chain ./res/totem-lego-readable.json --raw > ./res/totem-lego-raw.json
-# ./target/release/parachain-totem-wapex-node build-spec --chain ./res/totem-wapex-readable.json --raw > ./res/totem-wapex-raw.json
-# ./target/release/parachain-totem-kapex-node build-spec --chain ./res/totem-kapex-readable.json --raw > ./res/totem-kapex-raw.json
+# ./target/release/parachain-totem-lego-node build-spec --chain ./res/totem-lego-raw.json --raw > ./res/totem-lego-raw-new.json && \
+# ./target/release/parachain-totem-wapex-node build-spec --chain ./res/totem-wapex-raw.json --raw > ./res/totem-wapex-raw-new.json && \
+# ./target/release/parachain-totem-kapex-node build-spec --chain ./res/totem-kapex-raw.json --raw > ./res/totem-kapex-raw-new.json
 
 #______________________________________________________________#
 # now the raw file is ready to be included in the runtime. Change the path in `command.rs`` to point to the raw version of the file.
