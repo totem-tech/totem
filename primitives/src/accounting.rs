@@ -38,6 +38,7 @@
 mod chart_of_accounts;
 pub use chart_of_accounts::Ledger;
 
+use crate::LedgerBalance;
 use frame_support::{dispatch::EncodeLike, pallet_prelude::*};
 use scale_info::TypeInfo;
 use sp_runtime::traits::Member;
@@ -46,10 +47,9 @@ use sp_std::prelude::*;
 /// Main Totem accounting trait.
 pub trait Posting<AccountId, Hash, BlockNumber, CoinAmount> {
     type PostingIndex: Member + Copy + Into<u128> + Encode + Decode + Eq;
-    type LedgerBalance: Member + Copy + Into<i128> + Encode + Decode + Eq;
 
     fn handle_multiposting_amounts(
-        keys: &[Record<AccountId, Ledger, Self::LedgerBalance, Indicator, Hash, BlockNumber>],
+        keys: &[Record<AccountId, Hash, BlockNumber>],
     ) -> DispatchResultWithPostInfo;
 
     fn account_for_simple_transfer(
@@ -66,15 +66,14 @@ pub trait Posting<AccountId, Hash, BlockNumber, CoinAmount> {
 }
 
 /// Note: Debit and Credit balances are account specific - see chart of accounts.
-#[repr(u8)]
-#[derive(Decode, Encode, Clone, Copy, TypeInfo)]
+#[derive(Clone, Decode, Encode, Copy, TypeInfo)]
 pub enum Indicator {
     Debit = 0,
     Credit = 1,
 }
 
-#[derive(Clone, TypeInfo)]
-pub struct Record<AccountId, Ledger, LedgerBalance, Indicator, Hash, BlockNumber> {
+#[derive(Clone, Decode, Encode, TypeInfo)]
+pub struct Record<AccountId, Hash, BlockNumber> {
     pub primary_party: AccountId,
     pub counterparty: AccountId,
     pub ledger: Ledger,
@@ -103,10 +102,9 @@ impl<AccountId, Hash, BlockNumber, CoinAmount> Posting<AccountId, Hash, BlockNum
     for ()
 {
     type PostingIndex = u128;
-    type LedgerBalance = i128;
 
     fn handle_multiposting_amounts(
-        _fwd: &[Record<AccountId, Ledger, Self::LedgerBalance, Indicator, Hash, BlockNumber>],
+        _fwd: &[Record<AccountId, Hash, BlockNumber>],
     ) -> DispatchResultWithPostInfo {
         unimplemented!("Used as a mock, shouldn't be called")
     }
