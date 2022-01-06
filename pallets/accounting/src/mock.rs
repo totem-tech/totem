@@ -84,6 +84,10 @@ impl Posting for Test {
         unimplemented!()
     }
 
+    fn get_netfees_account() -> AccountId {
+        unimplemented!()
+    }
+
     fn get_pseudo_random_hash(s: AccountId, r: AccountId) -> Hash {
         unimplemented!()
     }
