@@ -108,10 +108,7 @@ mod pallet {
     use sp_std::prelude::*;
 
     use totem_common::TryConvert;
-    use totem_primitives::accounting::{
-        Indicator::{self, *},
-        Ledger, Posting, Record,
-    };
+    use totem_primitives::accounting::{Indicator, Ledger, Posting, Record};
     use totem_primitives::{LedgerBalance, PostingIndex};
 
     type CurrencyBalanceOf<T> =
@@ -332,7 +329,7 @@ mod pallet {
 
             T::AccountingConverter::convert(escrow_account)
         }
-        
+
         /// This function simply returns the Totem network fees account address
         fn get_netfees_account() -> T::AccountId {
             let netfees_account: [u8; 32] = *b"TotemAccountingNetworkFeeAddress";
@@ -416,7 +413,7 @@ mod pallet {
             let fee_hash: T::Hash = Self::get_pseudo_random_hash(payer.clone(), payer.clone());
 
             // Get the dummy address for fees. Note this does not identify the receipients of fees (validators)
-            // It is used just for generic self-referential accounting 
+            // It is used just for generic self-referential accounting
             let netfee_address: T::AccountId = Self::get_netfees_account();
 
             let keys = [

@@ -49,8 +49,8 @@ pub mod timekeeping;
 pub mod transfer;
 
 use frame_support::{dispatch::EncodeLike, pallet_prelude::*};
-use sp_std::vec::Vec;
 use scale_info::TypeInfo;
+use sp_std::vec::Vec;
 
 /// Balance on an account can be negative.
 pub type LedgerBalance = i128;
@@ -64,7 +64,6 @@ pub type PostingIndex = u128;
 /// Used for comparisons.
 pub type ComparisonAmounts = u128;
 
-#[repr(u8)]
 #[derive(Decode, Encode, Debug, Clone, Copy, PartialEq, TypeInfo)]
 pub enum RecordType {
     Teams,
@@ -73,7 +72,7 @@ pub enum RecordType {
 }
 
 /// A collection based on `Vec` that guarantees that every member is unique.
-#[derive(Decode, Encode)]
+#[derive(Decode, Encode, TypeInfo)]
 pub struct Set<T>(Vec<T>);
 
 // Implementations

@@ -46,7 +46,6 @@ pub trait Validating<AccountId, Hash> {
 // Module Types
 pub type OrderStatus = u16; // Generic Status for whatever the HashReference refers to
 
-#[repr(u8)]
 #[derive(Debug, Decode, Encode, Clone, Copy, PartialEq, Eq, TypeInfo)]
 pub enum ApprovalStatus {
     Submitted = 0,
