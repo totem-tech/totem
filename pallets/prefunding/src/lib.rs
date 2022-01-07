@@ -56,8 +56,6 @@ pub use pallet::*;
 #[frame_support::pallet]
 mod pallet {
 
-    use core::convert::TryFrom;
-
     use frame_support::{
         fail,
         pallet_prelude::*,
@@ -66,23 +64,15 @@ mod pallet {
     use frame_system::pallet_prelude::*;
 
     use sp_runtime::traits::{Convert, Hash};
-    use sp_std::{prelude::*, vec};
+    use sp_std::prelude::*;
 
     use totem_common::{StorageMapExt, TryConvert};
     use totem_primitives::{
-        accounting::{Indicator::*, Posting, Record as PostingRecord},
+        accounting::{Indicator, Ledger, Posting, Record as PostingRecord},
         escrow::{EscrowableCurrency, Reason},
         prefunding::*,
-        ComparisonAmounts,
-        LedgerBalance,
+        ComparisonAmounts, LedgerBalance,
     };
-
-    type AccountBalanceOf<T> = <<T as Config>::Accounting as Posting<
-        <T as frame_system::Config>::AccountId,
-        <T as frame_system::Config>::Hash,
-        <T as frame_system::Config>::BlockNumber,
-        CurrencyBalanceOf<T>,
-    >>::LedgerBalance;
 
     type EscrowableBalanceOf<T> = <<<T as Config>::Escrowable as EscrowableCurrency<
         <T as frame_system::Config>::AccountId,
@@ -130,16 +120,12 @@ mod pallet {
 
         type Currency: Currency<Self::AccountId>;
         type Escrowable: EscrowableCurrency<Self::AccountId, Moment = Self::BlockNumber>;
-        type PrefundingConverter: TryConvert<AccountBalanceOf<Self>, u128>
-            + TryConvert<AccountBalanceOf<Self>, CurrencyBalanceOf<Self>>
-            + TryConvert<CurrencyBalanceOf<Self>, AccountBalanceOf<Self>>
+        type PrefundingConverter: TryConvert<LedgerBalance, u128>
+            + TryConvert<CurrencyBalanceOf<Self>, LedgerBalance>
             + Convert<Vec<u8>, LockIdentifier>
             + Convert<u32, Self::BlockNumber>
-            + Convert<i128, AccountBalanceOf<Self>>
-            + TryConvert<u128, AccountBalanceOf<Self>>
-            + Convert<AccountBalanceOf<Self>, i128>
             + Convert<CurrencyBalanceOf<Self>, u128>
-            + TryConvert<AccountBalanceOf<Self>, EscrowableBalanceOf<Self>>;
+            + TryConvert<LedgerBalance, EscrowableBalanceOf<Self>>;
         type Accounting: Posting<
             Self::AccountId,
             Self::Hash,
@@ -255,7 +241,7 @@ mod pallet {
         pub fn prefund_someone(
             origin: OriginFor<T>,
             beneficiary: T::AccountId,
-            amount: u128,
+            amount: CurrencyBalanceOf<T>,
             deadline: T::BlockNumber,
             tx_uid: T::Hash,
         ) -> DispatchResultWithPostInfo {
@@ -265,14 +251,7 @@ mod pallet {
             let prefunding_hash: T::Hash =
                 Self::get_pseudo_random_hash(who.clone(), beneficiary.clone());
 
-            Self::prefunding_for(
-                who,
-                beneficiary,
-                amount.into(),
-                deadline,
-                prefunding_hash,
-                tx_uid,
-            )
+            Self::prefunding_for(who, beneficiary, amount, deadline, prefunding_hash, tx_uid)
         }
 
         /// Creates a single line simple invoice without taxes, tariffs or commissions.
@@ -331,7 +310,7 @@ mod pallet {
         /// Reserve the prefunding deposit.
         fn set_prefunding(
             s: T::AccountId,
-            c: AccountBalanceOf<T>,
+            c: LedgerBalance,
             d: T::BlockNumber,
             h: T::Hash,
             _u: T::Hash,
@@ -506,32 +485,38 @@ mod pallet {
         fn settle_unfunded_invoice() -> DispatchResultWithPostInfo {
             fail!("TODO")
         }
+
+        /// Return a pair of:
+        /// - The amount given as a parameter, but signed.
+        /// - The opposite of that amount.
+        fn increase_decrease_amounts(
+            amount: CurrencyBalanceOf<T>,
+        ) -> Result<(LedgerBalance, LedgerBalance), Error<T>> {
+            let increase_amount: LedgerBalance =
+                T::PrefundingConverter::try_convert(amount).ok_or(Error::<T>::Overflow)?;
+            let decrease_amount = increase_amount.checked_neg().ok_or(Error::<T>::Overflow)?;
+
+            Ok((increase_amount, decrease_amount))
+        }
     }
 
-    impl<T: Config> Encumbrance<T::AccountId, T::Hash, T::BlockNumber> for Pallet<T> {
+    impl<T: Config> Encumbrance<T::AccountId, T::Hash, T::BlockNumber, CurrencyBalanceOf<T>>
+        for Pallet<T>
+    {
         fn prefunding_for(
             who: T::AccountId,
             recipient: T::AccountId,
-            amount: u128,
+            amount: CurrencyBalanceOf<T>, //todo rename amount
             deadline: T::BlockNumber,
             ref_hash: T::Hash,
             uid: T::Hash,
         ) -> DispatchResultWithPostInfo {
             // As amount will always be positive, convert for use in accounting
-            let increase_amount: AccountBalanceOf<T> =
-                T::PrefundingConverter::try_convert(amount).ok_or(Error::<T>::Overflow)?;
-            // Invert the amount
-            let decrease_amount: AccountBalanceOf<T> = {
-                let to_invert = i128::try_from(amount).or(Err(Error::<T>::Overflow))?;
-                T::PrefundingConverter::convert(-1 * to_invert)
-            };
+            let (increase_amount, decrease_amount) = Self::increase_decrease_amounts(amount)?;
             let current_block = <frame_system::Pallet<T>>::block_number();
             // Prefunding is always recorded in the same block. It cannot be posted to another period
             let current_block_dupe = <frame_system::Pallet<T>>::block_number();
             let prefunding_hash: T::Hash = ref_hash;
-            // convert the account balanace to the currency balance (i128 -> u128)
-            let currency_amount: CurrencyBalanceOf<T> =
-                T::PrefundingConverter::try_convert(increase_amount).ok_or(Error::<T>::Overflow)?;
             // NEED TO CHECK THAT THE DEADLINE IS SENSIBLE!!!!
             // 48 hours is the minimum deadline. This is the minimum amountof time before the money can be reclaimed
             let minimum_deadline: T::BlockNumber = current_block
@@ -539,7 +524,7 @@ mod pallet {
             if deadline < minimum_deadline {
                 fail!(Error::<T>::ShortDeadline);
             }
-            let prefunded = (currency_amount, deadline.clone());
+            let prefunded = (amount, deadline.clone());
             let owners = (who.clone(), true, recipient, false);
             // manage the deposit
             if let Err(_) =
@@ -549,50 +534,50 @@ mod pallet {
             }
 
             // Deposit taken at this point. Note that if an error occurs beyond here we need to remove the locked funds.
-            let keys = vec![
-                PostingRecord::new(
-                    who.clone(),
-                    who.clone(),
-                    T::PrefundingConverter::convert(110_10005000_0000_u64), // debit  increase 110100050000000 Prefunding Account
-                    increase_amount,
-                    Credit,
-                    prefunding_hash,
-                    current_block,
-                    current_block_dupe,
-                ),
-                PostingRecord::new(
-                    who.clone(),
-                    who.clone(),
-                    T::PrefundingConverter::convert(110_10004000_0000_u64), // credit decrease 110100040000000 XTX Balance
-                    decrease_amount,
-                    Debit,
-                    prefunding_hash,
-                    current_block,
-                    current_block_dupe,
-                ),
-                PostingRecord::new(
-                    who.clone(),
-                    who.clone(),
-                    T::PrefundingConverter::convert(360_60002000_0000_u64), // debit  increase 360600020000000 Runtime Ledger by Module
-                    increase_amount,
-                    Credit,
-                    prefunding_hash,
-                    current_block,
-                    current_block_dupe,
-                ),
-                PostingRecord::new(
-                    who.clone(),
-                    who.clone(),
-                    T::PrefundingConverter::convert(360_60006000_0000_u64), // debit  increase 360600060000000 Runtime Ledger Control
-                    increase_amount,
-                    Credit,
-                    prefunding_hash,
-                    current_block,
-                    current_block_dupe,
-                ),
+            let keys = [
+                PostingRecord {
+                    primary_party: who.clone(),
+                    counterparty: who.clone(),
+                    ledger: Ledger::B1010005_0000000D, // debit  increase 110100050000000 Prefunding Account
+                    amount: increase_amount,
+                    debit_credit: Indicator::Credit,
+                    reference_hash: prefunding_hash,
+                    changed_on_blocknumber: current_block,
+                    applicable_period_blocknumber: current_block_dupe,
+                },
+                PostingRecord {
+                    primary_party: who.clone(),
+                    counterparty: who.clone(),
+                    ledger: Ledger::B1010004_0000000D, // credit decrease 110100040000000 XTX Balance
+                    amount: decrease_amount,
+                    debit_credit: Indicator::Debit,
+                    reference_hash: prefunding_hash,
+                    changed_on_blocknumber: current_block,
+                    applicable_period_blocknumber: current_block_dupe,
+                },
+                PostingRecord {
+                    primary_party: who.clone(),
+                    counterparty: who.clone(),
+                    ledger: Ledger::C6060002_0000000D, // debit  increase 360600020000000 Runtime Ledger by Module
+                    amount: increase_amount,
+                    debit_credit: Indicator::Credit,
+                    reference_hash: prefunding_hash,
+                    changed_on_blocknumber: current_block,
+                    applicable_period_blocknumber: current_block_dupe,
+                },
+                PostingRecord {
+                    primary_party: who.clone(),
+                    counterparty: who.clone(),
+                    ledger: Ledger::C6060006_0000000D, // debit  increase 360600060000000 Runtime Ledger Control
+                    amount: increase_amount,
+                    debit_credit: Indicator::Credit,
+                    reference_hash: prefunding_hash,
+                    changed_on_blocknumber: current_block,
+                    applicable_period_blocknumber: current_block_dupe,
+                },
             ];
 
-            if let Err(_) = T::Accounting::handle_multiposting_amounts(keys) {
+            if let Err(_) = T::Accounting::handle_multiposting_amounts(&keys) {
                 fail!(Error::<T>::InAccounting1);
             }
 
@@ -620,14 +605,14 @@ mod pallet {
         /// Must include a connection to the originating reference.
         /// Invoices cannot be made to parties that haven't asked for something identified by a valid hash.
         fn send_simple_invoice(
-            o: T::AccountId,
-            p: T::AccountId,
-            n: i128,
-            h: T::Hash,
-            u: T::Hash,
+            who: T::AccountId,
+            recipient: T::AccountId,
+            amount: LedgerBalance,
+            ref_hash: T::Hash,
+            uid: T::Hash,
         ) -> DispatchResultWithPostInfo {
             // Validate that the hash is indeed assigned to the seller
-            if Self::check_ref_beneficiary(o.clone(), h) == false {
+            if Self::check_ref_beneficiary(who.clone(), ref_hash) == false {
                 fail!(Error::<T>::NotAllowed2);
             }
 
@@ -636,115 +621,114 @@ mod pallet {
             // In order to proceed with a credit note, validate that the vendor has sufficient funds.
             // If they do not have sufficient funds, the credit note can still be issued, but will remain outstanding until it is settled.
             // As amount will always be positive, convert for use in accounting
-            let amount_converted = T::PrefundingConverter::convert(n);
             let current_block = frame_system::Pallet::<T>::block_number();
             let current_block_dupe = frame_system::Pallet::<T>::block_number();
 
             // Keys for posting
-            let keys = vec![
+            let keys = [
                 // Seller
-                PostingRecord::new(
-                    o.clone(),
-                    o.clone(),
-                    T::PrefundingConverter::convert(110_10008000_0000_u64), // Debit  increase 110100080000000	Accounts receivable (Sales Control Account or Trade Debtor's Account)
-                    amount_converted,
-                    Credit,
-                    h,
-                    current_block,
-                    current_block_dupe,
-                ),
-                PostingRecord::new(
-                    o.clone(),
-                    o.clone(),
-                    T::PrefundingConverter::convert(240_40001000_0000_u64), // Credit increase 240400010000000	Product or Service Sales
-                    amount_converted,
-                    Debit,
-                    h,
-                    current_block,
-                    current_block_dupe,
-                ),
-                PostingRecord::new(
-                    o.clone(),
-                    o.clone(),
-                    T::PrefundingConverter::convert(360_60001000_0000_u64), // Debit  increase 360600010000000	Sales Ledger by Payer
-                    amount_converted,
-                    Credit,
-                    h,
-                    current_block,
-                    current_block_dupe,
-                ),
-                PostingRecord::new(
-                    o.clone(),
-                    o.clone(),
-                    T::PrefundingConverter::convert(360_60005000_0000_u64), // Debit  increase 360600050000000	Sales Ledger Control
-                    amount_converted,
-                    Credit,
-                    h,
-                    current_block,
-                    current_block_dupe,
-                ),
+                PostingRecord {
+                    primary_party: who.clone(),
+                    counterparty: who.clone(),
+                    ledger: Ledger::B1010008_0000000D, // Debit  increase 110100080000000	Accounts receivable (Sales Control Account or Trade Debtor's Account)
+                    amount,
+                    debit_credit: Indicator::Credit,
+                    reference_hash: ref_hash,
+                    changed_on_blocknumber: current_block,
+                    applicable_period_blocknumber: current_block_dupe,
+                },
+                PostingRecord {
+                    primary_party: who.clone(),
+                    counterparty: who.clone(),
+                    ledger: Ledger::P4040001_0000000C, // Credit increase 240400010000000	Product or Service Sales
+                    amount,
+                    debit_credit: Indicator::Debit,
+                    reference_hash: ref_hash,
+                    changed_on_blocknumber: current_block,
+                    applicable_period_blocknumber: current_block_dupe,
+                },
+                PostingRecord {
+                    primary_party: who.clone(),
+                    counterparty: who.clone(),
+                    ledger: Ledger::C6060001_0000000D, // Debit  increase 360600010000000	Sales Ledger by Payer
+                    amount,
+                    debit_credit: Indicator::Credit,
+                    reference_hash: ref_hash,
+                    changed_on_blocknumber: current_block,
+                    applicable_period_blocknumber: current_block_dupe,
+                },
+                PostingRecord {
+                    primary_party: who.clone(),
+                    counterparty: who.clone(),
+                    ledger: Ledger::C6060005_0000000D, // Debit  increase 360600050000000	Sales Ledger Control
+                    amount,
+                    debit_credit: Indicator::Credit,
+                    reference_hash: ref_hash,
+                    changed_on_blocknumber: current_block,
+                    applicable_period_blocknumber: current_block_dupe,
+                },
                 // Buyer
-                PostingRecord::new(
-                    p.clone(),
-                    p.clone(),
-                    T::PrefundingConverter::convert(120_20003000_0000_u64), // Credit increase 120200030000000	Accounts payable
-                    amount_converted,
-                    Debit,
-                    h,
-                    current_block,
-                    current_block_dupe,
-                ),
-                PostingRecord::new(
-                    p.clone(),
-                    p.clone(),
-                    T::PrefundingConverter::convert(250_50012000_0013_u64), // Debit  increase 250500120000013	Labour
-                    amount_converted,
-                    Credit,
-                    h,
-                    current_block,
-                    current_block_dupe,
-                ),
-                PostingRecord::new(
-                    p.clone(),
-                    p.clone(),
-                    T::PrefundingConverter::convert(360_60003000_0000_u64), // Debit  increase 360600030000000	Purchase Ledger by Vendor
-                    amount_converted,
-                    Credit,
-                    h,
-                    current_block,
-                    current_block_dupe,
-                ),
-                PostingRecord::new(
-                    p.clone(),
-                    p.clone(),
-                    T::PrefundingConverter::convert(360_60007000_0000_u64), // Debit  increase 360600070000000	Purchase Ledger Control
-                    amount_converted,
-                    Credit,
-                    h,
-                    current_block,
-                    current_block_dupe,
-                ),
+                PostingRecord {
+                    primary_party: recipient.clone(),
+                    counterparty: recipient.clone(),
+                    ledger: Ledger::B2020003_0000000C, // Credit increase 120200030000000	Accounts payable
+                    amount,
+                    debit_credit: Indicator::Debit,
+                    reference_hash: ref_hash,
+                    changed_on_blocknumber: current_block,
+                    applicable_period_blocknumber: current_block_dupe,
+                },
+                PostingRecord {
+                    primary_party: recipient.clone(),
+                    counterparty: recipient.clone(),
+                    ledger: Ledger::P5050012_0000013D, // Debit  increase 250500120000013	Labour
+                    amount,
+                    debit_credit: Indicator::Credit,
+                    reference_hash: ref_hash,
+                    changed_on_blocknumber: current_block,
+                    applicable_period_blocknumber: current_block_dupe,
+                },
+                PostingRecord {
+                    primary_party: recipient.clone(),
+                    counterparty: recipient.clone(),
+                    ledger: Ledger::C6060003_0000000D, // Debit  increase 360600030000000	Purchase Ledger by Vendor
+                    amount,
+                    debit_credit: Indicator::Credit,
+                    reference_hash: ref_hash,
+                    changed_on_blocknumber: current_block,
+                    applicable_period_blocknumber: current_block_dupe,
+                },
+                PostingRecord {
+                    primary_party: recipient.clone(),
+                    counterparty: recipient.clone(),
+                    ledger: Ledger::C6060007_0000000D, // Debit  increase 360600070000000	Purchase Ledger Control
+                    amount,
+                    debit_credit: Indicator::Credit,
+                    reference_hash: ref_hash,
+                    changed_on_blocknumber: current_block,
+                    applicable_period_blocknumber: current_block_dupe,
+                },
             ];
 
-            if let Err(_) = T::Accounting::handle_multiposting_amounts(keys) {
+            if let Err(_) = T::Accounting::handle_multiposting_amounts(&keys) {
                 fail!(Error::<T>::InAccounting2);
             }
 
             // Add status processing
             let new_status: Status = 400; // invoiced(400), can no longer be accepted,
-            if let Err(_) = Self::set_ref_status(h, new_status) {
+            if let Err(_) = Self::set_ref_status(ref_hash, new_status) {
                 fail!(Error::<T>::SettingStatus2);
             }
 
-            Self::deposit_event(Event::InvoiceIssued(u));
+            Self::deposit_event(Event::InvoiceIssued(uid));
 
             Ok(().into())
         }
 
         /// Settles invoice by unlocking funds and updates various relevant accounts and pays prefunded amount.
         fn settle_prefunded_invoice(
-            o: T::AccountId,
-            h: T::Hash,
+            who: T::AccountId,
+            ref_hash: T::Hash,
             uid: T::Hash,
         ) -> DispatchResultWithPostInfo {
             use LockStatus::*;
@@ -752,144 +736,139 @@ mod pallet {
             // release state must be 11
             // sender must be owner
             // accounts updated before payment, because if there is an error then the accounting can be rolled back
-            let (payer, beneficiary) = match Self::get_release_state(h) {
+            let (payer, beneficiary) = match Self::get_release_state(ref_hash) {
                 // submitted, but not yet accepted
                 (Locked, Unlocked) => fail!(Error::<T>::NotApproved2),
                 (Locked, Locked) => {
                     // Validate that the hash is indeed owned by the buyer
-                    if Self::check_ref_owner(o.clone(), h) == false {
+                    if Self::check_ref_owner(who.clone(), ref_hash) == false {
                         fail!(Error::<T>::NotAllowed3);
                     }
 
                     // get beneficiary from hash
                     let (_, _, details /*TODO better name*/, _) =
-                        Self::prefunding_hash_owner(&h).ok_or(Error::<T>::NoDetails)?;
+                        Self::prefunding_hash_owner(&ref_hash).ok_or(Error::<T>::NoDetails)?;
                     // get prefunding amount for posting to accounts
                     let (prefunded_amount, _) =
-                        Self::prefunding(&h).ok_or(Error::<T>::NoPrefunding)?;
+                        Self::prefunding(&ref_hash).ok_or(Error::<T>::NoPrefunding)?;
                     // convert to Account Balance type
-                    let increase_amount: AccountBalanceOf<T> =
-                        T::PrefundingConverter::try_convert(prefunded_amount)
-                            .ok_or(Error::<T>::Overflow)?;
-                    let decrease_amount: AccountBalanceOf<T> = {
-                        let to_invert: i128 = T::PrefundingConverter::convert(increase_amount);
-                        T::PrefundingConverter::convert(-1 * to_invert)
-                    };
+                    let (increase_amount, decrease_amount) =
+                        Self::increase_decrease_amounts(prefunded_amount)?;
                     let current_block = frame_system::Pallet::<T>::block_number();
                     let current_block_dupe = frame_system::Pallet::<T>::block_number();
 
                     // Keys for posting
-                    let keys = vec![
+                    let keys = [
                         // Buyer
-                        PostingRecord::new(
-                            o.clone(),
-                            o.clone(),
-                            T::PrefundingConverter::convert(120_20003000_0000_u64), // 120200030000000	Debit  decrease Accounts payable
-                            decrease_amount,
-                            Credit,
-                            h,
-                            current_block,
-                            current_block_dupe,
-                        ),
-                        PostingRecord::new(
-                            o.clone(),
-                            o.clone(),
-                            T::PrefundingConverter::convert(110_10005000_0000_u64), // 110100050000000	Credit decrease Totem Runtime Deposit (Escrow)
-                            decrease_amount,
-                            Debit,
-                            h,
-                            current_block,
-                            current_block_dupe,
-                        ),
-                        PostingRecord::new(
-                            o.clone(),
-                            o.clone(),
-                            T::PrefundingConverter::convert(360_60002000_0000_u64), // 360600020000000	Credit decrease Runtime Ledger by Module
-                            decrease_amount,
-                            Debit,
-                            h,
-                            current_block,
-                            current_block_dupe,
-                        ),
-                        PostingRecord::new(
-                            o.clone(),
-                            o.clone(),
-                            T::PrefundingConverter::convert(360_60006000_0000_u64), // 360600060000000	Credit decrease Runtime Ledger Control
-                            decrease_amount,
-                            Debit,
-                            h,
-                            current_block,
-                            current_block_dupe,
-                        ),
-                        PostingRecord::new(
-                            o.clone(),
-                            o.clone(),
-                            T::PrefundingConverter::convert(360_60003000_0000_u64), // 360600030000000	Credit decrease Purchase Ledger by Vendor
-                            decrease_amount,
-                            Debit,
-                            h,
-                            current_block,
-                            current_block_dupe,
-                        ),
-                        PostingRecord::new(
-                            o.clone(),
-                            o.clone(),
-                            T::PrefundingConverter::convert(360_60007000_0000_u64), // 360600070000000	Credit decrease Purchase Ledger Control
-                            decrease_amount,
-                            Debit,
-                            h,
-                            current_block,
-                            current_block_dupe,
-                        ),
+                        PostingRecord {
+                            primary_party: who.clone(),
+                            counterparty: who.clone(),
+                            ledger: Ledger::B2020003_0000000C, // 120200030000000	Debit  decrease Accounts payable
+                            amount: decrease_amount,
+                            debit_credit: Indicator::Credit,
+                            reference_hash: ref_hash,
+                            changed_on_blocknumber: current_block,
+                            applicable_period_blocknumber: current_block_dupe,
+                        },
+                        PostingRecord {
+                            primary_party: who.clone(),
+                            counterparty: who.clone(),
+                            ledger: Ledger::B1010005_0000000D, // 110100050000000	Credit decrease Totem Runtime Deposit (Escrow)
+                            amount: decrease_amount,
+                            debit_credit: Indicator::Debit,
+                            reference_hash: ref_hash,
+                            changed_on_blocknumber: current_block,
+                            applicable_period_blocknumber: current_block_dupe,
+                        },
+                        PostingRecord {
+                            primary_party: who.clone(),
+                            counterparty: who.clone(),
+                            ledger: Ledger::C6060002_0000000D, // 360600020000000	Credit decrease Runtime Ledger by Module
+                            amount: decrease_amount,
+                            debit_credit: Indicator::Debit,
+                            reference_hash: ref_hash,
+                            changed_on_blocknumber: current_block,
+                            applicable_period_blocknumber: current_block_dupe,
+                        },
+                        PostingRecord {
+                            primary_party: who.clone(),
+                            counterparty: who.clone(),
+                            ledger: Ledger::C6060006_0000000D, // 360600060000000	Credit decrease Runtime Ledger Control
+                            amount: decrease_amount,
+                            debit_credit: Indicator::Debit,
+                            reference_hash: ref_hash,
+                            changed_on_blocknumber: current_block,
+                            applicable_period_blocknumber: current_block_dupe,
+                        },
+                        PostingRecord {
+                            primary_party: who.clone(),
+                            counterparty: who.clone(),
+                            ledger: Ledger::C6060003_0000000D, // 360600030000000	Credit decrease Purchase Ledger by Vendor
+                            amount: decrease_amount,
+                            debit_credit: Indicator::Debit,
+                            reference_hash: ref_hash,
+                            changed_on_blocknumber: current_block,
+                            applicable_period_blocknumber: current_block_dupe,
+                        },
+                        PostingRecord {
+                            primary_party: who.clone(),
+                            counterparty: who.clone(),
+                            ledger: Ledger::C6060007_0000000D, // 360600070000000	Credit decrease Purchase Ledger Control
+                            amount: decrease_amount,
+                            debit_credit: Indicator::Debit,
+                            reference_hash: ref_hash,
+                            changed_on_blocknumber: current_block,
+                            applicable_period_blocknumber: current_block_dupe,
+                        },
                         // Seller
-                        PostingRecord::new(
-                            details.clone(),
-                            details.clone(),
-                            T::PrefundingConverter::convert(110_10004000_0000_u64), // 110100040000000	Debit  increase XTX Balance
-                            increase_amount,
-                            Credit,
-                            h,
-                            current_block,
-                            current_block_dupe,
-                        ),
-                        PostingRecord::new(
-                            details.clone(),
-                            details.clone(),
-                            T::PrefundingConverter::convert(110_10008000_0000_u64), // 110100080000000	Credit decrease Accounts receivable (Sales Control Account or Trade Debtor's Account)
-                            decrease_amount,
-                            Debit,
-                            h,
-                            current_block,
-                            current_block_dupe,
-                        ),
-                        PostingRecord::new(
-                            details.clone(),
-                            details.clone(),
-                            T::PrefundingConverter::convert(360_60001000_0000_u64), // 360600010000000	Credit decrease Sales Ledger by Payer
-                            decrease_amount,
-                            Debit,
-                            h,
-                            current_block,
-                            current_block_dupe,
-                        ),
-                        PostingRecord::new(
-                            details.clone(),
-                            details.clone(),
-                            T::PrefundingConverter::convert(360_60005000_0000_u64), // 360600050000000	Credit decrease Sales Ledger Control
-                            decrease_amount,
-                            Debit,
-                            h,
-                            current_block,
-                            current_block_dupe,
-                        ),
+                        PostingRecord {
+                            primary_party: details.clone(),
+                            counterparty: details.clone(),
+                            ledger: Ledger::B1010004_0000000D, // 110100040000000	Debit  increase XTX Balance
+                            amount: increase_amount,
+                            debit_credit: Indicator::Credit,
+                            reference_hash: ref_hash,
+                            changed_on_blocknumber: current_block,
+                            applicable_period_blocknumber: current_block_dupe,
+                        },
+                        PostingRecord {
+                            primary_party: details.clone(),
+                            counterparty: details.clone(),
+                            ledger: Ledger::B1010008_0000000D, // 110100080000000	Credit decrease Accounts receivable (Sales Control Account or Trade Debtor's Account)
+                            amount: decrease_amount,
+                            debit_credit: Indicator::Debit,
+                            reference_hash: ref_hash,
+                            changed_on_blocknumber: current_block,
+                            applicable_period_blocknumber: current_block_dupe,
+                        },
+                        PostingRecord {
+                            primary_party: details.clone(),
+                            counterparty: details.clone(),
+                            ledger: Ledger::C6060001_0000000D, // 360600010000000	Credit decrease Sales Ledger by Payer
+                            amount: decrease_amount,
+                            debit_credit: Indicator::Debit,
+                            reference_hash: ref_hash,
+                            changed_on_blocknumber: current_block,
+                            applicable_period_blocknumber: current_block_dupe,
+                        },
+                        PostingRecord {
+                            primary_party: details.clone(),
+                            counterparty: details.clone(),
+                            ledger: Ledger::C6060005_0000000D, // 360600050000000	Credit decrease Sales Ledger Control
+                            amount: decrease_amount,
+                            debit_credit: Indicator::Debit,
+                            reference_hash: ref_hash,
+                            changed_on_blocknumber: current_block,
+                            applicable_period_blocknumber: current_block_dupe,
+                        },
                     ];
 
-                    if let Err(_) = T::Accounting::handle_multiposting_amounts(keys) {
+                    if let Err(_) = T::Accounting::handle_multiposting_amounts(&keys) {
                         fail!(Error::<T>::InAccounting3);
                     }
 
                     // export details for final payment steps
-                    (o, details)
+                    (who, details)
                 }
                 // This state is not allowed for this functions
                 (Unlocked, Locked) => fail!(Error::<T>::NotAllowed4),
@@ -899,12 +878,12 @@ mod pallet {
 
             // Set release lock "buyer who has approved invoice"
             // this may have been set independently, but is required for next step
-            if let Err(_) = Self::set_release_state(payer, Unlocked, h, uid) {
+            if let Err(_) = Self::set_release_state(payer, Unlocked, ref_hash, uid) {
                 fail!(Error::<T>::ReleaseState);
             }
 
             // Unlock, tansfer funds and mark hash as settled in full
-            if let Err(_) = Self::unlock_funds_for_beneficiary(beneficiary, h, uid) {
+            if let Err(_) = Self::unlock_funds_for_beneficiary(beneficiary, ref_hash, uid) {
                 fail!(Error::<T>::Unlocking);
             }
 
@@ -913,19 +892,11 @@ mod pallet {
             Ok(().into())
         }
 
-        /// Checks owner (of hash) - if anything fails then returns false.
-        fn check_ref_owner(o: T::AccountId, h: T::Hash) -> bool {
-            match Self::prefunding_hash_owner(&h) {
-                Some(owners) if owners.0 == o => true,
-                _ => false,
-            }
-        }
-
         /// Sets the release state by the owner or the beneficiary is only called when something already exists.
         fn set_release_state(
-            o: T::AccountId,
+            who: T::AccountId,
             o_lock: LockStatus,
-            h: T::Hash,
+            ref_hash: T::Hash,
             uid: T::Hash,
         ) -> DispatchResultWithPostInfo {
             use LockStatus::*;
@@ -936,9 +907,9 @@ mod pallet {
             // 01, sender approves (recipient can take, or refund)
             // 00, only the recipient authorises sender to retake funds regardless of deadline.
             // Initialise new tuple with some dummy values
-            let mut change = (o.clone(), Unlocked, o.clone(), Unlocked);
+            let mut change = (who.clone(), Unlocked, who.clone(), Unlocked);
 
-            match Self::prefunding_hash_owner(&h) {
+            match Self::prefunding_hash_owner(&ref_hash) {
                 Some(state_lock) => {
                     let locks = (state_lock.1, state_lock.3);
                     change.0 = state_lock.0.clone();
@@ -952,9 +923,9 @@ mod pallet {
                         (Locked, Unlocked) => {
                             match o_lock {
                                 Locked => {
-                                    if o == commander {
+                                    if who == commander {
                                         fail!(Error::<T>::WrongState1);
-                                    } else if o == fulfiller {
+                                    } else if who == fulfiller {
                                         change.1 = state_lock.1;
                                         change.3 = o_lock;
                                     } else {
@@ -964,10 +935,10 @@ mod pallet {
                                 Unlocked => {
                                     // We do care if the deadline has passed IF this is the commander calling directly
                                     // but that must be handled outside of this function
-                                    if o == commander {
+                                    if who == commander {
                                         change.1 = o_lock;
                                         change.3 = state_lock.3;
-                                    } else if o == fulfiller {
+                                    } else if who == fulfiller {
                                         fail!(Error::<T>::WrongState2);
                                     } else {
                                         fail!(Error::<T>::LockNotAllowed2);
@@ -980,10 +951,10 @@ mod pallet {
                         (Locked, Locked) => match o_lock {
                             Locked => fail!(Error::<T>::WrongState3),
                             Unlocked => {
-                                if o == commander {
+                                if who == commander {
                                     change.1 = o_lock;
                                     change.3 = state_lock.3;
-                                } else if o == fulfiller {
+                                } else if who == fulfiller {
                                     change.1 = state_lock.1;
                                     change.3 = o_lock;
                                 } else {
@@ -996,9 +967,9 @@ mod pallet {
                         (Unlocked, Locked) => match o_lock {
                             Locked => fail!(Error::<T>::LockNotAllowed4),
                             Unlocked => {
-                                if o == commander {
+                                if who == commander {
                                     fail!(Error::<T>::WrongState5);
-                                } else if o == fulfiller {
+                                } else if who == fulfiller {
                                     change.1 = state_lock.1;
                                     change.3 = o_lock;
                                 } else {
@@ -1013,44 +984,36 @@ mod pallet {
                 }
                 None => fail!(Error::<T>::HashDoesNotExist2),
             };
-            PrefundingHashOwner::<T>::insert(&h, change);
+            PrefundingHashOwner::<T>::insert(&ref_hash, change);
             // Issue event
             Self::deposit_event(Event::PrefundingLockSet(uid));
 
             Ok(().into())
         }
 
-        /// Checks beneficiary (of hash reference).
-        fn check_ref_beneficiary(o: T::AccountId, h: T::Hash) -> bool {
-            match Self::prefunding_hash_owner(&h) {
-                Some(owners) if owners.2 == o => true,
-                _ => false,
-            }
-        }
-
         /// Unlocks for owner.
         fn unlock_funds_for_owner(
-            o: T::AccountId,
-            h: T::Hash,
+            who: T::AccountId,
+            ref_hash: T::Hash,
             _uid: T::Hash,
         ) -> DispatchResultWithPostInfo {
             use LockStatus::*;
 
-            if Self::reference_valid(h) == false {
+            if Self::reference_valid(ref_hash) == false {
                 fail!(Error::<T>::HashDoesNotExist3);
             }
 
-            if Self::check_ref_owner(o.clone(), h) == false {
+            if Self::check_ref_owner(who.clone(), ref_hash) == false {
                 fail!(Error::<T>::NotOwner2);
             }
 
-            match Self::get_release_state(h) {
+            match Self::get_release_state(ref_hash) {
                 // submitted, but not yet accepted
                 // Check if the dealine has passed. If not funds cannot be release
                 (Locked, Unlocked) => {
-                    if Self::prefund_deadline_passed(h) {
+                    if Self::prefund_deadline_passed(ref_hash) {
                         let status: Status = 50; // Abandoned or Cancelled
-                        if let Err(_) = Self::cancel_prefunding_lock(o, h, status) {
+                        if let Err(_) = Self::cancel_prefunding_lock(who, ref_hash, status) {
                             fail!(Error::<T>::CancelFailed2);
                         }
                     } else {
@@ -1062,13 +1025,29 @@ mod pallet {
                 (Unlocked, Unlocked) => {
                     // Owner has been  given permission by beneficiary to release funds
                     let status: Status = 50; // Abandoned or cancelled
-                    if let Err(_) = Self::cancel_prefunding_lock(o, h, status) {
+                    if let Err(_) = Self::cancel_prefunding_lock(who, ref_hash, status) {
                         fail!(Error::<T>::CancellingPrefund);
                     }
                 }
             }
 
             Ok(().into())
+        }
+
+        /// Checks owner (of hash) - if anything fails then returns false.
+        fn check_ref_owner(who: T::AccountId, ref_hash: T::Hash) -> bool {
+            match Self::prefunding_hash_owner(&ref_hash) {
+                Some(owners) if owners.0 == who => true,
+                _ => false,
+            }
+        }
+
+        /// Checks beneficiary (of hash reference).
+        fn check_ref_beneficiary(who: T::AccountId, ref_hash: T::Hash) -> bool {
+            match Self::prefunding_hash_owner(&ref_hash) {
+                Some(owners) if owners.2 == who => true,
+                _ => false,
+            }
         }
     }
 }
