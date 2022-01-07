@@ -132,10 +132,15 @@ mod pallet {
         >;
         type Bonsai: Storing<Self::Hash>;
         type Currency: Currency<Self::AccountId>;
-        type OrdersConverter: TryConvert<i128, u128>
+        type OrdersConverter: TryConvert<i128, CurrencyBalanceOf<Self>>
             + Convert<u32, Self::BlockNumber>
             + Convert<Self::BlockNumber, u32>;
-        type Prefunding: Encumbrance<Self::AccountId, Self::Hash, Self::BlockNumber>;
+        type Prefunding: Encumbrance<
+            Self::AccountId,
+            Self::Hash,
+            Self::BlockNumber,
+            CurrencyBalanceOf<Self>,
+        >;
     }
 
     #[pallet::error]
@@ -623,7 +628,7 @@ mod pallet {
         fn set_prefunding(
             c: T::AccountId,
             f: T::AccountId,
-            a: u128,
+            a: CurrencyBalanceOf<T>,
             d: T::BlockNumber,
             o: T::Hash,
             u: T::Hash,

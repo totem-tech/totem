@@ -35,45 +35,53 @@
 // You should have received a copy of the GNU General Public License
 // along with Totem.  If not, see <http://www.gnu.org/licenses/>.
 
+use crate::LedgerBalance;
 use frame_support::{dispatch::EncodeLike, pallet_prelude::*};
-use sp_std::prelude::*;
 use scale_info::TypeInfo;
+use sp_std::prelude::*;
 
-pub trait Encumbrance<AccountId, Hash, BlockNumber> {
+pub trait Encumbrance<AccountId, Hash, BlockNumber, CoinAmount> {
     fn prefunding_for(
         who: AccountId,
         recipient: AccountId,
-        amount: u128,
+        amount: CoinAmount,
         deadline: BlockNumber,
         ref_hash: Hash,
         uid: Hash,
     ) -> DispatchResultWithPostInfo;
 
     fn send_simple_invoice(
-        o: AccountId,
-        p: AccountId,
-        n: i128,
-        h: Hash,
+        who: AccountId,
+        recipient: AccountId,
+        amount: LedgerBalance,
+        ref_hash: Hash,
         uid: Hash,
     ) -> DispatchResultWithPostInfo;
 
-    fn settle_prefunded_invoice(o: AccountId, h: Hash, uid: Hash) -> DispatchResultWithPostInfo;
+    fn settle_prefunded_invoice(
+        who: AccountId,
+        ref_hash: Hash,
+        uid: Hash,
+    ) -> DispatchResultWithPostInfo;
 
     fn set_release_state(
-        o: AccountId,
+        who: AccountId,
         o_lock: LockStatus,
-        h: Hash,
+        ref_hash: Hash,
         uid: Hash,
     ) -> DispatchResultWithPostInfo;
 
-    fn unlock_funds_for_owner(o: AccountId, h: Hash, uid: Hash) -> DispatchResultWithPostInfo;
+    fn unlock_funds_for_owner(
+        who: AccountId,
+        ref_hash: Hash,
+        uid: Hash,
+    ) -> DispatchResultWithPostInfo;
 
-    fn check_ref_owner(o: AccountId, h: Hash) -> bool;
+    fn check_ref_owner(who: AccountId, ref_hash: Hash) -> bool;
 
-    fn check_ref_beneficiary(o: AccountId, h: Hash) -> bool;
+    fn check_ref_beneficiary(who: AccountId, ref_hash: Hash) -> bool;
 }
 
-#[repr(u8)]
 #[derive(Clone, Copy, Debug, Decode, Encode, PartialEq, Eq, TypeInfo)]
 pub enum LockStatus {
     Unlocked = 0,
