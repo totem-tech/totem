@@ -109,7 +109,7 @@ mod pallet {
 
     use totem_common::TryConvert;
     use totem_primitives::accounting::{
-        Indicator::{self, *},
+        Indicator,
         Ledger, Posting, Record,
     };
     use totem_primitives::{LedgerBalance, PostingIndex};
