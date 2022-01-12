@@ -108,18 +108,27 @@ mod pallet {
     use sp_std::prelude::*;
 
     use totem_common::TryConvert;
-    use totem_primitives::accounting::{Indicator, Posting, Record, Ledger, B, A, CurrentAssets, P, I, X, Sales, OperatingExpenses, _0030_};
+    use totem_primitives::accounting::{
+        Indicator, 
+        Posting, 
+        Record, 
+        Ledger,
+        B, 
+        A, 
+        P, 
+        I, 
+        X, 
+        CurrentAssets,
+        Sales,
+        OperatingExpenses, 
+        _0030_,
+    };
     
-    // Bring in relevant accounts
-    use totem_primitives::accounting::Ledger::B(B::A(A::CurrentAssets(CurrentAssets::{
-        B10_0004_D000, 
-        B10_0008_D000,
-    })));
-    use totem_primitives::accounting::Ledger::P(P::I(I::Sales(Sales::{
-        P40_0001_C000,
-        P40_0007_C000,
-    })));
-    use totem_primitives::accounting::Ledger::P(P::X(X::OperatingExpenses(OperatingExpenses::_0030_(_0030_::P50_0030_D000))));
+    // ledger: Ledger::B(B::A(A::CurrentAssets(CurrentAssets::B10_0004_D000.clone()))),  // Internal Address Balance (Network Currency).
+    // ledger: Ledger::B(B::A(A::CurrentAssets(CurrentAssets::B10_0008_D000.clone()))), // Director's loan account (asset until repaid).
+    // ledger: Ledger::P(P::I(I::Sales(Sales::P40_0001_C000.clone()))), // Sales of services.
+    // ledger: Ledger::P(P::I(I::Sales(Sales::P40_0007_C000.clone()))), // Miscellaneous Income
+    // ledger: Ledger::P(P::X(X::OperatingExpenses(OperatingExpenses::_0030_(_0030_::P50_0030_D000.clone())))), // Network Transaction Fees.
     
     use totem_primitives::{LedgerBalance, PostingIndex};
 
@@ -364,7 +373,7 @@ mod pallet {
                 Record {
                     primary_party: from.clone(),
                     counterparty: to.clone(),
-                    ledger: B10_0004_D000, // Internal Address Balance (Network Currency).
+                    ledger: Ledger::B(B::A(A::CurrentAssets(CurrentAssets::B10_0004_D000.clone()))),  // Internal Address Balance (Network Currency).
                     amount: decrease_amount,
                     debit_credit: Indicator::Credit,
                     reference_hash,
@@ -374,7 +383,7 @@ mod pallet {
                 Record {
                     primary_party: from.clone(),
                     counterparty: to.clone(),
-                    ledger: B10_0008_D000, // Director's loan account (asset until repaid).
+                    ledger: Ledger::B(B::A(A::CurrentAssets(CurrentAssets::B10_0008_D000.clone()))), // Director's loan account (asset until repaid).
                     amount: increase_amount,
                     debit_credit: Indicator::Debit,
                     reference_hash,
@@ -384,7 +393,7 @@ mod pallet {
                 Record {
                     primary_party: to.clone(),
                     counterparty: from.clone(),
-                    ledger: B10_0004_D000, // Internal Address Balance (Network Currency).
+                    ledger: Ledger::B(B::A(A::CurrentAssets(CurrentAssets::B10_0004_D000.clone()))),  // Internal Address Balance (Network Currency).
                     amount: increase_amount,
                     debit_credit: Indicator::Debit,
                     reference_hash,
@@ -394,7 +403,7 @@ mod pallet {
                 Record {
                     primary_party: to.clone(),
                     counterparty: from.clone(),
-                    ledger: P40_0007_C000, // Miscellaneous Income
+                    ledger: Ledger::P(P::I(I::Sales(Sales::P40_0007_C000.clone()))), // Miscellaneous Income
                     amount: increase_amount,
                     debit_credit: Indicator::Credit,
                     reference_hash,
@@ -432,7 +441,7 @@ mod pallet {
                 Record {
                     primary_party: payer.clone(),
                     counterparty: netfee_address.clone(),
-                    ledger: B10_0004_D000, // Internal Address Balance (Network Currency).
+                    ledger: Ledger::B(B::A(A::CurrentAssets(CurrentAssets::B10_0004_D000.clone()))),  // Internal Address Balance (Network Currency).
                     amount: decrease_amount,
                     debit_credit: Indicator::Credit,
                     reference_hash: fee_hash,
@@ -442,7 +451,7 @@ mod pallet {
                 Record {
                     primary_party: payer.clone(),
                     counterparty: netfee_address.clone(),
-                    ledger: P50_0030_D000, // Network Transaction Fees.
+                    ledger: Ledger::P(P::X(X::OperatingExpenses(OperatingExpenses::_0030_(_0030_::P50_0030_D000.clone())))), // Network Transaction Fees.
                     amount: increase_amount,
                     debit_credit: Indicator::Debit,
                     reference_hash: fee_hash,
@@ -452,7 +461,7 @@ mod pallet {
                 Record {
                     primary_party: netfee_address.clone(),
                     counterparty: payer.clone(),
-                    ledger: B10_0004_D000, // Internal Address Balance (Network Currency).
+                    ledger: Ledger::B(B::A(A::CurrentAssets(CurrentAssets::B10_0004_D000.clone()))),  // Internal Address Balance (Network Currency).
                     amount: increase_amount,
                     debit_credit: Indicator::Debit,
                     reference_hash: fee_hash,
@@ -462,7 +471,7 @@ mod pallet {
                 Record {
                     primary_party: netfee_address.clone(),
                     counterparty: payer.clone(),
-                    ledger: P40_0001_C000, // Sales of services.
+                    ledger: Ledger::P(P::I(I::Sales(Sales::P40_0001_C000.clone()))), // Sales of services.
                     amount: increase_amount,
                     debit_credit: Indicator::Credit,
                     reference_hash: fee_hash,

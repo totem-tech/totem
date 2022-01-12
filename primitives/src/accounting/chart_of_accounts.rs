@@ -2979,7 +2979,9 @@ pub enum Ledger {
     C(ControlAccounts),
 }
 
+//*****************************************************************************//
 // The following is the actual structure of the hierarchy.
+//*****************************************************************************//
 
 // pub struct Ledger {
 //     pub enum B {
