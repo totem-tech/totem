@@ -22,9 +22,9 @@
 # Once added the next step is to convert the readable chainspec to raw format for inclusion in the runtime.
 #______________________________________________________________#
 
-# ./target/release/parachain-totem-lego-node build-spec --chain ./res/totem-lego-raw.json --raw > ./res/totem-lego-raw-new.json && \
-# ./target/release/parachain-totem-wapex-node build-spec --chain ./res/totem-wapex-raw.json --raw > ./res/totem-wapex-raw-new.json && \
-# ./target/release/parachain-totem-kapex-node build-spec --chain ./res/totem-kapex-raw.json --raw > ./res/totem-kapex-raw-new.json
+# ./target/release/parachain-totem-lego-node build-spec --chain ./res/totem-lego-template.json --raw > ./res/totem-lego-raw-new.json && \
+# ./target/release/parachain-totem-wapex-node build-spec --chain ./res/totem-wapex-template.json --raw > ./res/totem-wapex-raw-new.json && \
+# ./target/release/parachain-totem-kapex-node build-spec --chain ./res/totem-kapex-template.json --raw > ./res/totem-kapex-raw-new.json
 
 #______________________________________________________________#
 # now the raw file is ready to be included in the runtime. Change the path in `command.rs`` to point to the raw version of the file.
