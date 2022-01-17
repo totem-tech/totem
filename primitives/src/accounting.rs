@@ -36,8 +36,8 @@
 // along with Totem.  If not, see <http://www.gnu.org/licenses/>.
 
 mod chart_of_accounts;
-pub use chart_of_accounts::Ledger;
-
+pub use chart_of_accounts::{Ledger, {CurrentAssets, Sales, OperatingExpenses, _0030_, B,A,P,I,X,}};
+    
 use crate::LedgerBalance;
 use frame_support::{dispatch::EncodeLike, pallet_prelude::*};
 use scale_info::TypeInfo;
@@ -67,10 +67,14 @@ pub trait Posting<AccountId, Hash, BlockNumber, CoinAmount> {
     fn get_pseudo_random_hash(s: AccountId, r: AccountId) -> Hash;
 }
 
-/// Note: Debit and Credit balances are account specific - see chart of accounts.
+/// Debit or Credit Indicator
+/// Debit and Credit balances are account specific - see chart of accounts.
 #[derive(Clone, Decode, Encode, Copy, TypeInfo)]
+#[scale_info(capture_docs = "always")]
 pub enum Indicator {
+    /// Debit
     Debit = 0,
+    /// Credit
     Credit = 1,
 }
 

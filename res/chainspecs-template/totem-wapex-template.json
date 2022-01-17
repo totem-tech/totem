@@ -1,0 +1,79 @@
+{
+  "name": "Totem Wapex Parachain",
+  "id": "totem_wapex",
+  "chainType": "Live",
+  "bootNodes": [
+    "/dns4/w-boot-1.kapex.network/tcp/30333/ws/p2p/12D3KooWAhxe6K9RbzsGgrE3nRtSCzRbgSDYUHZgSPSRQfBx7CAV"
+  ],
+  "telemetryEndpoints": null,
+  "protocolId": "wapex",
+  "properties": {
+    "ss58Format": 2007,
+    "tokenDecimals": 12,
+    "tokenSymbol": "WAPEX"
+  },
+  "relay_chain": "westend",
+  "para_id": 2107,
+  "consensusEngine": null,
+  "codeSubstitutes": {},
+  "genesis": {
+    "runtime": {
+      "system": {
+        "code": "0x"
+      },
+      "parachainSystem": null,
+      "parachainInfo": {
+        "parachainId": 2107
+      },      
+      "sudo": {
+        "key": "5EHt73bxrpC7VURsUhwV7PrqRy4g732TQbKFWGwXWPcgNSYz"
+      },
+      "balances": {
+        "balances": [
+          [
+            "5EHt73bxrpC7VURsUhwV7PrqRy4g732TQbKFWGwXWPcgNSYz",
+            2399999999960000000000
+          ],
+          [
+            "5DbwcnXEBkTGUFXy1JBWvJCEaU49uGJPNFegtyUws5ACH4Y7",
+            20000000000
+          ],
+          [
+            "5G6W9BmF4i7E381cyFhodPqchVtPY7P56Dxt8hCW6XJ6go6z",
+            20000000000
+          ]
+        ]
+      },
+      "collatorSelection": {
+        "invulnerables": [
+          "5DbwcnXEBkTGUFXy1JBWvJCEaU49uGJPNFegtyUws5ACH4Y7",
+          "5G6W9BmF4i7E381cyFhodPqchVtPY7P56Dxt8hCW6XJ6go6z"
+        ],
+        "candidacyBond": 16000000000,
+        "desiredCandidates": 0
+      },
+      "session": {
+        "keys": [
+          [
+            "5DbwcnXEBkTGUFXy1JBWvJCEaU49uGJPNFegtyUws5ACH4Y7",
+            "5DbwcnXEBkTGUFXy1JBWvJCEaU49uGJPNFegtyUws5ACH4Y7",
+            {
+              "aura": "5DbwcnXEBkTGUFXy1JBWvJCEaU49uGJPNFegtyUws5ACH4Y7"
+            }
+          ],
+          [
+            "5G6W9BmF4i7E381cyFhodPqchVtPY7P56Dxt8hCW6XJ6go6z",
+            "5G6W9BmF4i7E381cyFhodPqchVtPY7P56Dxt8hCW6XJ6go6z",
+            {
+              "aura": "5G6W9BmF4i7E381cyFhodPqchVtPY7P56Dxt8hCW6XJ6go6z"
+            }
+          ]
+        ]
+      },
+      "aura": {
+        "authorities": []
+      },
+      "auraExt": null
+    }
+  }
+}

@@ -1,1175 +1,1779 @@
-use codec::{Decode, Encode, EncodeLike, Error, Input};
-use scale_info::{build::Fields, Path, Type, TypeInfo};
-use strum::FromRepr;
+//                              Næ§@@@ÑÉ©
+//                        æ@@@@@@@@@@@@@@@@@@
+//                    Ñ@@@@?.?@@@@@@@@@@@@@@@@@@@N
+//                 ¶@@@@@?^%@@.=@@@@@@@@@@@@@@@@@@@@
+//               N@@@@@@@?^@@@»^@@@@@@@@@@@@@@@@@@@@@@
+//               @@@@@@@@?^@@@».............?@@@@@@@@@É
+//              Ñ@@@@@@@@?^@@@@@@@@@@@@@@@@@@'?@@@@@@@@Ñ
+//              @@@@@@@@@?^@@@»..............»@@@@@@@@@@
+//              @@@@@@@@@?^@@@»^@@@@@@@@@@@@@@@@@@@@@@@@
+//              @@@@@@@@@?^ë@@.@@@@@@@@@@@@@@@@@@@@@@@@
+//               @@@@@@@@?^´@@@o.%@@@@@@@@@@@@@@@@@@@@©
+//                @@@@@@@?.´@@@@@ë.........*.±@@@@@@@æ
+//                 @@@@@@@@?´.I@@@@@@@@@@@@@@.@@@@@N
+//                  N@@@@@@@@@@ë.*=????????=?@@@@@Ñ
+//                    @@@@@@@@@@@@@@@@@@@@@@@@@@@¶
+//                        É@@@@@@@@@@@@@@@@Ñ¶
+//                             Næ§@@@ÑÉ©
+
+// Copyright 2020 Chris D'Costa
+// This file is part of Totem Live Accounting.
+// Authors:
+// - Félix Daudré-Vignier   email: felix@totemaccounting.com
+// - Chris D'Costa          email: chris.dcosta@totemaccounting.com
+
+// Totem is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// Totem is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with Totem.  If not, see <http://www.gnu.org/licenses/>.
+
+use codec::{Decode, Encode};
+use scale_info::TypeInfo;
 
 #[allow(non_camel_case_types)]
-#[derive(Debug, Copy, Clone, Eq, PartialEq, FromRepr)]
-#[repr(u16)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum ChangesInInventories {
+    /// P50_0001_D000,
+    RawMaterials,
+    /// P50_0001_D001,
+    WorkInProgress,
+    /// P50_0001_D002,
+    FinishedGoods,
+}
+/// Cost Of Goods Sold
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum Cogs {
+    ChangesInInventories(ChangesInInventories),
+    /// P50_0001_D003,
+    PurchasesDirectMaterialCosts,
+    /// P50_0001_D004,
+    DirectLabourCosts,
+    /// P50_0001_D005,
+    ManufacturingFactoryOverhead,
+    /// P50_0001_D006,
+    PurchasesReturnsAndAllowances,
+    /// P50_0001_D007,
+    PurchasedIscount,
+    /// P50_0001_D008,
+    InventoryWriteDown,
+}
+/// Charges In Out
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0002_ {
+    /// P50_0002_D000,
+    InterEntityChargeIn,
+    /// P50_0002_D001,
+    InterEntityChargeOut,
+    /// P50_0002_D002,
+    ITDistribution,
+    /// P50_0002_D003,
+    DistributionToCapital,
+    /// P50_0002_D004,
+    Allocations,
+    /// P50_0002_D005,
+    AllocationByCountry,
+    /// P50_0002_D006,
+    FacilitiesAllocation,
+    /// P50_0002_D007,
+    AssessResearchDevelopmentRecharges,
+}
+/// PropertyPlantEquipment
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum PropertyPlantEquipment {
+    /// P50_0003_D001,
+    /// B12_1001_D000,
+    /// B12_1002_C000,
+    Land,
+    /// P50_0003_D002,
+    /// B12_1001_D001,
+    /// B12_1002_C001,
+    Buildings,
+    /// P50_0003_D003,
+    /// B12_1001_D002,
+    /// B12_1002_C002,
+    FurnitureFixturesFittings,
+    /// P50_0003_D004,
+    /// B12_1001_D003,
+    /// B12_1002_C003,
+    PlantAndEquipment,
+    /// P50_0003_D005,
+    /// B12_1001_D004,
+    /// B12_1002_C004,
+    MotorVehicles,
+    /// P50_0003_D006,
+    /// B12_1001_D005,
+    /// B12_1002_C005,
+    Supplies,
+    /// P50_0003_D007,
+    /// B12_1001_D006,
+    /// B12_1002_C006,
+    ComputerAndITEquipment,
+    /// P50_0003_D008,
+    /// B12_1001_D007,
+    /// B12_1002_C007,
+    RightOfUseAssets,
+    /// P50_0003_D009,
+    /// B12_1001_D009,
+    /// B12_1002_C009,
+    LeaseholdImprovements,
+    /// B12_1001_D008,
+    /// B12_1002_C008,
+    AssetsUnderConstruction,
+}
+/// Primary Intangibles
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum IntangibleAssetList {
+    /// P50_0003_D011,
+    /// B13_2002_D000,
+    /// B13_2006_C000,
+    TrademarkAndPatents,
+    /// P50_0003_D012,
+    /// B13_2003_D000,
+    /// B13_2006_C001,
+    ComputerSoftwareLicences,
+    /// P50_0003_D010,
+    /// B13_2001_D000,
+    /// B13_2006_C002,
+    OtherIntangibleAssets,
+}
+/// Depreciation Depletion Amortization
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0003_ {
+    /// P50_0003_D000,
+    GeneralProjectCosts,
+    /// P50_0003_D013,
+    GovernmentGrants,
+    /// P50_0003_D015,
+    NonCapitalProjectExpense,
+    Depreciation(PropertyPlantEquipment),
+    Amortization(IntangibleAssetList),
+    /// P50_0003_D014,
+    GainLossMiscellaneousSales,
+}
+/// Field Trials
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0004_ {
+    /// P50_0004_D000,
+    ConsumptionOther,
+    /// P50_0004_D001,
+    Trials,
+    /// P50_0004_D002,
+    Samples,
+}
+/// Warranties
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0005_ {
+    /// P50_0005_D000,
+    Warranties,
+}
+/// Tax Corporation Tax
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0006_ {
+    /// P50_0006_D000,
+    CorporationTax,
+}
+/// Tax Fines And Penalties
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0007_ {
+    /// P50_0007_D000,
+    EmployeeTax,
+    /// P50_0007_D001,
+    PropertyTax,
+    /// P50_0007_D002,
+    TradeLicencesTax,
+    /// P50_0007_D003,
+    EnviromentalTax,
+    /// P50_0007_D004,
+    RoadTax,
+    /// P50_0007_D005,
+    TaxesOther,
+    /// P50_0007_D006,
+    TaxesOtherAlternateAcct,
+    /// P50_0007_D007,
+    NonDeductibleFinesPenalties,
+    /// P50_0007_D008,
+    Penalties,
+    /// P50_0007_D009,
+    LicensesFeesCertificatesOtherTaxes,
+    /// P50_0007_D010,
+    CarTax,
+    /// P50_0007_D011,
+    CapitalGainsTaxonCryptoAssets,
+}
+/// Claims
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0008_ {
+    /// P50_0008_D000,
+    Claims,
+}
+/// Commissions
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0009_ {
+    /// P50_0009_D000,
+    Manual,
+    /// P50_0009_D001,
+    IntercompanyExpense,
+    /// P50_0009_D002,
+    IntercompanyIncome,
+}
+/// Marketing Programs
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0010_ {
+    /// P50_0010_D000,
+    SamplesConsumptionMarketing,
+    /// P50_0010_D001,
+    Promos,
+    /// P50_0010_D002,
+    AdvertisingExpenses,
+    /// P50_0010_D003,
+    AdvertisingPromosPlantVisit,
+    /// P50_0010_D004,
+    DesignAndArtwork,
+    /// P50_0010_D005,
+    AdPromosGifts,
+    /// P50_0010_D006,
+    AdPromosMeetingsSeminars,
+    /// P50_0010_D007,
+    AdPromosPrintedMaterial,
+    /// P50_0010_D008,
+    AdPromosOutdoor,
+    /// P50_0010_D009,
+    AdPromosPresentationMaterial,
+    /// P50_0010_D010,
+    DistributorEvents,
+    /// P50_0010_D011,
+    MarketResearch,
+    /// P50_0010_D012,
+    FairsAndExhibitions,
+    /// P50_0010_D013,
+    MediaPrint,
+    /// P50_0010_D014,
+    MediaRadio,
+    /// P50_0010_D015,
+    MediaTelevision,
+    /// P50_0010_D016,
+    MediaOther,
+    /// P50_0010_D017,
+    Samples,
+    /// P50_0010_D018,
+    CustomGiftsTaxable,
+    /// P50_0010_D019,
+    CustomGiftsNonTaxable,
+    /// P50_0010_D020,
+    TechnicalServiceFees,
+    /// P50_0010_D021,
+    Literature,
+    /// P50_0010_D022,
+    BrandMerchandise,
+    /// P50_0010_D023,
+    TradeShowsExhibitFees,
+    /// P50_0010_D024,
+    AgencyFees,
+    /// P50_0010_D025,
+    AudioVisuals,
+    /// P50_0010_D026,
+    MarketingEventsDaysInTheField,
+    /// P50_0010_D027,
+    MarketingMiscellaneousExpense,
+    /// P50_0010_D028,
+    MarketingCostSharing,
+}
+/// Consulting Fees
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0011_ {
+    /// P50_0011_D000,
+    ConsultingFees,
+}
+/// Services
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0012_ {
+    /// P50_0012_D000,
+    MiscellaneousService,
+    /// P50_0012_D001,
+    AnalyticalTesting,
+    /// P50_0012_D002,
+    CommunicationsTarifs,
+    /// P50_0012_D003,
+    ExperimentalTesting,
+    /// P50_0012_D004,
+    FinServices,
+    /// P50_0012_D005,
+    FreightExpenses,
+    /// P50_0012_D006,
+    HousekeepingLaundry,
+    /// P50_0012_D007,
+    LanguageTranslationServices,
+    /// P50_0012_D008,
+    MailDeliveryServices,
+    /// P50_0012_D009,
+    MiscellaneousFees,
+    /// P50_0012_D010,
+    Contractors,
+    /// P50_0012_D011,
+    TechnicalAssistance,
+    /// P50_0012_D012,
+    LaboratoryExpense,
+    /// P50_0012_D013,
+    Labour,
+    /// P50_0012_D014,
+    Printing,
+    /// P50_0012_D015,
+    Warehouse,
+    /// P50_0012_D016,
+    PhotographsGraphics,
+    /// P50_0012_D017,
+    ProjectEngineering,
+    /// P50_0012_D018,
+    ResearchAssistance,
+    /// P50_0012_D019,
+    ResearchShoppingExpense,
+    /// P50_0012_D020,
+    OtherServiceForProduction,
+    /// P50_0012_D021,
+    SoftwareMaintenanceFees,
+    /// P50_0012_D022,
+    TaxPreparationFees,
+    /// P50_0012_D023,
+    TestingServices,
+}
+/// Travel Expenses
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0013_ {
+    /// P50_0013_D000,
+    PerDiem,
+    /// P50_0013_D001,
+    TravelGeneral,
+    /// P50_0013_D002,
+    AirTickets,
+    /// P50_0013_D003,
+    AirTicketsOutsideCountryOfResidence,
+    /// P50_0013_D004,
+    Miles,
+    /// P50_0013_D005,
+    TaxiOtherPersonalTransport,
+}
+/// Hotels
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0014_ {
+    /// P50_0014_D000,
+    LodgingHotelCosts,
+}
+/// Meetings Conferences
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0015_ {
+    /// P50_0015_D000,
+    MeetingsConferences,
+    /// P50_0015_D001,
+    OtherMeetings,
+    /// P50_0015_D002,
+    KeyDistributorMeetings,
+    /// P50_0015_D003,
+    TravelForeign,
+    /// P50_0015_D004,
+    TravelNonEmployee,
+    /// P50_0015_D005,
+    TravelTechMeetingsConferences,
+}
+/// Restaurant Meals
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0016_ {
+    /// P50_0016_D000,
+    Entertainment,
+    /// P50_0016_D001,
+    WithinCountryOfResidence,
+    /// P50_0016_D002,
+    OutsideCountryOfResidence,
+    /// P50_0016_D003,
+    EntertainmentNonDeductable,
+    /// P50_0016_D004,
+    EntertainmentFieldSales,
+    /// P50_0016_D005,
+    EntertainmentTrainingEducation,
+    /// P50_0016_D006,
+    EntertainmentBusinessDevelopmentNoMeeting,
+    /// P50_0016_D007,
+    EntertainmentBusinessDevelopment,
+}
+/// Other Travel Expenses
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0017_ {
+    /// P50_0017_D000,
+    OtherTravelExpenses,
+}
+/// Cost Pooling
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0018_ {
+    /// P50_0018_D000,
+    PublicRelations,
+}
+/// Car Expenses
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0019_ {
+    /// P50_0019_D000,
+    Other,
+    /// P50_0019_D001,
+    Parking,
+    /// P50_0019_D002,
+    CompanyCar,
+    /// P50_0019_D003,
+    Telephone,
+    /// P50_0019_D004,
+    Rental,
+    /// P50_0019_D005,
+    Repairs,
+    /// P50_0019_D006,
+    CarFinancing,
+    /// P50_0019_D007,
+    Fuel,
+    /// P50_0019_D008,
+    LeasedAutos,
+}
+/// Equipment
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0020_ {
+    /// P50_0020_D000,
+    Equipment,
+}
+/// Plant Maintenance
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0021_ {
+    /// P50_0021_D000,
+    PlantMaintenance,
+}
+/// Phones Telecom
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0022_ {
+    /// P50_0022_D000,
+    CellularUsage,
+    /// P50_0022_D001,
+    CommunicationRemoteAccess,
+    /// P50_0022_D002,
+    MiscellaneousDataCommunications,
+    /// P50_0022_D003,
+    TelephoneFacsimiles,
+}
+/// Rental Leases
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0023_ {
+    /// P50_0023_D000,
+    Warehouse,
+    /// P50_0023_D001,
+    NonLeaseRental,
+    /// P50_0023_D002,
+    BuildingOffice,
+    /// P50_0023_D003,
+    Land,
+    /// P50_0023_D004,
+    Equipment,
+    /// P50_0023_D005,
+    SubLeaseIncome,
+    /// P50_0023_D006,
+    OtherFacilities,
+}
+/// Repair Maintenance
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0024_ {
+    /// P50_0024_D000,
+    OfficeLabFurniture,
+    /// P50_0024_D001,
+    ServiceContracts,
+    /// P50_0024_D002,
+    Repairs,
+    /// P50_0024_D003,
+    RepairsEquipment,
+    /// P50_0024_D004,
+    ITMaintenance,
+    /// P50_0024_D005,
+    Maintenance,
+    /// P50_0024_D006,
+    MaintenanceEquip,
+    /// P50_0024_D007,
+    MaintOther,
+    /// P50_0024_D008,
+    MaintenanceOtherMiscellaneousHardware,
+    /// P50_0024_D009,
+    MaintenanceOtherOfficeCleaning,
+    /// P50_0024_D010,
+    MaintenanceBuilding,
+    /// P50_0024_D011,
+    Tools,
+    /// P50_0024_D012,
+    Services,
+    /// P50_0024_D013,
+    PurchasedSupplies,
+    /// P50_0024_D014,
+    PlntMaintEquipmentNonCapital,
+    /// P50_0024_D015,
+    MiscellaneousMaintenance,
+}
+/// Supplies
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0025_ {
+    /// P50_0025_D000,
+    Other,
+    /// P50_0025_D001,
+    Office,
+    /// P50_0025_D002,
+    PhotcopyOrDocumentHandling,
+    /// P50_0025_D003,
+    Lab,
+    /// P50_0025_D004,
+    Safety,
+    /// P50_0025_D005,
+    Production,
+    /// P50_0025_D006,
+    Maintenance,
+    /// P50_0025_D007,
+    IndustrialChemicals,
+    /// P50_0025_D008,
+    Cleaning,
+}
+/// Utilities
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0026_ {
+    /// P50_0026_D000,
+    ElectricalEquipment,
+    /// P50_0026_D001,
+    ComputerRelatedEquipment,
+    /// P50_0026_D002,
+    SoftwareLicenses,
+    /// P50_0026_D003,
+    Electricity,
+    /// P50_0026_D004,
+    Water,
+    /// P50_0026_D005,
+    Gas,
+    /// P50_0026_D006,
+    Fuel,
+    /// P50_0026_D007,
+    UtilitiesCombined,
+    /// P50_0026_D008,
+    CloudStorage,
+    /// P50_0026_D009,
+    DataCenters,
+}
+/// Insurance
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0027_ {
+    /// P50_0027_D000,
+    Other,
+    /// P50_0027_D001,
+    ExportCredit,
+    /// P50_0027_D002,
+    SelfInsurance,
+    /// P50_0027_D003,
+    Motorvehicle,
+    /// P50_0027_D004,
+    Medical,
+    /// P50_0027_D005,
+    Life,
+    /// P50_0027_D006,
+    Travel,
+}
+/// Corporate Governance
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0028_ {
+    /// P50_0028_D000,
+    NonExecDirFeesOtherGovernanceCosts,
+}
+/// Legal Fees
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0029_ {
+    /// P50_0029_D000,
+    ExternalCorporateSecretarialFees,
+    /// P50_0029_D001,
+    Litigation,
+    /// P50_0029_D002,
+    OutsideCounselFees,
+    /// P50_0029_D003,
+    LicensesPermits,
+    /// P50_0029_D004,
+    LegalFeesInternational,
+    /// P50_0029_D005,
+    LegalFeesOther,
+    /// P50_0029_D006,
+    FCPAGifts,
+    /// P50_0029_D007,
+    FCPATravel,
+    /// P50_0029_D008,
+    FCPAMealsEntertainment,
+    /// P50_0029_D009,
+    BusinessContributions,
+    /// P50_0029_D010,
+    CharitableContributions,
+    /// P50_0029_D011,
+    DonationsDisallowed,
+    /// P50_0029_D012,
+    LocalTax,
+    /// P50_0029_D013,
+    AuditFeesExternal,
+    /// P50_0029_D014,
+    AuditorFirmTaxFees,
+    /// P50_0029_D015,
+    AuditorFirmOtherFees,
+    /// P50_0029_D016,
+    AuditFees,
+    /// P50_0029_D017,
+    Patents,
+    /// P50_0029_D018,
+    ProductRegistrations,
+    /// P50_0029_D019,
+    TrademarkAndPatents,
+    /// P50_0029_D020,
+    DesignRights,
+}
+/// Non Capitalised Expenses
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum NonCapitalised {
+    /// P50_0030_D015,
+    Equipment,
+    /// P50_0030_D016,
+    Software,
+}
+/// Recovered Expenses
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum RecoveredExpenses {
+    /// P50_0030_D018,
+    CanteenReceipts,
+    /// P50_0030_D019,
+    MiscellaneousChargeOut,
+    /// P50_0030_D020,
+    Insurance,
+    /// P50_0030_D021,
+    CarContract,
+    /// P50_0030_D022,
+    Other,
+    /// P50_0030_D023,
+    Salaries,
+    /// P50_0030_D024,
+    Wages,
+}
+/// Administration Cost
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0030_ {
+    /// P50_0030_D000,
+    NetworkTransactionFees,
+    /// P50_0030_D001,
+    BankCharges,
+    /// P50_0030_D002,
+    AdministrationBusinessTax,
+    /// P50_0030_D003,
+    CorporateMembership,
+    /// P50_0030_D004,
+    MembershipsSubscriptions,
+    /// P50_0030_D005,
+    OtherNonDeductible,
+    /// P50_0030_D006,
+    Postage,
+    /// P50_0030_D007,
+    Courrier,
+    /// P50_0030_D008,
+    ManagementAdjustment,
+    /// P50_0030_D009,
+    CollectionExpense,
+    /// P50_0030_D010,
+    CreditReports,
+    /// P50_0030_D011,
+    OtherMiscellaneousExpense,
+    /// P50_0030_D012,
+    MiscellaneousMonthEndAccruals,
+    /// P50_0030_D013,
+    Sponsorship,
+    /// P50_0030_D014,
+    BooksLibrary,
+    NonCapitalised(NonCapitalised),
+    /// P50_0030_D017,
+    MiscellaneousReimbursement,
+    RecoveredExpenses(RecoveredExpenses),
+    /// P50_0030_D025,
+    ProcurementCardPurchases,
+    /// P50_0030_D026,
+    AdministrationServiceFees,
+    /// P50_0030_D027,
+    OtherMiscellaneousIncomeExpense,
+    //// Bad Debts
+}
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0031_ {
+    /// P50_0031_D000,
+    BadDebtExpenseReversal,
+}
+/// Miscellaneous Expenses
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0032_ {
+    /// P50_0032_D000,
+    ShippingCost,
+    /// P50_0032_D001,
+    OtherCosts,
+    /// P50_0032_D002,
+    StandardCostIntercompany,
+    /// P50_0032_D003,
+    FinishedGoodsConsumption,
+    /// P50_0032_D004,
+    SamplesConsumption,
+    /// P50_0032_D005,
+    SemiFinishedConsumption,
+    /// P50_0032_D006,
+    FreightNonCustomer,
+    /// P50_0032_D007,
+    FreightFromToWarehouse,
+    /// P50_0032_D008,
+    DutiesPurchases,
+    /// P50_0032_D009,
+    HandlingWarehouse,
+    /// P50_0032_D010,
+    Transportation,
+    /// P50_0032_D011,
+    WasteDisposal,
+    /// P50_0032_D013,
+    CustomsFees,
+    /// P50_0032_D014,
+    SponsorshipDonations,
+}
+/// Financial Guarantee Fees
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0033_ {
+    /// P50_0033_D000,
+    FinancialGuaranteeFees,
+}
+/// Royalty Expenses
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0034_ {
+    /// P50_0034_D000,
+    RoyaltyExpenses,
+}
+/// Extraordinary Expenses
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0035_ {
+    /// P50_0035_D000,
+    ExtraordinaryExpenses,
+}
+/// Impairmentlossonfinassets
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0036_ {
+    /// P50_0036_D000,
+    FinancialAssets,
+    /// P50_0037_D000,
+    ContractAssets,
+    Other,
+}
+/// Provisions
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _0038_ {
+    /// P50_0038_D000,
+    WarrantyLegalClaimsOther,
+    /// P50_0038_D001,
+    UnusedLeave,
+}
+/// Property,plantandequipmentwrittenoff
+// #[allow(non_camel_case_types)]
+// #[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+// #[scale_info(capture_docs = "always")]
+// pub enum _0039_ {
+//     /// P50_0039_D000,
+//     WriteOff(PropertyPlantEquipment),
+// }
+/// Other Miscellaneous Charges
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _1001_ {
+    /// P51_1001_D000,
+    ITMiscellaneous,
+    /// P51_1001_D001,
+    SecondaryCosts,
+    /// P51_1001_D002,
+    ReportingAdjustment,
+}
+/// Social Security
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum SocialSecurity {
+    /// P52_2001_D009,
+    EmployerContribution,
+    /// P52_2001_D012,
+    Provision,
+    /// P52_2001_D013,
+    Payroll,
+    /// P52_2001_D014,
+    Accruals13thMonth,
+    /// P52_2001_D015,
+    AccrualsHolidayPay,
+    /// P52_2001_D011,
+    Other,
+}
+/// Salaries
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _2001_ {
+    /// P52_2001_D000,
+    Salaries,
+    /// P52_2001_D001,
+    Extra13thMonth,
+    /// P52_2001_D002,
+    AchievementAwards,
+    /// P52_2001_D003,
+    RepresentationAllowance,
+    /// P52_2001_D004,
+    Fees,
+    /// P52_2001_D005,
+    SalariedOperations,
+    /// P52_2001_D006,
+    HourlyWages13thMonth,
+    /// P52_2001_D007,
+    PayrollFees,
+    /// P52_2001_D008,
+    PayrollLuncheonVouchers,
+    SocialSecurity(SocialSecurity),
+    /// P52_2001_D010,
+    FringesVariable,
+    /// P52_2001_D016,
+    HousingTax,
+    /// P52_2001_D017,
+    ApprenticeshipTax,
+    /// P52_2001_D018,
+    WorkCouncil,
+    /// P52_2001_D019,
+    SeverencePay,
+    /// P52_2001_D020,
+    TransportationSubsidy,
+    /// P52_2001_D021,
+    HoulyWages,
+    /// P52_2001_D022,
+    HourlyWagesPerDiem,
+    /// P52_2001_D023,
+    OvertimePayments,
+    /// P52_2001_D024,
+    SickPay,
+    /// P52_2001_D025,
+    HolidayPay,
+    /// P52_2001_D026,
+    VacationPay,
+    /// P52_2001_D027,
+    OtherEmployeeCompensation,
+    /// P52_2001_D028,
+    SavingsPlan,
+    /// P52_2001_D029,
+    FieldIncentivePlan,
+    /// P52_2001_D030,
+    Pension,
+    /// P52_2001_D031,
+    InsurancePlanLiveMedical,
+    /// P52_2001_D032,
+    InsuranceWorkAccident,
+    /// P52_2001_D033,
+    InsurancePrivateCollective,
+    /// P52_2001_D034,
+    PensionCostsCompanyPortion,
+    /// P52_2001_D035,
+    PrivatePatientPlan,
+    /// P52_2001_D036,
+    EarlyRetirementPlans,
+    /// P52_2001_D037,
+    EmployeeShareOptionExpense,
+}
+/// Expat Expenses
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _2002_ {
+    /// P52_2002_D000,
+    SchoolExpenses,
+    /// P52_2002_D001,
+    HomeLeaveExpatexpenses,
+    /// P52_2002_D002,
+    ExpatCost,
+    /// P52_2002_D003,
+    AssigneeAllowancesOther,
+    /// P52_2002_D004,
+    EmployeLanguageLessons,
+    /// P52_2002_D005,
+    EmployeeMovingExpense,
+    /// P52_2002_D006,
+    EmployeeAssistanceProgram,
+    /// P52_2002_D007,
+    EmployeeHousingExpense,
+    /// P52_2002_D008,
+    ExpatOtherBenefits,
+    /// P52_2002_D009,
+    AssigneeTax,
+}
+/// Incentive Plan
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _2003_ {
+    /// P52_2003_D000,
+    IncentivePlan,
+}
+/// Incentive Plan Overhead
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _2004_ {
+    /// P52_2004_D000,
+    IncentivePlanOverhead,
+}
+/// Employee Services
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _2005_ {
+    /// P52_2005_D000,
+    EmployeeServiceAwards,
+    /// P52_2005_D001,
+    SecurityServices,
+    /// P52_2005_D002,
+    HealthSafety,
+    /// P52_2005_D003,
+    Cleaning,
+    /// P52_2005_D004,
+    CafeteriaService,
+    /// P52_2005_D005,
+    MedicalBenefits,
+    /// P52_2005_D006,
+    MedicalServicesAndSupplies,
+    /// P52_2005_D007,
+    RecreationSportsSocial,
+    /// P52_2005_D008,
+    Recruiting,
+    /// P52_2005_D009,
+    EmployeeAgencyFees,
+    /// P52_2005_D010,
+    TransportOfPersonnel,
+    /// P52_2005_D011,
+    EducationTraining,
+    /// P52_2005_D012,
+    EducationTrainingAssociatedTravelCosts,
+    /// P52_2005_D013,
+    TrainingTax,
+    /// P52_2005_D014,
+    Tuition,
+    /// P52_2005_D015,
+    TuitionTaxable,
+    /// P52_2005_D016,
+    LaundryClothing,
+    /// P52_2005_D017,
+    MealAllowance,
+    /// P52_2005_D018,
+    Celebrations,
+}
+/// Interest Expense
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _3001_ {
+    /// P53_3001_D000,
+    BankBorrowings,
+    /// P53_3001_D001,
+    ConvertibleBonds,
+    /// P53_3001_D002,
+    DividendsOnRedeemablePreferenceShares,
+    /// P53_3001_D003,
+    LeaseLiabilities,
+    /// P53_3001_D004,
+    UnwindingOfDiscountOnProvisions,
+}
+/// Accrued Reveues Receivalbles
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum AccruedRevenuesReceivables {
+    /// B10_0010_D000,
+    /// B10_0010_D001,
+    LoanTo(Parties),
+    /// B10_0010_D002,
+    Other,
+    /// B10_0010_D003,
+    FinanceLease,
+    /// B10_0010_D004,
+    StaffLoans,
+    /// B10_0010_D005,
+    GovernmentGrant,
+}
+/// Inventory
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum Inventory {
+    /// B10_0013_D000,
+    RawMaterials,
+    /// B10_0013_D001,
+    WorkInProgress,
+    /// B10_0013_D002,
+    FinishedGoods,
+}
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum CurrentAssets {
+    /// B10_0001_D000,
+    BankCurrentAccount,
+    /// B10_0002_D000,
+    BankSavingsAccount,
+    /// B10_0003_D000,
+    PettyCash,
+    /// B10_0004_D000,
+    InternalBalance,
+    /// B10_0005_D000,
+    EscrowDeposit,
+    /// B10_0006_D000,
+    FixedDeposits,
+    /// B10_0007_D000,
+    PrepaidExpensesonaccountOperatingExpense,
+    /// B10_0008_D000,
+    DirectorsLoanAccount,
+    /// B10_0009_D000,
+    /// B10_0009_D001,
+    TradeReceivables(Parties),
+    AccruedRevenuesReceivables(AccruedRevenuesReceivables),
+    /// B10_0011_C001,
+    /// B10_0012_C000,
+    ImpairmentLoss(_0036_),
+    /// B10_0011_C000,
+    AllowanceForDoubtfulDebts,
+    Inventory(Inventory),
+    /// B10_0014_D000,
+    AdvancestosuppliersTradeSupplies,
+    /// B10_0015_D000,
+    Contractassets,
+    /// B10_0016_D000,
+    EquitySecuritiesFVTPL,
+    /// B10_0017_D000,
+    AssetsOfDisposalGroupHeldForSale,
+    /// B10_0018_D000,
+    LoanNotesFloatingFixedAmortisedCost,
+    /// B10_0019_D000,
+    /// B10_0019_D001,
+    DerivativeFinInstr(Derivatives),
+    // B10_0019_D002,
+}
+/// CryptoCurrency
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum Coins {
+    /// B11_4001_D000,
+    /// B11_4006_C000,
+    UTXOType,
+    /// B11_4001_D001,
+    /// B11_4006_C001,
+    NonceType,
+    /// B11_4001_D002,
+    /// B11_4006_C002,
+    ParachainType,
+    /// B11_4001_D003,
+    /// B11_4006_C003,
+    ThirdPartyCustody,
+    /// B11_4001_D004,
+    /// B11_4006_C004,
+    Other,
+}
+/// Fungibility
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum Fungibility {
+    Fungible,
+    NonFungible,
+}
+/// Tokens
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum Tokens {
+    /// B11_4002_D000,
+    /// B11_4003_D000,
+    SmartContract(Fungibility),
+    // B11_4007_C000,
+    // B11_4008_C000,
+    /// B11_4002_D001,
+    /// B11_4003_D001,
+    ThirdParty(Fungibility),
+    // B11_4007_C001,
+    // B11_4008_C001,
+    /// B11_4004_D000,
+    /// B11_4009_C000,
+    LiquidityPoolPair,
+    /// B11_4005_D000,
+    /// B11_4010_C000,
+    CryptoLoanCollateral,
+}
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum CurrentAssetsCrypto {
+    Coins(Coins),
+    Tokens(Tokens),
+    CoinImpairment(Coins),
+    TokenImpairment(Tokens),
+}
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum FixedAssets {
+    PropPlantEquip(PropertyPlantEquipment),
+    AccumulatedDepreciation(PropertyPlantEquipment),
+}
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum IntagibleAssets {
+        Intangibles(IntangibleAssetList),
+        /// B13_2004_D000,
+        ExternalNetworkCrypto,
+        /// B13_2005_D000,
+        Goodwill,
+        /// B13_2007_C000,
+        ImpairmentLoss,
+        AccumulatedDepreciationIntangibles(IntangibleAssetList),
+}
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum OtherReceivables {
+    LoansTo(Parties),    
+    /// B14_3009_D003,
+    FinanceLease,
+    /// B14_3009_D004,
+    StaffLoans,
+    /// B14_3009_D005,
+    IndemnificationAssets,
+    /// B14_3009_D002,
+    Other,
+}
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum InvestmentIn {
+    /// B14_3001_D000,
+    /// B14_3007_C001,
+    Subsidiaries,
+    /// B14_3002_D000,
+    /// B14_3007_C002,
+    JointVentures,
+    /// B14_3003_D000,
+    /// B14_3007_C003,
+    Associates,
+    /// B14_3004_D000,
+    Properties,
+}
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum NonCurrentAssets {
+    InvestmentIn(InvestmentIn),
+    /// B14_3005_D000,
+    EquitySecuritiesFVOCI,
+    /// B14_3005_D001,
+    DebtSecuritiesFVOCI,
+    /// B14_3006_D000,
+    /// B14_3007_C000,
+    DeferredIncomeTax,
+    /// B14_3008_D000,
+    NonListedDebtInstrFVTPL,
+    /// B14_3008_D001,
+    MandatorilyMeasuredAtFVTPL,
+    /// B14_3008_D002,
+    ConvertibleBondsFVTPL,
+    OtherReceivables(OtherReceivables),
+    FinancialInstruments(Derivatives),
+    ImpairmentLossOn(InvestmentIn),
+    ImpairmentOfFixedAssets,
+}
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum Provisions {
+    /// B20_0018_C000,
+    WarrantyLegalClaimsOthers,
+    /// B20_0018_C001,
+    UnusedLeave,
+}
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum CurrentLiabilities {
+    /// B20_0001_C000,
+    SalesTaxbyJurisdict,
+    /// B20_0002_C000,
+    FederalStateTaxByJurisdict,
+    AccountsPayableTradeCreditors(Parties),
+    ShortTermLoansPayable(Parties),
+    CurrentPortionOfLongTermDebtNonTrade(Parties),
+    /// B20_0004_C000,
+    SalariesPayable,
+    /// B20_0005_C000,
+    WagesPayable,
+    /// B20_0006_C000,
+    CommissionPayable,
+    /// B20_0007_C000,
+    FreightPayable,
+    /// B20_0008_C000,
+    OtherAccruedExpensesPayable,
+    /// B20_0009_C000,
+    PayrollTaxByJurisdict,
+    /// B20_0010_C000,
+    InterestPayable,
+    /// B20_0011_C000,
+    AdvancesFromCustomers,
+    /// B20_0012_C000,
+    LawsuitsLegalCostsPayable,
+    /// B20_0014_C000,
+    FinGuarantees,
+    /// B20_0015_C000,
+    ContractLiabilities,
+    /// B20_0016_C000,
+    BankoverDrafts,
+    /// B20_0017_C000,
+    CurrentPortionOfLeaseLiabilities,
+    Provisions(Provisions),
+    DerivativeFinInstr(Derivatives),
+    /// B20_0020_C000,
+    DividendPayable,
+    /// B20_0021_C000,
+    CurrentPortionOfBankBorrowingsPayable,
+}
+/// Related Or Non Related Parties
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum Parties {
+    /// B14_3009_D001,
+    /// B20_0003_C000,
+    RelatedParties,
+    // B20_0003_C001,
+    // B20_0003_C002,
+    // B21_1014_C000,
+    /// B14_3009_D000,
+    /// B20_0013_C000,
+    NonRelatedParties,
+    // B20_0013_C001,
+    // B20_0013_C002,
+    // B21_1014_C001,
+}
+/// Derivative Financial Intruments
+/// Used In Current Liabilities And Non Current Liabilities
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum Derivatives {
+    /// B14_3010_D000,
+    /// B20_0019_C000,
+    InterestRateSwaps,
+    // B21_1016_C000,
+    /// B14_3010_D001,
+    /// B20_0019_C001,
+    CurrencyForwards,
+    // B21_1016_C001,
+    /// B14_3010_D002,
+    /// B20_0019_C002,
+    CommodityForwards,
+    // B21_1016_C002,
+}
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum NonCurrentLiabilities {
+    /// B21_1001_C000,
+    WitholdingIncomeTaxJurisdictPayable,
+    /// B21_1002_C000,
+    DeferredOrUnearnedRevenues,
+    /// B21_1003_C000,
+    BondsPayable,
+    /// B21_1004_C000,
+    NotesLoansPayable,
+    /// B21_1005_C000,
+    WarantyLiab,
+    /// B21_1006_C000,
+    CorpTaxByJurisdictPayableAtPeriodEnd,
+    /// B21_1007_C000,
+    InstallmentLoansPayable,
+    /// B21_1008_C000,
+    PortionBankBorrowingsPayable,
+    /// B21_1009_C000,
+    MortgageOrPropertyLoansPayable,
+    /// B21_1010_C000,
+    RedeemablePreferenceShares,
+    /// B21_1011_C000,
+    PortionLeaseLiab,
+    /// B21_1012_C000,
+    ContingentConsiderationPayable,
+    /// B21_1013_C000,
+    DeferredIncomeTax,
+    NonCurrentPortionLongTermDebt(Parties),
+    /// B21_1015_C000,
+    ProvisionsWarrantyLegalClaimsOther,
+    FinancialInstruments(Derivatives),
+}
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum ShareholdersEquity {
+    /// B30_0001_C000,
+    PersonalNetWorth,
+    /// B30_0002_C000,
+    OwnersEquity,
+}
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum OtherEquity {
+    /// B31_1001_C000,
+    CorpTaxByJurisdictCalcAfterPL,
+}
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum CapitalStock {
+    /// B32_2001_C000,
+    OrdinaryShares,
+    /// B32_2002_C000,
+    PreferenceShares,
+    /// B32_2003_D000,
+    TreasuryShares,
+}
+// Fair Value Gains or Losses on Financial Assets at FVOCI
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _3003_ {
+    /// B33_3003_C000,
+    DebtInstrFVOCIGainLoss,
+    /// B33_3003_C001,
+    EquityInstrFVOCIGainLoss,
+}
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum OtherReserves {
+    /// B33_3001_C000,
+    ShareApplicationMonies,
+    /// B33_3002_C000,
+    ShareOptionReserve,
+    /// Fair Value Gains Or Losses On Financial Assets At FVOCI
+    FairValueReserve(_3003_),
+    /// B33_3004_C000,
+    HedgingReserveCFlowHedges,
+    /// B33_3005_C000,
+    EquityCompOfConvertibleBonds,
+    /// B33_3006_C000,
+    AssetRevaluationReserve(PropertyPlantEquipment),
+}
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum RetainedEarnings {
+    /// B34_4001_D000,
+    DividendPaid,
+    /// B34_4002_C000,
+    RetainedEarnings,
+}
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum Sales {
+    /// P40_0001_C000,
+    SalesOfServices,
+    /// P40_0002_C000,
+    SalesOfGoods,
+    /// P40_0003_D000,
+    SalesReturnsAndAllowances,
+    /// P40_0004_C000,
+    SalesDiscounts,
+    /// P40_0005_C000,
+    FreightBillable,
+    /// P40_0006_C000,
+    CommissionBillable,
+    /// P40_0007_C000,
+    MiscellaneousIncome,
+}
+/// Other Income Interest Income
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum _1002_ {
+    /// P41_1002_C000,
+    FinAssetsMeasuredAmortisedCost,
+    /// P41_1002_C001,
+    Investments,
+    /// P41_1002_C002,
+    TradeReceivables,
+    /// P41_1002_C003,
+    BankDeposits,
+    /// P41_1002_C004,
+    LoansToAnassociateSubsidiary,
+    /// P41_1002_C005,
+    DebtInvestmentsMeasuredFVOCI,
+}
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum OtherIncome {
+    /// P41_1001_C000,
+    RoyaltyIncome,
+    /// Other Income Interest Income
+    IntrestIncome(_1002_),
+    /// P41_1002_C005,
+    DebtInvestmentsMeasuredFVOCI,
+    /// P41_1003_C000,
+    DividendIncome,
+    /// P41_1004_C000,
+    RentalIncome,
+    /// P41_1005_C000,
+    GrantIncome,
+    /// P41_1006_C000,
+    FVGainLossFinAssetsAndLiabFVTPL,
+    /// P41_1007_C000,
+    FVGainLossDerivativeFinInstr,
+    /// P41_1008_C000,
+    IneffectivenessFVCFlowHedges,
+    /// P41_1009_C000,
+    FinAssetsFVOCI,
+    /// P41_1010_C000,
+    FVGainLossInvestmentProperties,
+    /// P41_1011_C000,
+    FVGainLossContingentConsideration,
+}
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum OtherOperatingIncome {
+    /// P42_1001_C000,
+    ShareOfProfitLossOf(InvestmentIn),
+    /// P42_1002_C000,
+    GainLossDisposal(PropertyPlantEquipment),
+    /// P42_1003_C000,
+    GainLossDiscontinuedOperations,
+}
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum OtherComprehensiveIncome {
+    /// P43_2001_C000,
+    DebtInstr,
+    /// P43_2001_C001,
+    EquityInstr,
+    /// P43_2002_C000,
+    FvGainsLossCFlowHedges,
+    /// P43_2003_C000,
+    ShareOfOCIAssociates,
+    /// P43_2004_C000,
+    ReclassificationAdjustments,
+    /// P43_2005_C000,
+    RevaluationGains(PropertyPlantEquipment),
+    /// P43_2006_C000,
+    /// P43_2006_C001,
+    /// P43_2006_C002,
+    /// P43_2006_C003,
+    /// P43_2006_C004,
+    /// P43_2007_C000,
+    FVGainLossHoldingCrypto(Coins),
+    /// P43_2007_C001,
+    /// P43_2008_C000,
+    /// P43_2009_C001,
+    /// P43_2009_C000,
+    /// P43_2010_C000,
+    /// P43_2011_C000,
+    FVGainLossHoldingTokens(Tokens),
+    GainLossDisposalCrypto(Coins),
+    GainLossDisposalTokens(Tokens),
+}
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum OperatingExpenses {
+    CostofGoodsSold(Cogs),
+    // _0001_(Cogs),
+    ChargesInOut(_0002_),
+    // _0002_(_0002_),
+    DepreciationDepletionAmortization(_0003_),
+    // _0003_(_0003_),
+    FieldTrials(_0004_),
+    // _0004_(_0004_),
+    Warranties(_0005_),
+    // _0005_(_0005_),
+    TaxCorporationTax(_0006_),
+    // _0006_(_0006_),
+    TaxFinesPenalties(_0007_),
+    // _0007_(_0007_),
+    Claims(_0008_),
+    // _0008_(_0008_),
+    Commissions(_0009_),
+    // _0009_(_0009_),
+    MarketingPrograms(_0010_),
+    // _0010_(_0010_),
+    ConsultingFees(_0011_),
+    // _0011_(_0011_),
+    Services(_0012_),
+    // _0012_(_0012_),
+    TravelExpenses(_0013_),
+    // _0013_(_0013_),
+    Hotels(_0014_),
+    // _0014_(_0014_),
+    MeetingsConferences(_0015_),
+    // _0015_(_0015_),
+    RestaurantMeals(_0016_),
+    // _0016_(_0016_),
+    OtherTravelExpenses(_0017_),
+    // _0017_(_0017_),
+    CostPooling(_0018_),
+    // _0018_(_0018_),
+    CarExpenses(_0019_),
+    // _0019_(_0019_),
+    Equipment(_0020_),
+    // _0020_(_0020_),
+    PlantMaintenance(_0021_),
+    // _0021_(_0021_),
+    PhonesTelecom(_0022_),
+    // _0022_(_0022_),
+    RentalLeases(_0023_),
+    // _0023_(_0023_),
+    RepairMaintenance(_0024_),
+    // _0024_(_0024_),
+    Supplies(_0025_),
+    // _0025_(_0025_),
+    Utilities(_0026_),
+    // _0026_(_0026_),
+    Insurance(_0027_),
+    // _0027_(_0027_),
+    CorporateGovernance(_0028_),
+    // _0028_(_0028_),
+    LegalFees(_0029_),
+    // _0029_(_0029_),
+    AdministrationCost(_0030_),
+    // _0030_(_0030_),
+    BadDebts(_0031_),
+    // _0031_(_0031_),
+    MiscellaneousExpenses(_0032_),
+    // _0032_(_0032_),
+    FinGuaranteeFees(_0033_),
+    // _0033_(_0033_),
+    RoyaltyExpenses(_0034_),
+    // _0034_(_0034_),
+    ExtraordinaryExpenses(_0035_),
+    // _0035_(_0035_),
+    ImpairmentLoss(_0036_),
+    // _0036_(_0036_),
+    Provisions(_0038_),
+    // _0038_(_0038_),
+    WriteOff(PropertyPlantEquipment),
+    // _0039_(_0039_),
+}
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum OtherOperatingExpenses {
+    OtherMiscellaneousCharges(_1001_),
+    // _1001_(_1001_),
+}
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum PersonnelCosts {
+    Salaries(_2001_),
+    // _2001_(_2001_),
+    ExpatExpenses(_2002_),
+    // _2002_(_2002_),
+    IncentivePlan(_2003_),
+    // _2003_(_2003_),
+    IncentivePlanOverhead(_2004_),
+    // _2004_(_2004_),
+    EmployeeServices(_2005_),
+    // _2005_(_2005_),
+}
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum FinanceCosts {
+    InterestExpense(_3001_),
+    // _3001_(_3001_),
+}
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum ControlAccounts {
+    PurchaseControl,
+    // C60_0001_000D,
+    SalesControl,
+    // C60_0002_000D,
+    TaxControl,
+    // C60_0003_000D,
+    EscrowedFundsControl,
+    // C60_0004_000D,
+    BorrowingsControl,
+    // C60_0005_000D,
+    DefiBorrowingsControl,
+    // C60_0006_000D,
+    LiquidityPoolControl,
+    // C60_0007_000D,
+}
+/// Assets
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum A {
+    CurrentAssets(CurrentAssets),
+    CurrentAssetsCrypto(CurrentAssetsCrypto),
+    FixedAssets(FixedAssets),
+    IntagibleAssets(IntagibleAssets),
+    NonCurrentAssets(NonCurrentAssets),
+}
+/// Liabilities
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum L {
+    CurrentLiabilities(CurrentLiabilities),
+    NonCurrentLiabilities(NonCurrentLiabilities),
+}
+/// Equity
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum E {
+    ShareholdersEquity(ShareholdersEquity),
+    OtherEquity(OtherEquity),
+    CapitalStock(CapitalStock),
+    OtherReserves(OtherReserves),
+    RetainedEarnings(RetainedEarnings),
+}
+/// Income
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum I {
+    Sales(Sales),
+    OtherIncome(OtherIncome),
+    OtherOperatingIncome(OtherOperatingIncome),
+    OtherComprehensiveIncome(OtherComprehensiveIncome),
+}
+/// Expenses
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum X {
+    OperatingExpenses(OperatingExpenses),
+    OtherOperatingExpenses(OtherOperatingExpenses),
+    PersonnelCosts(PersonnelCosts),
+    FinanceCosts(FinanceCosts),
+}
+/// Profit And Loss
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum P {
+    Income(I),
+    Expenses(X),
+}
+/// Balance Sheet
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
+pub enum B {
+    Assets(A),
+    Liabilities(L),
+    Equity(E),
+}
+/// Ledger
+#[allow(non_camel_case_types)]
+#[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
+#[scale_info(capture_docs = "always")]
 pub enum Ledger {
-    /// Bank Current Account.
-    B1010001_0000000D,
-    /// Bank Savings Account.
-    B1010002_0000000D,
-    /// Petty Cash.
-    B1010003_0000000D,
-    /// Internal Address Balance (Network Currency).
-    B1010004_0000000D,
-    /// Totem Escrow Deposit.
-    B1010005_0000000D,
-    /// Fixed deposits.
-    B1010006_0000000D,
-    /// Prepaid Expenses on account (Operating Expense).
-    B1010007_0000000D,
-    /// Director's loan account (asset until repaid).
-    B1010008_0000000D,
-    /// Trade receivables - non-related parties.
-    B1010009_0000000D,
-    /// Trade receivables - related parties.
-    B1010010_0000000D,
-    /// Loan to non-related parties - Current Assets.
-    B1010011_0000000D,
-    /// Loan to related parties - Current Assets.
-    B1010011_0000001D,
-    /// Other receivables - Current Assets.
-    B1010011_0000002D,
-    /// Finance lease receivables - Current Assets.
-    B1010011_0000003D,
-    /// Staff loans - Current Assets.
-    B1010011_0000004D,
-    /// Government grant receivables.
-    B1010011_0000005D,
-    /// Allowance for doubtful debts .
-    B1010012_0000000C,
-    /// Other .
-    B1010012_0000001C,
-    /// Impairment loss on contract assets .
-    B1010012_0000002C,
-    /// Raw materials.
-    B1010013_0000000D,
-    /// Work in progress.
-    B1010013_0000001D,
-    /// Finished goods.
-    B1010013_0000002D,
-    /// Advances to suppliers (Trade Supplies).
-    B1010014_0000000D,
-    /// Contract assets.
-    B1010015_0000000D,
-    /// Equity securities - Fair value through P&L.
-    B1010016_0000000D,
-    /// Assets of disposal group classified as held-for-sale.
-    B1010017_0000000D,
-    /// Loan notes - floating or fixed.
-    B1010018_0000000D,
-    /// Interest rate swaps - Current Assets.
-    B1010019_0000000D,
-    /// Currency forwards - Current Assets.
-    B1010020_0000000D,
-    /// Commodity forwards - Current Assets.
-    B1010021_0000000D,
-    /// Cryptocurrency (UTXO).
-    B1114001_0000000D,
-    /// Cryptocurrency (Nonce).
-    B1114001_0000001D,
-    /// Cryptocurrency (Parachain).
-    B1114001_0000002D,
-    /// Cryptocurrency (Third-party custodian).
-    B1114001_0000003D,
-    /// Cryptocurrency (Other).
-    B1114001_0000004D,
-    /// Fungible tokens (smart contract).
-    B1114002_0000000D,
-    /// Fungible tokens (Third-party custodian).
-    B1114002_0000001D,
-    /// Non-Fungible tokens (smart contract).
-    B1114003_0000002D,
-    /// Non-Fungible tokens (Third-party custodian).
-    B1114003_0000003D,
-    /// Liquidity Pool Pair (smart contract).
-    B1114004_0000000D,
-    /// Cryprto Loan Collateral.
-    B1114005_0000000D,
-    /// Impairment Loss Cryptocurrency (UTXO).
-    B1114006_0000002C,
-    /// Impairment Loss Cryptocurrency (Nonce).
-    B1114006_0000003C,
-    /// Impairment Loss Cryptocurrency (Parachain).
-    B1114006_0000004C,
-    /// Impairment Loss Cryptocurrency (Third-party custodian).
-    B1114006_0000000C,
-    /// Impairment Loss Cryptocurrency (Other).
-    B1114006_0000001C,
-    /// Impairment Loss Fungible tokens (smart contract).
-    B1114007_0000002C,
-    /// Impairment Loss Fungible tokens (Third-party custodian).
-    B1114007_0000003C,
-    /// Impairment Loss Non-Fungible tokens (smart contract).
-    B1114008_0000000C,
-    /// Impairment Loss Non-Fungible tokens (Third-party custodian).
-    B1114008_0000001C,
-    /// Impairment Loss Liquidity Pool Pair (smart contract).
-    B1114009_0000000C,
-    /// Impairment Loss Crypto Loan Collateral.
-    B1114010_0000000C,
-    /// Land.
-    B1211001_0000000D,
-    /// Buildings.
-    B1211002_0000000D,
-    /// Furniture fixtures and fittings.
-    B1211003_0000000D,
-    /// Plant and equipment.
-    B1211004_0000000D,
-    /// Motor vehicles.
-    B1211005_0000000D,
-    /// Supplies.
-    B1211006_0000000D,
-    /// Computer and IT equipment.
-    B1211007_0000000D,
-    /// Right-of-use assets.
-    B1211008_0000000D,
-    /// Assets under construction.
-    B1211009_0000000D,
-    /// Leasehold improvements.
-    B1211010_0000000D,
-    /// Land - Accumulated depreciation.
-    B1211011_0000000C,
-    /// Buildings- Accumulated depreciation.
-    B1211011_0000001C,
-    /// Furniture fixtures and fittings - Accumulated depreciation.
-    B1211011_0000002C,
-    /// Plant and equipment - Accumulated depreciation.
-    B1211011_0000003C,
-    /// Motor vehicles - Accumulated depreciation.
-    B1211011_0000004C,
-    /// Supplies - Accumulated depreciation.
-    B1211011_0000005C,
-    /// Computer and IT equipment - Accumulated depreciation.
-    B1211011_0000006C,
-    /// Right-of-use assets - Accumulated depreciation.
-    B1211011_0000007C,
-    /// Assets under construction - Accumulated depreciation.
-    B1211011_0000008C,
-    /// Leasehold improvements - Accumulated depreciation.
-    B1211011_0000009C,
-    /// e.g. Films, copyrights or other intellectual property rights - Accumulated depreciation.
-    B1312001_0000000D,
-    /// Trademark and patents (BS).
-    B1312002_0000000D,
-    /// Computer software licences.
-    B1312003_0000000D,
-    /// External Network Cryptocurrency.
-    B1312004_0000000D,
-    /// Goodwill.
-    B1312005_0000000D,
-    /// Trademark and patents - Accumulated amortisation.
-    B1312006_0000000C,
-    /// Computer software licences - Accumulated amortisation.
-    B1312006_0000001C,
-    /// Others.
-    B1312006_0000002C,
-    /// Impairment loss on intangible assets.
-    B1312007_0000000C,
-    /// Investment in subsidiaries.
-    B1413001_0000000D,
-    /// Investment in joint venture.
-    B1413002_0000000D,
-    /// Investment in associates.
-    B1413003_0000000D,
-    /// Investment properties.
-    B1413004_0000000D,
-    /// Equity securities - Fair value through other comprehensive income.
-    B1413005_0000000D,
-    /// Debt securities.
-    B1413006_0000001D,
-    /// Deferred income tax - Non-Current Assets.
-    B1413007_0000000D,
-    /// Impairment of fixed assets.
-    B1413008_0000000C,
-    /// Impairment investment in subsidiaries.
-    B1413008_0000001C,
-    /// Impairment investment in joint venture.
-    B1413008_0000002C,
-    /// Impairment investment in associates.
-    B1413008_0000003C,
-    /// Non-listed debt instruments.
-    B1413009_0000000D,
-    /// Mandatorily measured at FVTPL (e.g. redeemable preference shares).
-    B1413009_0000001D,
-    /// Convertible bonds - Non-Current Assets (BS).
-    B1413009_0000002D,
-    /// Loan to non-related parties - Non-Current Assets.
-    B1413010_0000000D,
-    /// Loan to related parties - Non-Current Assets.
-    B1413010_0000001D,
-    /// Other receivables - Non-Current Assets.
-    B1413010_0000002D,
-    /// Finance lease receivables - Non-Current Assets.
-    B1413010_0000003D,
-    /// Staff loans - Non-Current Assets.
-    B1413010_0000004D,
-    /// Indemnification assets.
-    B1413010_0000005D,
-    /// Interest rate swaps - Non-Current Assets.
-    B1413011_0000000D,
-    /// Currency forwards - Non-Current Assets.
-    B1413011_0000001D,
-    /// Commodity forwards - Non-Current Assets.
-    B1413011_0000002D,
-    /// Sales Tax by Jurisdiction (Can be a negative balance for reclaims [technically an asset]).
-    B2020001_0000000C,
-    /// Federal or State Tax By Jurisdiction on Sales.
-    B2020002_0000000C,
-    /// Accounts payable (Trade creditors).
-    B2020003_0000000C,
-    /// Current portion of long-term Debt (non-trade).
-    B2020003_0000001C,
-    /// Short-term Loans (Payable).
-    B2020003_0000002C,
-    /// Salaries Payable.
-    B2020004_0000000C,
-    /// Wages Payable.
-    B2020005_0000000C,
-    /// Commission Payable.
-    B2020006_0000000C,
-    /// Freight Payable.
-    B2020007_0000000C,
-    /// Other Accrued Expenses Payable.
-    B2020008_0000000C,
-    /// Payroll Tax By Jurisdiction Liabilities.
-    B2020009_0000000C,
-    /// Interest Payable.
-    B2020010_0000000C,
-    /// Advances from customers.
-    B2020011_0000000C,
-    /// Lawsuits and Legal Costs Payable.
-    B2020012_0000000C,
-    /// Accounts payable (Trade creditors).
-    B2020013_0000000C,
-    /// Short-term Loans (Payable).
-    B2020013_0000001C,
-    /// Current portion of long-term Debt (non-trade).
-    B2020013_0000002C,
-    /// Financial guarantees.
-    B2020014_0000000C,
-    /// Contract liabilities.
-    B2020015_0000000C,
-    /// Bank overdrafts.
-    B2020016_0000000C,
-    /// Current portion of lease liabilities.
-    B2020017_0000000C,
-    /// Warranty / Legal claims / Others - Current Liabilities (BS).
-    B2020018_0000000C,
-    /// Unused leave - Current Liabilities (BS).
-    B2020018_0000001C,
-    /// Interest rate swaps - Current Liabilities.
-    B2020019_0000000C,
-    /// Currency forwards - Current Liabilities.
-    B2020019_0000001C,
-    /// Commodity forwards - Current Liabilities.
-    B2020019_0000002C,
-    /// Dividend payable.
-    B2020020_0000000C,
-    /// Current portion of bank borrowings (Payable).
-    B2020021_0000000C,
-    /// Income Tax By Jurisdiction Payable (Witholding Tax).
-    B2121001_0000000C,
-    /// Deferred Revenues (Unearned Revenues).
-    B2121002_0000000C,
-    /// Bonds Payable.
-    B2121003_0000000C,
-    /// Notes (Loans) Payable.
-    B2121004_0000000C,
-    /// Waranty Liabilities.
-    B2121005_0000000C,
-    /// Corporation tax by jurisdiction payable (posted at end of period or end of year).
-    B2121006_0000000C,
-    /// Installment Loans (Payable).
-    B2121007_0000000C,
-    /// Portion of bank borrowings (Payable) - Non-Current Liabilities.
-    B2121008_0000000C,
-    /// Mortgage or Property Loans (Payable).
-    B2121009_0000000C,
-    /// Redeemable preference shares.
-    B2121010_0000000C,
-    /// Portion of lease liabilities - Non-Current Liabilities.
-    B2121011_0000000C,
-    /// Contingent consideration payable.
-    B2121012_0000000C,
-    /// Deferred income tax - Non-Current Liabilities.
-    B2121013_0000000C,
-    /// Non-current portion of long-term Debt (non-trade).
-    B2121014_0000000C,
-    /// Non-current portion of long-term Debt (non-trade).
-    B2121014_0000001C,
-    /// Warranty / Legal claims / Others - Non-Current Liabilities (BS).
-    B2121015_0000000C,
-    /// Interest rate swaps - Non-Current Liabilities.
-    B2121016_0000000C,
-    /// Currency forwards - Non-Current Liabilities.
-    B2121016_0000001C,
-    /// Commodity forwards - Non-Current Liabilities.
-    B2121016_0000002C,
-    /// Personal Net Worth.
-    B3030001_0000000C,
-    /// Owner's Equity.
-    B3030002_0000000C,
-    /// Corporation tax by jurisdiction (calculated after P&L).
-    B3131001_0000000C,
-    /// Ordinary shares.
-    B3232001_0000000C,
-    /// Preference shares.
-    B3232002_0000000C,
-    /// Treasury shares.
-    B3232003_0000000D,
-    /// Share application monies.
-    B3333001_0000000C,
-    /// Share option reserve.
-    B3333002_0000000C,
-    /// Fair value gains / (losses) on financial assets at FVOCI (debt instruments).
-    B3333003_0000000C,
-    /// Fair value gains / (losses) on financial assets at FVOCI (equity instruments).
-    B3333004_0000001C,
-    /// Cash flow hedges.
-    B3333005_0000000C,
-    /// Equity component of convertible bonds.
-    B3333006_0000000C,
-    /// Revaluation of property, plant and equipment.
-    B3333007_0000000C,
-    /// Dividend paid.
-    B3434001_0000000D,
-    /// Retained Earnings.
-    B3434002_0000000C,
-    /// Sales of services.
-    P4040001_0000000C,
-    /// Sales of goods.
-    P4040002_0000000C,
-    /// Sales returns and allowances.
-    P4040003_0000000D,
-    /// Sales discounts.
-    P4040004_0000000C,
-    /// Freight Billable.
-    P4040005_0000000C,
-    /// Commission Billable.
-    P4040006_0000000C,
-    /// Miscellaneous Income.
-    P4040007_0000000C,
-    /// Royalty income.
-    P4141001_0000000C,
-    /// FInancial assets measured at amortised cost.
-    P4141002_0000000C,
-    /// Investments.
-    P4141002_0000001C,
-    /// Trade receivables.
-    P4141002_0000002C,
-    /// Bank deposits.
-    P4141002_0000003C,
-    /// Loans to an associate / subsidiary.
-    P4141002_0000004C,
-    /// Debt investments measured at FVOCI.
-    P4141002_0000005C,
-    /// Dividend income.
-    P4141003_0000000C,
-    /// Rental income.
-    P4141004_0000000C,
-    /// Grant income.
-    P4141005_0000000C,
-    /// Fair value gains / (losses) on financial assets and liabilities at FVTPL.
-    P4141006_0000000C,
-    /// Fair value gains / (losses) on derivative financial instruments.
-    P4141007_0000000C,
-    /// Ineffectiveness on fair value / cash flow hedges.
-    P4141008_0000000C,
-    /// Financial assets at FVOCI, reclassified from OCI on disposal.
-    P4141009_0000000C,
-    /// Fair value gains / (losses) on investment properties.
-    P4141010_0000000C,
-    /// Fair value gains / (loss) on contingent consideration .
-    P4141011_0000000C,
-    /// Share of profit / (loss) of associates and joint ventures.
-    P4241001_0000000C,
-    /// Gains / (Losses) on sale / disposal of property, plant and equipment.
-    P4241002_0000000C,
-    /// Profit / (loss) from discontinued operations.
-    P4241003_0000000C,
-    /// Debt instruments .
-    P4342001_0000000C,
-    /// Equity instruments.
-    P4342002_0000001C,
-    /// Fair value gains / (losses) on cash flow hedges.
-    P4342003_0000000C,
-    /// Share of other comprehensive income of associates.
-    P4342004_0000000C,
-    /// Reclassification adjustments (for items that may be reclassified subsequently to profit or loss).
-    P4342005_0000000C,
-    /// Revaluation gains on property, plant and equipment.
-    P4342006_0000000C,
-    /// Fair Value gains / (loses) holding Cryptocurrency (UTXO).
-    P4342007_0000000C,
-    /// Fair Value gains / (loses) holding Cryptocurrency (Nonce).
-    P4342007_0000001C,
-    /// Fair Value gains / (loses) holding Cryptocurrency (Parachain).
-    P4342007_0000002C,
-    /// Fair Value gains / (loses) holding Cryptocurrency (Third-party custodian).
-    P4342007_0000003C,
-    /// Fair Value gains / (loses) holding Cryptocurrency (Other).
-    P4342007_0000004C,
-    /// Fair Value gains / (loses) holding Fungible tokens (smart contract).
-    P4342008_0000000C,
-    /// Fair Value gains / (loses) holding Fungible tokens (Third-party custodian).
-    P4342008_0000001C,
-    /// Fair Value gains / (loses) holding Non-Fungible tokens (smart contract).
-    P4342009_0000000C,
-    /// Fair Value gains / (loses) holding Non-Fungible tokens (Third-party custodian).
-    P4342009_0000001C,
-    /// Fair Value gains / (loses) holding Liquidity Pool Pair (smart contract).
-    P4342010_0000000C,
-    /// Fair Value gains / (loses) holding Crypto Loan Collateral.
-    P4342011_0000000C,
-    /// Gains / (Losses) on sale / disposal of Cryptocurrency Assets.
-    P4342012_0000000C,
-    /// Raw materials - changes in inventories.
-    P5050001_0000000D,
-    /// Work in progress - changes in inventories.
-    P5050001_0000001D,
-    /// Finished goods - changes in inventories.
-    P5050001_0000002D,
-    /// Purchases - direct material costs.
-    P5050001_0000003D,
-    /// Direct labour costs.
-    P5050001_0000004D,
-    /// Manufacturing / Factory overhead.
-    P5050001_0000005D,
-    /// Purchases returns and allowances.
-    P5050001_0000006D,
-    /// Purchase discount.
-    P5050001_0000007D,
-    /// Inventory write-down / Reversal of inventory write-down.
-    P5050001_0000008D,
-    /// Inter-Entity Charge In.
-    P5050002_0000000D,
-    /// Inter-Entity Charge Out.
-    P5050002_0000001D,
-    /// IT Distribution.
-    P5050002_0000002D,
-    /// Distribution To Capital.
-    P5050002_0000003D,
-    /// Allocations.
-    P5050002_0000004D,
-    /// Allocation By Country.
-    P5050002_0000005D,
-    /// Facilities Allocation.
-    P5050002_0000006D,
-    /// Assess Research And Development Recharges.
-    P5050002_0000007D,
-    /// General Project Costs.
-    P5050003_0000000D,
-    /// Depreciation Land.
-    P5050003_0000001D,
-    /// Depreciation Buildings.
-    P5050003_0000002D,
-    /// Depreciation Furniture fixtures and fittings.
-    P5050003_0000003D,
-    /// Depreciation Plant and equipment.
-    P5050003_0000004D,
-    /// Depreciation Motor vehicles.
-    P5050003_0000005D,
-    /// Depreciation Supplies.
-    P5050003_0000006D,
-    /// Depreciation Computer and IT equipment.
-    P5050003_0000007D,
-    /// Depreciation Right-of-use assets.
-    P5050003_0000008D,
-    /// Depreciation Leasehold improvements.
-    P5050003_0000009D,
-    /// Amortisation of Others intangible assets.
-    P5050003_0000010D,
-    /// Amortisation of Trademark and patents.
-    P5050003_0000011D,
-    /// Amortisation of Computer software licences.
-    P5050003_0000012D,
-    /// Amortization Government Grants.
-    P5050003_0000013D,
-    /// Gain Loss On Miscellaneous Sales.
-    P5050003_0000014D,
-    /// Non Capital Project Expense.
-    P5050003_0000015D,
-    /// Consumption Other.
-    P5050004_0000000D,
-    /// Trials.
-    P5050004_0000001D,
-    /// Samples.
-    P5050004_0000002D,
-    /// Warranties.
-    P5050005_0000000D,
-    /// Tax (Corporation Tax).
-    P5050006_0000000D,
-    /// Employee Tax.
-    P5050007_0000000D,
-    /// Tax Property.
-    P5050007_0000001D,
-    /// Tax Trade Licences.
-    P5050007_0000002D,
-    /// Tax Enviromental.
-    P5050007_0000003D,
-    /// Road Tax.
-    P5050007_0000004D,
-    /// Taxes Other.
-    P5050007_0000005D,
-    /// Taxes Other Alternate Acct.
-    P5050007_0000006D,
-    /// Non-Deductible Fines Penalties.
-    P5050007_0000007D,
-    /// Penalties.
-    P5050007_0000008D,
-    /// Licenses Fees Certificates Other Taxes.
-    P5050007_0000009D,
-    /// Car Tax.
-    P5050007_0000010D,
-    /// Capital Gains Tax on Crypto Assets.
-    P5050007_0000011D,
-    /// Claims .
-    P5050008_0000000D,
-    /// Commissions Manual.
-    P5050009_0000000D,
-    /// Commissions Intercompany Expense.
-    P5050009_0000001D,
-    /// Commissions Intercompany Income.
-    P5050009_0000002D,
-    /// Samples Consumption Marketing.
-    P5050010_0000000D,
-    /// Promotions.
-    P5050010_0000001D,
-    /// Advertising Expenses.
-    P5050010_0000002D,
-    /// Advertising Promotions Plant Visit.
-    P5050010_0000003D,
-    /// Design And Artwork.
-    P5050010_0000004D,
-    /// Advertising Promotions Gifts.
-    P5050010_0000005D,
-    /// Advertising Promotions Meetings Seminars.
-    P5050010_0000006D,
-    /// Advertising Promotions Printed Material.
-    P5050010_0000007D,
-    /// Advertising Promotions Outdoor Advertising.
-    P5050010_0000008D,
-    /// Advertising Promotions Presentation Material.
-    P5050010_0000009D,
-    /// Distributor Events.
-    P5050010_0000010D,
-    /// Market Research.
-    P5050010_0000011D,
-    /// Fairs And Exhibitions.
-    P5050010_0000012D,
-    /// Media Print.
-    P5050010_0000013D,
-    /// Media Radio.
-    P5050010_0000014D,
-    /// Media Television.
-    P5050010_0000015D,
-    /// Media Other.
-    P5050010_0000016D,
-    /// Samples.
-    P5050010_0000017D,
-    /// Custom Gifts Taxable.
-    P5050010_0000018D,
-    /// Custom Gifts Non Taxable.
-    P5050010_0000019D,
-    /// Technical Service Fees.
-    P5050010_0000020D,
-    /// Literature.
-    P5050010_0000021D,
-    /// Brand Merchandise.
-    P5050010_0000022D,
-    /// Trade Shows Exhibit Fees.
-    P5050010_0000023D,
-    /// Agency Fees.
-    P5050010_0000024D,
-    /// Audio Visuals.
-    P5050010_0000025D,
-    /// Marketing Events Days In The Field.
-    P5050010_0000026D,
-    /// Marketing Miscellaneous Expense.
-    P5050010_0000027D,
-    /// Marketing Cost Sharing.
-    P5050010_0000028D,
-    /// Consulting Fees .
-    P5050011_0000000D,
-    /// Miscellaneous Service.
-    P5050012_0000000D,
-    /// Analytical Testing.
-    P5050012_0000001D,
-    /// Communications Tarriffs.
-    P5050012_0000002D,
-    /// Experimental Testing.
-    P5050012_0000003D,
-    /// Financial Services.
-    P5050012_0000004D,
-    /// Freight Expenses.
-    P5050012_0000005D,
-    /// Housekeeping & Laundry.
-    P5050012_0000006D,
-    /// Language Translation Services.
-    P5050012_0000007D,
-    /// Mail Delivery Services.
-    P5050012_0000008D,
-    /// Miscellaneous Fees.
-    P5050012_0000009D,
-    /// Contractors.
-    P5050012_0000010D,
-    /// Technical Assistance.
-    P5050012_0000011D,
-    /// Laboratory Expense.
-    P5050012_0000012D,
-    /// Labour.
-    P5050012_0000013D,
-    /// Printing.
-    P5050012_0000014D,
-    /// Warehouse.
-    P5050012_0000015D,
-    /// Photographs Graphics.
-    P5050012_0000016D,
-    /// Project Engineering.
-    P5050012_0000017D,
-    /// Research Assistance.
-    P5050012_0000018D,
-    /// Research Shopping Expense.
-    P5050012_0000019D,
-    /// Other service for Production.
-    P5050012_0000020D,
-    /// Software Maintenance Fees.
-    P5050012_0000021D,
-    /// Tax Preparation Fees.
-    P5050012_0000022D,
-    /// Testing Services.
-    P5050012_0000023D,
-    /// Travel Expenses Per Diem.
-    P5050013_0000000D,
-    /// Travel General.
-    P5050013_0000001D,
-    /// Travel Expenses Air Tickets.
-    P5050013_0000002D,
-    /// Travel Expenses Air Tickets Outside Country Of Residence.
-    P5050013_0000003D,
-    /// Travel Expenses Miles.
-    P5050013_0000004D,
-    /// Taxi & Other Personal Transport.
-    P5050013_0000005D,
-    /// Lodging Hotel Costs.
-    P5050014_0000000D,
-    /// Meetings Conferences.
-    P5050015_0000000D,
-    /// Other Grower Meetings.
-    P5050015_0000001D,
-    /// Key Distributor Meetings.
-    P5050015_0000002D,
-    /// Travel Foreign.
-    P5050015_0000003D,
-    /// Travel Non Employee.
-    P5050015_0000004D,
-    /// Travel Tech Meetings Conferences.
-    P5050015_0000005D,
-    /// Business Meals Entertainment.
-    P5050016_0000000D,
-    /// Business Meals Within Country Of Residence.
-    P5050016_0000001D,
-    /// Business Meals Outside Country Of Residence.
-    P5050016_0000002D,
-    /// Entertainment Non-Deductable.
-    P5050016_0000003D,
-    /// Meals Entertainment Field Sales.
-    P5050016_0000004D,
-    /// Meals Entertainment Training Education.
-    P5050016_0000005D,
-    /// Meals Entertainment Business Development (No Meeting).
-    P5050016_0000006D,
-    /// Meals Entertainment Business Development.
-    P5050016_0000007D,
-    /// Other Travel Expenses .
-    P5050017_0000000D,
-    /// Public Relations.
-    P5050018_0000000D,
-    /// Automobile Expense.
-    P5050019_0000000D,
-    /// Automobile Expense Parking.
-    P5050019_0000001D,
-    /// Automobile Expense Company Car.
-    P5050019_0000002D,
-    /// Automobile Expense Telephone.
-    P5050019_0000003D,
-    /// Automobile Expense Rental.
-    P5050019_0000004D,
-    /// Automobile Expense Repairs.
-    P5050019_0000005D,
-    /// Automobile Expense Car Financing.
-    P5050019_0000006D,
-    /// Automobile Expense Fuel.
-    P5050019_0000007D,
-    /// Leased Autos.
-    P5050019_0000008D,
-    /// Equipment.
-    P5050020_0000000D,
-    /// Plant Maintenance .
-    P5050021_0000000D,
-    /// Cellular Usage.
-    P5050022_0000000D,
-    /// Communication Remote Access.
-    P5050022_0000001D,
-    /// Miscellaneous Data Communications.
-    P5050022_0000002D,
-    /// Telephone Facsimiles.
-    P5050022_0000003D,
-    /// Rent Warehouse.
-    P5050023_0000000D,
-    /// Non Lease Rental.
-    P5050023_0000001D,
-    /// Rent Building Office.
-    P5050023_0000002D,
-    /// Rent Land.
-    P5050023_0000003D,
-    /// Rent Equipment.
-    P5050023_0000004D,
-    /// Sub Lease Income.
-    P5050023_0000005D,
-    /// Rent Other Facilities.
-    P5050023_0000006D,
-    /// Office Lab Furniture.
-    P5050024_0000000D,
-    /// Service Contracts.
-    P5050024_0000001D,
-    /// Repairs.
-    P5050024_0000002D,
-    /// Repairs Equipment.
-    P5050024_0000003D,
-    /// IT Maintenance.
-    P5050024_0000004D,
-    /// Maintenance.
-    P5050024_0000005D,
-    /// Maintenance Equip.
-    P5050024_0000006D,
-    /// Maint Other.
-    P5050024_0000007D,
-    /// Maintenance Other Miscellaneous Hardware.
-    P5050024_0000008D,
-    /// Maintenance Other Office Cleaning.
-    P5050024_0000009D,
-    /// Maintenance Building.
-    P5050024_0000010D,
-    /// Tools.
-    P5050024_0000011D,
-    /// Services.
-    P5050024_0000012D,
-    /// Purchased Supplies.
-    P5050024_0000013D,
-    /// Pm Purchased Equipment Non Capital.
-    P5050024_0000014D,
-    /// Miscellaneous Maintenance.
-    P5050024_0000015D,
-    /// Supplies Other.
-    P5050025_0000000D,
-    /// Supplies Office.
-    P5050025_0000001D,
-    /// Supplies Office Photcopy Document Handling.
-    P5050025_0000002D,
-    /// Supplies Lab.
-    P5050025_0000003D,
-    /// Supplies Safety.
-    P5050025_0000004D,
-    /// Supplies Production.
-    P5050025_0000005D,
-    /// Supplies Maintenance.
-    P5050025_0000006D,
-    /// Supplies Industrial (Chemicals etc...).
-    P5050025_0000007D,
-    /// Supplies Cleaning.
-    P5050025_0000008D,
-    /// Equipment Electrical Equipment.
-    P5050026_0000000D,
-    /// Computer Related Equipment.
-    P5050026_0000001D,
-    /// Software Licenses.
-    P5050026_0000002D,
-    /// Electricity Purchased.
-    P5050026_0000003D,
-    /// Water Purchased.
-    P5050026_0000004D,
-    /// Gas Purchased.
-    P5050026_0000005D,
-    /// Fuel.
-    P5050026_0000006D,
-    /// Utilities Combined.
-    P5050026_0000007D,
-    /// Cloud Storage.
-    P5050026_0000008D,
-    /// Datacentres.
-    P5050026_0000009D,
-    /// Insurance Other.
-    P5050027_0000000D,
-    /// Insurance Other Export Credit.
-    P5050027_0000001D,
-    /// Self Insurance.
-    P5050027_0000002D,
-    /// Motor vehicle insurance.
-    P5050027_0000003D,
-    /// Medical insurance.
-    P5050027_0000004D,
-    /// Life insurance.
-    P5050027_0000005D,
-    /// Travel insurance.
-    P5050027_0000006D,
-    /// Non-exec Directors Fees, & Other Governance Costs.
-    P5050028_0000000D,
-    /// External Corporate Secretarial fees.
-    P5050029_0000000D,
-    /// Litigation.
-    P5050029_0000001D,
-    /// Outside Counsel Fees.
-    P5050029_0000002D,
-    /// Licenses Permits.
-    P5050029_0000003D,
-    /// Legal Fees International.
-    P5050029_0000004D,
-    /// Legal Fees Other.
-    P5050029_0000005D,
-    /// FCPA Gifts.
-    P5050029_0000006D,
-    /// FCPA Travel.
-    P5050029_0000007D,
-    /// FCPA Meals Entertainment.
-    P5050029_0000008D,
-    /// Business Contributions.
-    P5050029_0000009D,
-    /// Charitable Contributions.
-    P5050029_0000010D,
-    /// Donations Disallowed.
-    P5050029_0000011D,
-    /// Local Tax.
-    P5050029_0000012D,
-    /// Audit Fees External.
-    P5050029_0000013D,
-    /// Auditor Firm Tax Fees.
-    P5050029_0000014D,
-    /// Auditor Firm Other Fees.
-    P5050029_0000015D,
-    /// Audit Fees.
-    P5050029_0000016D,
-    /// Patents.
-    P5050029_0000017D,
-    /// Product Registrations.
-    P5050029_0000018D,
-    /// Trademark and patents (P&L).
-    P5050029_0000019D,
-    /// Design Rights.
-    P5050029_0000020D,
-    /// Network Transaction Fees.
-    P5050030_0000000D,
-    /// Bank Charges.
-    P5050030_0000001D,
-    /// Administration Business Tax.
-    P5050030_0000002D,
-    /// Corporate Membership.
-    P5050030_0000003D,
-    /// Memberships Subscriptions.
-    P5050030_0000004D,
-    /// Other Non Deductible.
-    P5050030_0000005D,
-    /// Postage Expenses.
-    P5050030_0000006D,
-    /// Courrier Expenses.
-    P5050030_0000007D,
-    /// Management Adjustment.
-    P5050030_0000008D,
-    /// Collection Expense.
-    P5050030_0000009D,
-    /// Credit Reports.
-    P5050030_0000010D,
-    /// Other Miscellaneous Expense.
-    P5050030_0000011D,
-    /// Miscellaneous Month End Accruals.
-    P5050030_0000012D,
-    /// Sponsorship.
-    P5050030_0000013D,
-    /// Books Library.
-    P5050030_0000014D,
-    /// Equipment Purchased Non-Capitalised.
-    P5050030_0000015D,
-    /// Software Purchased Non-Capitalised.
-    P5050030_0000016D,
-    /// Miscellaneous Reimbursement Expenses.
-    P5050030_0000017D,
-    /// Recovered Expenses Canteen Receipts.
-    P5050030_0000018D,
-    /// Recovered Expense Miscellaneous Charge Out.
-    P5050030_0000019D,
-    /// Recovered Expenses Insurance.
-    P5050030_0000020D,
-    /// Recovered Expenses Car Contract.
-    P5050030_0000021D,
-    /// Recovered Expenses Other.
-    P5050030_0000022D,
-    /// Recovered Expenses Salaries.
-    P5050030_0000023D,
-    /// Recovered Expenses Wages.
-    P5050030_0000024D,
-    /// Procurement Card Purchases.
-    P5050030_0000025D,
-    /// Administration Service Fees.
-    P5050030_0000026D,
-    /// Other Miscellaneous Income Expense.
-    P5050030_0000027D,
-    /// Bad Debt Expense / Reversal.
-    P5050031_0000000D,
-    /// Shipping Cost.
-    P5050033_0000000D,
-    /// Other Costs.
-    P5050033_0000001D,
-    /// Standard Cost Intercompany.
-    P5050033_0000002D,
-    /// Finished Goods Consumption Each.
-    P5050033_0000003D,
-    /// Samples Consumption.
-    P5050033_0000004D,
-    /// Semifinished Consumption.
-    P5050033_0000005D,
-    /// Freight Non-Customer.
-    P5050033_0000006D,
-    /// Freight From or To Warehouse.
-    P5050033_0000007D,
-    /// Duties On Purchases.
-    P5050033_0000008D,
-    /// Handling Warehouse.
-    P5050033_0000009D,
-    /// Transportation.
-    P5050033_0000010D,
-    /// Waste Disposal.
-    P5050033_0000011D,
-    /// Customs Fees.
-    P5050033_0000013D,
-    /// Sponsorship / Donations.
-    P5050033_0000014D,
-    /// Financial guarantee fees.
-    P5050034_0000001D,
-    /// Royalty expenses.
-    P5050035_0000002D,
-    /// Extraordinary expenses.
-    P5050037_0000004D,
-    /// Impairment loss on financial assets.
-    P5050038_0000005D,
-    /// Impairment loss on contract assets.
-    P5050039_0000006D,
-    /// Warranty / Legal claims / Others - Expenses (P&L).
-    P5050040_0000000D,
-    /// Unused leave - Expenses (P&L).
-    P5050040_0000001D,
-    /// Property, plant and equipment written off.
-    P5050041_0000000D,
-    /// Information Technology Miscellaneous.
-    P5151001_0000000D,
-    /// Secondary Costs.
-    P5151001_0000001D,
-    /// Reporting Adjustment.
-    P5151001_0000002D,
-    /// Salaries.
-    P5252001_0000000D,
-    /// Salaries 13th Month.
-    P5252001_0000001D,
-    /// Salaries Achievement Awards.
-    P5252001_0000002D,
-    /// Salaries Representation Allowance.
-    P5252001_0000003D,
-    /// Salaries Fees.
-    P5252001_0000004D,
-    /// Salaried Operations.
-    P5252001_0000005D,
-    /// Wages 13th Month.
-    P5252001_0000006D,
-    /// Payroll Fees.
-    P5252001_0000007D,
-    /// Payroll Luncheon Vouchers.
-    P5252001_0000008D,
-    /// Social Security Employer Contribution.
-    P5252001_0000009D,
-    /// Fringes Variable.
-    P5252001_0000010D,
-    /// Social Security Other.
-    P5252001_0000011D,
-    /// Social Security Provision.
-    P5252001_0000012D,
-    /// Payroll Social Security.
-    P5252001_0000013D,
-    /// Accruals Social Security Charges 13th Month.
-    P5252001_0000014D,
-    /// Accruals Social Security Charges Holiday Pay.
-    P5252001_0000015D,
-    /// Housing Tax.
-    P5252001_0000016D,
-    /// Apprenticeship Tax.
-    P5252001_0000017D,
-    /// Work Council.
-    P5252001_0000018D,
-    /// Severence Pay.
-    P5252001_0000019D,
-    /// Transportation Subsidy.
-    P5252001_0000020D,
-    /// Wages Hourly.
-    P5252001_0000021D,
-    /// Salaries Wages Per Diem.
-    P5252001_0000022D,
-    /// Overtime Payments.
-    P5252001_0000023D,
-    /// Sick Pay.
-    P5252001_0000024D,
-    /// Holiday Pay.
-    P5252001_0000025D,
-    /// Vacation Pay.
-    P5252001_0000026D,
-    /// Other Employee Compensation.
-    P5252001_0000027D,
-    /// Savings Plan.
-    P5252001_0000028D,
-    /// Field Incentive Plan.
-    P5252001_0000029D,
-    /// Pension.
-    P5252001_0000030D,
-    /// Insurance Plan Live Medical.
-    P5252001_0000031D,
-    /// Insurance Work Accident.
-    P5252001_0000032D,
-    /// Insurance Private Collective.
-    P5252001_0000033D,
-    /// Pension Costs Company Portion.
-    P5252001_0000034D,
-    /// Private Patient Plan.
-    P5252001_0000035D,
-    /// Early Retirement Plans.
-    P5252001_0000036D,
-    /// Employee share option expense.
-    P5252001_0000037D,
-    /// School Expenses.
-    P5252002_0000000D,
-    /// Home Leave -Expat expenses.
-    P5252002_0000001D,
-    /// Expat Cost.
-    P5252002_0000002D,
-    /// Assignee Allowances Other.
-    P5252002_0000003D,
-    /// Employe Language Lessons.
-    P5252002_0000004D,
-    /// Employee Moving Expense.
-    P5252002_0000005D,
-    /// Employee Assistance Program.
-    P5252002_0000006D,
-    /// Employee Housing Expense.
-    P5252002_0000007D,
-    /// Expat Other Benefits.
-    P5252002_0000008D,
-    /// Assignee Tax.
-    P5252002_0000009D,
-    /// Incentive Plan.
-    P5252004_0000000D,
-    /// Incentive Plan Overhead.
-    P5252005_0000000D,
-    /// Employee Service Awards.
-    P5252006_0000000D,
-    /// Security Services.
-    P5252006_0000001D,
-    /// Health Safety.
-    P5252006_0000002D,
-    /// Cleaning And Security Services Alternate Account.
-    P5252006_0000003D,
-    /// Cafeteria Service.
-    P5252006_0000004D,
-    /// Medical Benefits.
-    P5252006_0000005D,
-    /// Medical Services and Supplies.
-    P5252006_0000006D,
-    /// Recreation Sports Social.
-    P5252006_0000007D,
-    /// Recruiting.
-    P5252006_0000008D,
-    /// Employee Agency Fees.
-    P5252006_0000009D,
-    /// Transport Of Personal.
-    P5252006_0000010D,
-    /// Education Training.
-    P5252006_0000011D,
-    /// Education Training Associated Travel Costs.
-    P5252006_0000012D,
-    /// Training Tax.
-    P5252006_0000013D,
-    /// Tuition.
-    P5252006_0000014D,
-    /// Tuition Taxable.
-    P5252006_0000015D,
-    /// Laundry Clothing.
-    P5252006_0000016D,
-    /// Meal Allowance.
-    P5252006_0000017D,
-    /// Celebrations.
-    P5252006_0000018D,
-    /// Social Security .
-    P5252007_0000000D,
-    /// Bank borrowings.
-    P5353001_0000000D,
-    /// Convertible bonds - Interest Expense (P&L).
-    P5353001_0000001D,
-    /// Dividends on redeemable preference shares.
-    P5353001_0000002D,
-    /// Lease liabilities.
-    P5353001_0000003D,
-    /// Unwinding of discount on provisions.
-    P5353001_0000004D,
-    /// Purchase Control.
-    C6060001_0000000D,
-    /// Sales Control.
-    C6060002_0000000D,
-    /// Tax Control.
-    C6060003_0000000D,
-    /// Escrowed Funds Control.
-    C6060004_0000000D,
-    /// Borrowings Control.
-    C6060005_0000000D,
-    /// Defi Borrowings Control.
-    C6060006_0000000D,
-    /// Liquidity Pool Control.
-    C6060007_0000000D,
+    BalanceSheet(B),
+    ProfitLoss(P),
+    ControlAccounts(ControlAccounts),
 }
-
-impl Encode for Ledger {
-    fn size_hint(&self) -> usize {
-        2
-    }
-
-    fn using_encoded<R, F: FnOnce(&[u8]) -> R>(&self, f: F) -> R {
-        f(&(*self as u16).to_le_bytes())
-    }
-}
-
-impl Decode for Ledger {
-    fn decode<I: Input>(value: &mut I) -> Result<Self, Error> {
-        let bytes = {
-            let mut buffer = [0, 0];
-            value.read(&mut buffer)?;
-            buffer
-        };
-        let variant = u16::from_le_bytes(bytes);
-
-        Self::from_repr(variant).ok_or_else(|| "Invalid variant value for `Ledger`".into())
-    }
-
-    fn encoded_fixed_size() -> Option<usize> {
-        Some(2)
-    }
-}
-
-impl TypeInfo for Ledger {
-    type Identity = Self;
-
-    fn type_info() -> Type {
-        Type::builder()
-            .path(Path::new(stringify!(Ledger), module_path!()))
-            .composite(Fields::unnamed().field(|f| f.compact::<u16>().type_name("u16")))
-    }
-}
-
-impl EncodeLike for Ledger {}
-impl EncodeLike<u16> for Ledger {}
