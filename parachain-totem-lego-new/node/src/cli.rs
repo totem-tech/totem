@@ -1,5 +1,20 @@
+// Copyright 2019-2021 Parity Technologies (UK) Ltd.
+// This file is part of Cumulus.
+
+// Cumulus is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// Cumulus is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with Cumulus.  If not, see <http://www.gnu.org/licenses/>.
+
 use crate::chain_spec;
-use cumulus_client_cli;
 use sc_cli;
 use std::path::PathBuf;
 use structopt::StructOpt;
@@ -42,6 +57,9 @@ pub enum Subcommand {
 
 	// /// Try some testing command against a specified runtime state.
 	// TryRuntime(try_runtime_cli::TryRuntimeCmd),
+
+	/// Key management CLI utilities
+	Key(sc_cli::KeySubcommand),
 }
 
 /// Command for exporting the genesis state of the parachain
@@ -51,18 +69,17 @@ pub struct ExportGenesisStateCommand {
 	#[structopt(parse(from_os_str))]
 	pub output: Option<PathBuf>,
 
-	// /// Id of the parachain this state is for.
-	// ///
-	// /// Default: 100
-	// #[structopt(long, conflicts_with = "chain")]
-	// pub parachain_id: Option<u32>,
+	/// Id of the parachain this state is for.
+	///
+	/// Default: 100
+	#[structopt(long)]
+	pub parachain_id: Option<u32>,
 
 	/// Write output in binary. Default is to write in hex.
 	#[structopt(short, long)]
 	pub raw: bool,
 
 	/// The name of the chain for that the genesis state should be exported.
-	// #[structopt(long, conflicts_with = "parachain-id")]
 	#[structopt(long)]
 	pub chain: Option<String>,
 }
@@ -98,7 +115,7 @@ pub struct Cli {
 
 	/// Relay chain arguments
 	#[structopt(raw = true)]
-	pub relay_chain_args: Vec<String>,
+	pub relaychain_args: Vec<String>,
 }
 
 #[derive(Debug)]
@@ -121,14 +138,7 @@ impl RelayChainCli {
 	) -> Self {
 		let extension = chain_spec::Extensions::try_get(&*para_config.chain_spec);
 		let chain_id = extension.map(|e| e.relay_chain.clone());
-		let base_path = para_config
-			.base_path
-			.as_ref()
-			.map(|x| x.path().join("polkadot"));
-		Self {
-			base_path,
-			chain_id,
-			base: polkadot_cli::RunCmd::from_iter(relay_chain_args),
-		}
+		let base_path = para_config.base_path.as_ref().map(|x| x.path().join("polkadot"));
+		Self { base_path, chain_id, base: polkadot_cli::RunCmd::from_iter(relay_chain_args) }
 	}
 }

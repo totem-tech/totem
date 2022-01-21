@@ -1,5 +1,5 @@
 [package]
-name = 'parachain-totem-lego-node'
+name = 'parachain-node'
 version = '1.1.0'
 authors = ['Totem Accounting <support@totemaccounting.com>']
 description = 'A Totem LEGO node'
@@ -13,13 +13,15 @@ build = 'build.rs'
 targets = ['x86_64-unknown-linux-gnu']
 
 [[bin]]
-name = 'parachain-totem-lego-node'
+name = 'parachain-node'
 path = 'src/main.rs'
 
 [features]
 default = []
-runtime-benchmarks = ['parachain-totem-lego-runtime/runtime-benchmarks']
-# try-runtime = ['parachain-totem-lego-runtime/try-runtime']
+lego-runtime-benchmarks = ['lego-runtime/runtime-benchmarks']
+wapex-runtime-benchmarks = ['wapex-runtime/runtime-benchmarks']
+kapex-runtime-benchmarks = ['kapex-runtime/runtime-benchmarks']
+# try-runtime = ['lego-runtime/try-runtime']
 
 [dependencies]
 derive_more = '0.99.2'
@@ -32,7 +34,9 @@ futures = { version = '0.3.1', features = ['compat'] }
 async-trait = '0.1.42'
 
 # Local Dependencies
-parachain-totem-lego-runtime = { path = '../runtime' }
+lego-runtime = { path = '../lego/runtime' }
+wapex-runtime = { path = '../wapex/runtime' }
+kapex-runtime = { path = '../kapex/runtime' }
 parachains-common = { path = "../../parachains-common" }
 
 # Substrate Dependencies
