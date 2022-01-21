@@ -24,21 +24,20 @@ use kapex_runtime::{AccountId, AuraId, Signature, EXISTENTIAL_DEPOSIT};
 use sc_chain_spec::{ChainSpecExtension, ChainSpecGroup};
 use sc_service::ChainType;
 use serde::{Deserialize, Serialize};
-// use sp_core::{sr25519, Pair, Public};
 use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public};
 use sp_runtime::traits::{IdentifyAccount, Verify};
 
-// use parachain_totem_lego_runtime::FundingConfig;
+// use lego_runtime::FundingConfig;
+// use wapex_runtime::FundingConfig;
+// use kapex_runtime::FundingConfig;
 
 /// Specialized `ChainSpec` for the normal parachain runtime.
 pub type ChainSpec = sc_service::GenericChainSpec<rococo_parachain_runtime::GenesisConfig, Extensions>;
 
-/// Totem Kapex on Local Polkadot generator
-pub type LegoChainSpec = sc_service::GenericChainSpec<parachain_totem_lego_runtime::GenesisConfig, Extensions>;
-
-pub fn totem_lego_config() -> Result<ChainSpec, String> {
-	ChainSpec::from_json_bytes(&include_bytes!("../../../res/totem-lego-raw.json")[..])
-}
+/// Totem Parachain Generator
+pub type LegoChainSpec = sc_service::GenericChainSpec<lego_runtime::GenesisConfig, Extensions>;
+pub type WapexChainSpec = sc_service::GenericChainSpec<wapex_runtime::GenesisConfig, Extensions>;
+pub type KapexChainSpec = sc_service::GenericChainSpec<kapex_runtime::GenesisConfig, Extensions>;
 
 /// Helper function to generate a crypto pair from seed
 pub fn get_from_seed<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Public {
@@ -113,7 +112,7 @@ pub fn get_lego_chain_spec() -> LegoChainSpec {
 	LegoChainSpec::from_genesis(
 		"Lego Local Testnet",
 		"lego_local_testnet",
-		ChainType::Live,
+		ChainType::Local,
 		move || lego_testnet_genesis(2000.into()),
 		Vec::new(),
 		None,
@@ -123,41 +122,34 @@ pub fn get_lego_chain_spec() -> LegoChainSpec {
 		Extensions { relay_chain: "rococo".into(), para_id: 2000 },
 	)
 }
-
-// pub fn get_shell_chain_spec() -> ShellChainSpec {
-// 	ShellChainSpec::from_genesis(
-// 		"Shell Local Testnet",
-// 		"shell_local_testnet",
-// 		ChainType::Local,
-// 		move || shell_testnet_genesis(1000.into()),
-// 		Vec::new(),
-// 		None,
-// 		None,
-// 		None,
-// 		None,
-// 		Extensions { relay_chain: "westend".into(), para_id: 1000 },
-// 	)
-// }
-
-// pub fn get_seedling_chain_spec() -> SeedlingChainSpec {
-// 	SeedlingChainSpec::from_genesis(
-// 		"Seedling Local Testnet",
-// 		"seedling_local_testnet",
-// 		ChainType::Local,
-// 		move || {
-// 			seedling_testnet_genesis(
-// 				get_account_id_from_seed::<sr25519::Public>("Alice"),
-// 				2000.into(),
-// 			)
-// 		},
-// 		Vec::new(),
-// 		None,
-// 		None,
-// 		None,
-// 		None,
-// 		Extensions { relay_chain: "westend".into(), para_id: 2000 },
-// 	)
-// }
+pub fn get_wapex_chain_spec() -> WapexChainSpec {
+	WapexChainSpec::from_genesis(
+		"Wapex Testnet",
+		"wapex_testnet",
+		ChainType::Live,
+		move || wapex_testnet_genesis(2107.into()),
+		Vec::new(),
+		None,
+		None,
+		None,
+		None,
+		Extensions { relay_chain: "westend".into(), para_id: 2107 },
+	)
+}
+pub fn get_kapex_chain_spec() -> KapexChainSpec {
+	KapexChainSpec::from_genesis(
+		"Kapex",
+		"kapex",
+		ChainType::Live,
+		move || kapex_genesis(2007.into()),
+		Vec::new(),
+		None,
+		None,
+		None,
+		None,
+		Extensions { relay_chain: "polkadot".into(), para_id: 2007 },
+	)
+}
 
 pub fn staging_test_net() -> ChainSpec {
 	ChainSpec::from_genesis(
