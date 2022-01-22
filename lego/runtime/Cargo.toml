@@ -6,7 +6,7 @@ description = 'The Totem LEGO Parachain Runtime'
 license = 'Apache-2.0'
 homepage = 'https://totemaccounting.com'
 repository = 'https://gitlab.com/totem-tech/totem'
-edition = '2021' 
+edition = '2021'
 
 [package.metadata.docs.rs]
 targets = ['x86_64-unknown-linux-gnu']
@@ -19,7 +19,9 @@ codec = { package = 'parity-scale-codec', version = '2.3.0', default-features = 
 ] }
 log = { version = '0.4.14', default-features = false }
 parachain-info = { git = 'https://github.com/paritytech/cumulus', branch = 'polkadot-v0.9.15', default-features = false }
-scale-info = { version = '1.0.0', default-features = false, features = ['derive'] }
+scale-info = { version = '1.0.0', default-features = false, features = [
+	'derive',
+] }
 serde = { version = '1.0.132', optional = true, features = ['derive'] }
 hex-literal = { version = '0.3.4', optional = true }
 smallvec = '1.6.1'
@@ -90,9 +92,7 @@ pallet-xcm = { git = 'https://github.com/paritytech/polkadot', branch = 'release
 substrate-wasm-builder = { git = 'https://github.com/paritytech/substrate.git', branch = 'polkadot-v0.9.15' }
 
 [features]
-default = [
-	'std',
-]
+default = ['std']
 std = [
 	'codec/std',
 	'cumulus-pallet-aura-ext/std',
@@ -142,7 +142,7 @@ std = [
 	# 'pallet-randomness-collective-flip/std',
 	# 'pallet-session/std',
 	# 'polkadot-runtime-common/std',
-#	'pallet-balances/std',
+	#	'pallet-balances/std',
 ]
 
 runtime-benchmarks = [
@@ -153,11 +153,11 @@ runtime-benchmarks = [
 	'pallet-xcm/runtime-benchmarks',
 	'sp-runtime/runtime-benchmarks',
 	'xcm-builder/runtime-benchmarks',
-	'cumulus-pallet-session-benchmarking/runtime-benchmarks',
-	'frame-benchmarking',
-	'frame-system-benchmarking',
-	'pallet-collator-selection/runtime-benchmarks',
-	'pallet-balances-totem/runtime-benchmarks',
+	#'cumulus-pallet-session-benchmarking/runtime-benchmarks',
+	#'frame-benchmarking',
+	#'frame-system-benchmarking',
+	#'pallet-collator-selection/runtime-benchmarks',
+	#'pallet-balances-totem/runtime-benchmarks',
 ]
 
 # try-runtime = [
