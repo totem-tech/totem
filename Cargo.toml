@@ -5,10 +5,6 @@ panic = 'unwind'
 members = [
 	'lego/node',
 	'lego/runtime',
-	'wapex/node',
-	'wapex/runtime',
-	'kapex/node',
-	'kapex/runtime',
 	'parachain-totem-kapex/node',
 	'parachain-totem-kapex/runtime',
 	'parachain-totem-wapex/node',
