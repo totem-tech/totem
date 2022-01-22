@@ -34,10 +34,10 @@ futures = { version = '0.3.1', features = ['compat'] }
 async-trait = '0.1.42'
 
 # Local Dependencies
-lego-runtime = { path = 'lego/runtime' }
+lego-runtime = { path = '../runtime' }
 # wapex-runtime = { path = 'wapex/runtime' }
 # kapex-runtime = { path = 'kapex/runtime' }
-parachains-common = { path = "../parachains-common" }
+parachains-common = { path = "../../parachains-common" }
 
 # Substrate Dependencies
 frame-benchmarking = { git = 'https://github.com/paritytech/substrate', branch = 'polkadot-v0.9.15' }
