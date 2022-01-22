@@ -9,6 +9,7 @@
   ],
   "telemetryEndpoints": null,
   "protocolId": "kapex",
+  "forkId": null,
   "properties": {
     "ss58Format": 2007,
     "tokenDecimals": 12,
@@ -27,9 +28,6 @@
       "parachainInfo": {
         "parachainId": 2007
       },  
-      "sudo": {
-        "key": "5EyMdKjqZgCeNJrjhGDGigHGhvYtyMCgybk4LNSqgxWQUHJ3"
-      },
       "balances": {
         "balances": [
           [
@@ -46,34 +44,14 @@
           ]
         ]
       },
-      "collatorSelection": {
-        "invulnerables": [
-          "5FpvZBV1nxFxysNKsXnTFzDU8EmkPdjg23RajS7qZp64hfgq",
-          "5GU68rgaaTYarNDt7U5MKcQbcGZT9EqptBTegvaz75b5GLiU"
-        ],
-        "candidacyBond": 16000000000,
-        "desiredCandidates": 0
-      },
-      "session": {
-        "keys": [
-          [
-            "5FpvZBV1nxFxysNKsXnTFzDU8EmkPdjg23RajS7qZp64hfgq",
-            "5FpvZBV1nxFxysNKsXnTFzDU8EmkPdjg23RajS7qZp64hfgq",
-            {
-              "aura": "5FpvZBV1nxFxysNKsXnTFzDU8EmkPdjg23RajS7qZp64hfgq"
-            }
-          ],
-          [
-            "5GU68rgaaTYarNDt7U5MKcQbcGZT9EqptBTegvaz75b5GLiU",
-            "5GU68rgaaTYarNDt7U5MKcQbcGZT9EqptBTegvaz75b5GLiU",
-            {
-              "aura": "5GU68rgaaTYarNDt7U5MKcQbcGZT9EqptBTegvaz75b5GLiU"
-            }
-          ]
-        ]
+      "sudo": {
+        "key": "5EyMdKjqZgCeNJrjhGDGigHGhvYtyMCgybk4LNSqgxWQUHJ3"
       },
       "aura": {
-        "authorities": []
+        "authorities": [
+          "5FpvZBV1nxFxysNKsXnTFzDU8EmkPdjg23RajS7qZp64hfgq",
+          "5GU68rgaaTYarNDt7U5MKcQbcGZT9EqptBTegvaz75b5GLiU"
+        ]
       },
       "auraExt": null
     }

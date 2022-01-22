@@ -102,8 +102,8 @@ impl_opaque_keys! {
 /// This runtime version.
 #[sp_version::runtime_version]
 pub const VERSION: RuntimeVersion = RuntimeVersion {
-	spec_name: create_runtime_str!("parachain-totem-lego"),
-	impl_name: create_runtime_str!("parachain-totem-lego"),
+	spec_name: create_runtime_str!("kapex-parachain"),
+	impl_name: create_runtime_str!("kapex-parachain"),
 	authoring_version: 1,
 	spec_version: 1,
 	impl_version: 0,

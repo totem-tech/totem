@@ -1,5 +1,5 @@
 // Copyright 2021 Parity Technologies (UK) Ltd.
-// This file is part of Cumulus.
+// This file is part of Cumulus and Totem Accounting Software.
 
 // Cumulus is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,12 +13,17 @@
 
 // You should have received a copy of the GNU General Public License
 // along with Cumulus.  If not, see <http://www.gnu.org/licenses/>.
+// Respecting the above licence, Totem has enhanced this file.
 
 //! Parachain-specific RPCs implementation.
+
+//! Enhanced with Totem specific runtime code. 
 
 #![warn(missing_docs)]
 
 use std::sync::Arc;
+
+use parachain_totem_lego_runtime::{opaque::Block, AccountId, Balance, Index as Nonce};
 
 use sc_client_api::AuxStore;
 pub use sc_rpc::{DenyUnsafe, SubscriptionTaskExecutor};

@@ -1,80 +1,58 @@
 {
-   "name": "Totem Lego Parachain",
-   "id": "totem_lego",
-   "chainType": "Live",
-   "bootNodes": [
-     "/ip4/159.89.1.153/tcp/31436/ws/p2p/12D3KooWCwPGSVmQSLTRMgaU1GaK6oHXijKdFcMiCBzzKygxVcXL",
-     "/dns4/l-boot-1.kapex.network/tcp/31436/ws/p2p/12D3KooWNpTmqisnMwdAUtjRHCxdb6EQcymdwQvdQFNuFfgBX1K3"
-   ],
-   "telemetryEndpoints": null,
-   "protocolId": "lego",
-   "properties": {
-     "ss58Format": 2007,
-     "tokenDecimals": 12,
-     "tokenSymbol": "LEGO"
-   },
-   "relay_chain": "rococo",
-   "para_id": 2000,
-   "consensusEngine": null,
-   "codeSubstitutes": {},
-   "genesis": {
-     "runtime": {
+  "name": "Totem Lego Parachain",
+  "id": "totem_lego",
+  "chainType": "Local",
+  "bootNodes": [
+    "/ip4/159.89.1.153/tcp/31436/ws/p2p/12D3KooWCwPGSVmQSLTRMgaU1GaK6oHXijKdFcMiCBzzKygxVcXL",
+    "/dns4/l-boot-1.kapex.network/tcp/31436/ws/p2p/12D3KooWNpTmqisnMwdAUtjRHCxdb6EQcymdwQvdQFNuFfgBX1K3"
+  ],
+  "telemetryEndpoints": null,
+  "protocolId": "lego",
+  "forkId": null,
+  "properties": {
+    "ss58Format": 2007,
+    "tokenDecimals": 12,
+    "tokenSymbol": "LEGO"
+  },
+  "relay_chain": "rococo",
+  "para_id": 2000,
+  "consensusEngine": null,
+  "codeSubstitutes": {},
+  "genesis": {
+    "runtime": {
       "system": {
         "code": "0x"
       },
-       "parachainSystem": null,
-       "parachainInfo": {
-         "parachainId": 2000
-       },
-       "sudo": {
-         "key": "5CcEDRg5DpwhLs8e2gn1A9Yjv9pRKTbgadkYtur7WH6hMSZJ"
-       },
-       "balances": {
-         "balances": [
-           [
-             "5CcEDRg5DpwhLs8e2gn1A9Yjv9pRKTbgadkYtur7WH6hMSZJ",
-             2360000000000000000
-           ],
-           [
-             "5Fxc4SWjmAnJgQtDosmytWevznn2LMDjv2s7AUJ8EeU4CqYA",
-             20000000000000000
-           ],
-           [
-             "5F2NU9EgK2tas9yj4ATui2hxoMvLB4Ge8Ws4GWDb7ryHirjM",
-             20000000000000000
-           ]
-         ]
-       },
-       "collatorSelection": {
-         "invulnerables": [
-           "5Fxc4SWjmAnJgQtDosmytWevznn2LMDjv2s7AUJ8EeU4CqYA",
-           "5F2NU9EgK2tas9yj4ATui2hxoMvLB4Ge8Ws4GWDb7ryHirjM"
-         ],
-         "candidacyBond": 16000000000000000,
-         "desiredCandidates": 0
-       },
-       "session": {
-         "keys": [
-           [
-             "5Fxc4SWjmAnJgQtDosmytWevznn2LMDjv2s7AUJ8EeU4CqYA",
-             "5Fxc4SWjmAnJgQtDosmytWevznn2LMDjv2s7AUJ8EeU4CqYA",
-             {
-               "aura": "5Fxc4SWjmAnJgQtDosmytWevznn2LMDjv2s7AUJ8EeU4CqYA"
-             }
-           ],
-           [
-             "5F2NU9EgK2tas9yj4ATui2hxoMvLB4Ge8Ws4GWDb7ryHirjM",
-             "5F2NU9EgK2tas9yj4ATui2hxoMvLB4Ge8Ws4GWDb7ryHirjM",
-             {
-               "aura": "5F2NU9EgK2tas9yj4ATui2hxoMvLB4Ge8Ws4GWDb7ryHirjM"
-             }
-           ]
-         ]
-       },
-       "aura": {
-        "authorities": []
+      "parachainSystem": null,
+      "parachainInfo": {
+        "parachainId": 2000
+      },
+      "balances": {
+        "balances": [
+          [
+            "5CcEDRg5DpwhLs8e2gn1A9Yjv9pRKTbgadkYtur7WH6hMSZJ",
+            2360000000000000000
+          ],
+          [
+            "5Fxc4SWjmAnJgQtDosmytWevznn2LMDjv2s7AUJ8EeU4CqYA",
+            20000000000000000
+          ],
+          [
+            "5F2NU9EgK2tas9yj4ATui2hxoMvLB4Ge8Ws4GWDb7ryHirjM",
+            20000000000000000
+          ]
+        ]
+      },
+      "sudo": {
+        "key": "5CcEDRg5DpwhLs8e2gn1A9Yjv9pRKTbgadkYtur7WH6hMSZJ"
+      },
+      "aura": {
+        "authorities": [
+          "5Fxc4SWjmAnJgQtDosmytWevznn2LMDjv2s7AUJ8EeU4CqYA",
+          "5F2NU9EgK2tas9yj4ATui2hxoMvLB4Ge8Ws4GWDb7ryHirjM"
+        ]
       },
       "auraExt": null
-     }
-   }
-}     
+    }
+  }
+}

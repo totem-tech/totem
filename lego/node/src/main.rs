@@ -1,12 +1,12 @@
 // Copyright 2019-2021 Parity Technologies (UK) Ltd.
-// This file is part of Cumulus.
+// This file is part of Cumulus and used by Totem Accounting.
 
-// Substrate is free software: you can redistribute it and/or modify
+// Cumulus is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 
-// Substrate is distributed in the hope that it will be useful,
+// Cumulus is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
@@ -14,9 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with Cumulus.  If not, see <http://www.gnu.org/licenses/>.
 
-use substrate_build_script_utils::{generate_cargo_keys, rerun_if_git_head_changed};
+//! Totem Loego Parachain Collator
+#![warn(missing_docs)]
+#![warn(unused_extern_crates)]
 
-fn main() {
-	generate_cargo_keys();
-	rerun_if_git_head_changed();
+mod chain_spec;
+#[macro_use]
+mod service;
+mod cli;
+mod command;
+mod rpc;
+
+fn main() -> sc_cli::Result<()> {
+	command::run()
 }

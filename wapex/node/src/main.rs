@@ -1,5 +1,5 @@
 // Copyright 2019-2021 Parity Technologies (UK) Ltd.
-// This file is part of Cumulus.
+// This file is part of Cumulus and used by Totem Accounting.
 
 // Cumulus is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Cumulus.  If not, see <http://www.gnu.org/licenses/>.
 
-//! Cumulus test parachain collator
-
+//! Totem Loego Parachain Collator
 #![warn(missing_docs)]
 #![warn(unused_extern_crates)]
 
