@@ -17,9 +17,7 @@
 // Respecting the above licence Totem has enhanced this file.
 
 // Lego Runtime Types
-use lego_runtime::{
-	AccountId, Balance, Hash, Index as Nonce, RuntimeApi,
-};
+use lego_runtime::{RuntimeApi};
 
 // After v0.9.16
 // use cumulus_client_consensus_aura::{AuraConsensus, BuildAuraConsensusParams, SlotProportion};
@@ -50,8 +48,7 @@ use cumulus_primitives_core::{
 
 use polkadot_service::NativeExecutionDispatch;
 
-use crate::rpc;
-pub use parachains_common::{Block, Header};
+pub use parachains_common::{AccountId, Balance, Block, Hash, Header, Index as Nonce};
 
 use cumulus_client_consensus_relay_chain::Verifier as RelayChainVerifier;
 use futures::lock::Mutex;
@@ -83,7 +80,7 @@ use sp_runtime::{
 // before v0.9.16
 use std::sync::Arc;
 
-use substrate_prometheus_endpoint::Registry;
+use substrate_prometheus_endpoint::{Registry, Executor};
 
 /// Native executor instance.
 pub struct LegoRuntimeExecutor;
@@ -223,7 +220,7 @@ async fn start_lego_node_impl<RuntimeApi, Executor, RB, BIQ, BIC>(
 	parachain_config: Configuration,
 	polkadot_config: Configuration,
 	id: ParaId,
-	_rpc_ext_builder: RB,
+	rpc_ext_builder: RB,
 	build_import_queue: BIQ,
 	build_consensus: BIC,
 ) -> sc_service::error::Result<(
@@ -527,7 +524,7 @@ pub async fn start_lego_node(
 	id: ParaId,
 ) -> sc_service::error::Result<(
 	TaskManager,
-	Arc<TFullClient<Block,lego_runtime::RuntimeApi,
+	Arc<TFullClient<Block, RuntimeApi,
 	NativeElseWasmExecutor<LegoRuntimeExecutor>>>,
 )>
 where
@@ -550,7 +547,7 @@ where
 	sc_client_api::StateBackendFor<TFullBackend<Block>, Block>: sp_api::StateBackend<BlakeTwo256>,
 	Executor: sc_executor::NativeExecutionDispatch + 'static,
 {
-	start_node_impl::<RuntimeApi, Executor, _, _, _>(
+	start_lego_node_impl::<RuntimeApi, Executor, _, _, _>(
 		parachain_config,
 		polkadot_config,
 		id,

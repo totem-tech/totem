@@ -23,8 +23,6 @@
 
 use std::sync::Arc;
 
-use lego_runtime::Balance;
-
 use sc_client_api::AuxStore;
 pub use sc_rpc::{DenyUnsafe, SubscriptionTaskExecutor};
 use sc_transaction_pool_api::TransactionPool;
@@ -32,7 +30,7 @@ use sp_api::ProvideRuntimeApi;
 use sp_block_builder::BlockBuilder;
 use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
 
-use parachains_common::{AccountId, Block, Index as Nonce};
+use parachains_common::{AccountId, Balance, Block, Index as Nonce};
 
 /// A type representing all RPC extensions.
 pub type RpcExtension = jsonrpc_core::IoHandler<sc_rpc::Metadata>;
