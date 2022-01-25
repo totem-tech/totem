@@ -18,7 +18,6 @@
 
 use cumulus_primitives_core::ParaId;
 use hex_literal::hex;
-// use rococo_parachain_runtime::{AccountId, AuraId, Signature};
 use lego_runtime::{AccountId, AuraId, Signature, EXISTENTIAL_DEPOSIT};
 use sc_chain_spec::{ChainSpecExtension, ChainSpecGroup};
 use sc_service::ChainType;
@@ -26,13 +25,12 @@ use serde::{Deserialize, Serialize};
 use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public};
 use sp_runtime::traits::{IdentifyAccount, Verify};
 
+type AccountPublic = <Signature as Verify>::Signer;
+
 // use lego_runtime::FundingConfig;
 
-/// Specialized `ChainSpec` for the normal parachain runtime.
-// pub type ChainSpec = sc_service::GenericChainSpec<rococo_parachain_runtime::GenesisConfig, Extensions>;
-
 /// Totem Parachain Generator
-pub type LegoChainSpec = sc_service::GenericChainSpec<lego_runtime::GenesisConfig, Extensions>;
+pub type ChainSpec = sc_service::GenericChainSpec<lego_runtime::GenesisConfig, Extensions>;
 
 /// Helper function to generate a crypto pair from seed
 pub fn get_from_seed<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Public {
@@ -58,8 +56,6 @@ impl Extensions {
 	}
 }
 
-type AccountPublic = <Signature as Verify>::Signer;
-
 /// Helper function to generate an account ID from seed
 pub fn get_account_id_from_seed<TPublic: Public>(seed: &str) -> AccountId
 where
@@ -82,13 +78,20 @@ pub fn get_collator_keys_from_seed(seed: &str) -> AuraId {
 	get_public_from_seed::<AuraId>(seed)
 }
 
+/// Generate the session keys from individual elements.
+///
+/// The input must be a tuple of individual keys (a single arg for now since we have just one key).
+pub fn lego_session_keys(keys: AuraId) -> lego_runtime::SessionKeys {
+	lego_runtime::SessionKeys { aura: keys }
+}
+
 pub fn get_chain_spec() -> ChainSpec {
 	ChainSpec::from_genesis(
 		"Local Testnet",
 		"local_testnet",
 		ChainType::Local,
 		move || {
-			testnet_genesis(
+			lego_testnet_genesis(
 				get_account_id_from_seed::<sr25519::Public>("Alice"),
 				vec![get_from_seed::<AuraId>("Alice"), get_from_seed::<AuraId>("Bob")],
 				vec![
@@ -112,19 +115,17 @@ pub fn get_chain_spec() -> ChainSpec {
 		None,
 		None,
 		None,
-		None,
 		Extensions { relay_chain: "westend".into(), para_id: 1000 },
 	)
 }
 
-pub fn get_lego_chain_spec() -> LegoChainSpec {
-	LegoChainSpec::from_genesis(
+pub fn get_lego_chain_spec() -> ChainSpec {
+	ChainSpec::from_genesis(
 		"Lego Parachain",
 		"lego",
 		ChainType::Local,
 		move || lego_genesis(2000.into()),
 		Vec::new(),
-		None,
 		None,
 		None,
 		None,
@@ -138,7 +139,7 @@ pub fn staging_test_net() -> ChainSpec {
 		"staging_testnet",
 		ChainType::Live,
 		move || {
-			testnet_genesis(
+			lego_testnet_genesis(
 				hex!["9ed7705e3c7da027ba0583a22a3212042f7e715d3c168ba14f1424e2bc111d00"].into(),
 				vec![
 					// $secret//one
@@ -158,33 +159,9 @@ pub fn staging_test_net() -> ChainSpec {
 		None,
 		None,
 		None,
-		None,
 		Extensions { relay_chain: "westend".into(), para_id: 1000 },
 	)
 }
-// for the staging test net
-// fn testnet_genesis(
-// 	root_key: AccountId,
-// 	initial_authorities: Vec<AuraId>,
-// 	endowed_accounts: Vec<AccountId>,
-// 	id: ParaId,
-// ) -> rococo_parachain_runtime::GenesisConfig {
-// 	rococo_parachain_runtime::GenesisConfig {
-// 		system: rococo_parachain_runtime::SystemConfig {
-// 			code: rococo_parachain_runtime::WASM_BINARY
-// 				.expect("WASM binary was not build, please build it!")
-// 				.to_vec(),
-// 		},
-// 		balances: rococo_parachain_runtime::BalancesConfig {
-// 			balances: endowed_accounts.iter().cloned().map(|k| (k, 1 << 60)).collect(),
-// 		},
-// 		sudo: rococo_parachain_runtime::SudoConfig { key: Some(root_key) },
-// 		parachain_info: rococo_parachain_runtime::ParachainInfoConfig { parachain_id: id },
-// 		aura: rococo_parachain_runtime::AuraConfig { authorities: initial_authorities },
-// 		aura_ext: Default::default(),
-// 		parachain_system: Default::default(),
-// 	}
-// }
 
 fn lego_testnet_genesis(
 	root_key: AccountId,
@@ -198,26 +175,67 @@ fn lego_testnet_genesis(
 				.expect("WASM binary was not build, please build it!")
 				.to_vec(),
 		},
-		balances: lego_runtime:BalancesConfig {
+		balances: lego_runtime::BalancesConfig {
 			balances: endowed_accounts
 			.iter()
 			.cloned()
 			.map()
 			.collect(),
 		},
-		sudo: parachain_totem_lego_runtime::SudoConfig { key: Some(root_key) },
-		parachain_info: parachain_totem_lego_runtime::ParachainInfoConfig { parachain_id: id },
-		aura: parachain_totem_lego_runtime::AuraConfig { authorities: initial_authorities },
+		sudo: lego_runtime::SudoConfig { key: root_key },
+		parachain_info: lego_runtime::ParachainInfoConfig { parachain_id: id },
+		aura: lego_runtime::AuraConfig { authorities: initial_authorities },
 		aura_ext: Default::default(),
 		parachain_system: Default::default(),
 	}
 }
 
-/// Generate the session keys from individual elements.
-///
-/// The input must be a tuple of individual keys (a single arg for now since we have just one key).
-pub fn lego_session_keys(keys: AuraId) -> lego_runtime::SessionKeys {
-	lego_runtime::SessionKeys { aura: keys }
+fn lego_genesis(
+	invulnerables: Vec<(AccountId, AuraId)>,
+	endowed_accounts: Vec<AccountId>,
+	id: ParaId,
+	root_key: AccountId,
+) -> lego_runtime::GenesisConfig {
+	lego_runtime::GenesisConfig {
+		system: lego_runtime::SystemConfig {
+			code: lego_runtime::WASM_BINARY
+				.expect("WASM binary was not build, please build it!")
+				.to_vec(),
+		},
+		balances: lego_runtime::BalancesConfig {
+			balances: endowed_accounts
+			.iter()
+			.cloned()
+			// .map(|k| (k, 1 << 60))
+			.map()
+			.collect(),
+		},
+		sudo: lego_runtime::SudoConfig { key: root_key },
+		parachain_info: lego_runtime::ParachainInfoConfig { parachain_id: id },
+		collator_selection: lego_runtime::CollatorSelectionConfig {
+			invulnerables: invulnerables.iter().cloned().map(|(acc, _)| acc).collect(),
+			candidacy_bond: 1_600_000,
+			..Default::default()
+		},
+		session: lego_runtime::SessionConfig {
+			keys: invulnerables
+				.into_iter()
+				.map(|(acc, aura)| {
+					(
+						acc.clone(),                  // account id
+						acc,                          // validator id
+						lego_session_keys(aura), // session keys
+					)
+				})
+				.collect(),
+		},
+		// no need to pass anything to aura, in fact it will panic if we do. Session will take care
+		// of this.
+		aura: Default::default(),
+		aura_ext: Default::default(),
+		parachain_system: Default::default(),
+		// funding: FundingConfig::default(),
+	}
 }
 
 pub fn lego_development_config() -> ChainSpec {
@@ -236,36 +254,21 @@ pub fn lego_development_config() -> ChainSpec {
 		move || {
 			lego_testnet_genesis(
 				// initial collators.
-				vec![
-					(
+				vec![(
 						get_account_id_from_seed::<sr25519::Public>("Alice"),
 						get_collator_keys_from_seed("Alice"),
-					),
-					(
-						get_account_id_from_seed::<sr25519::Public>("Bob"),
-						get_collator_keys_from_seed("Bob"),
-					),
-				],
+					)],
 				vec![
 					get_account_id_from_seed::<sr25519::Public>("Alice"),
 					get_account_id_from_seed::<sr25519::Public>("Bob"),
-					get_account_id_from_seed::<sr25519::Public>("Charlie"),
-					get_account_id_from_seed::<sr25519::Public>("Dave"),
-					get_account_id_from_seed::<sr25519::Public>("Eve"),
-					get_account_id_from_seed::<sr25519::Public>("Ferdie"),
 					get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
 					get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
-					get_account_id_from_seed::<sr25519::Public>("Charlie//stash"),
-					get_account_id_from_seed::<sr25519::Public>("Dave//stash"),
-					get_account_id_from_seed::<sr25519::Public>("Eve//stash"),
-					get_account_id_from_seed::<sr25519::Public>("Ferdie//stash"),
 				],
 				1000.into(),
-				get_account_id_from_seed::<sr25519::Public>("Alice"),
 			)
 		},
 		// Bootnodes
-		vec![],
+		Vec::new(),
 		// Telemetry
 		None,
 		// Protocol ID
@@ -274,7 +277,7 @@ pub fn lego_development_config() -> ChainSpec {
 		Some(properties),
 		// Extensions
 		Extensions {
-			relay_chain: "rococo-local".into(), // You MUST set this to the correct network!
+			relay_chain: "polkadot-dev".into(), // You MUST set this to the correct network!
 			para_id: 1000,
 		},
 	)
@@ -321,11 +324,10 @@ pub fn lego_local_config() -> ChainSpec {
 					get_account_id_from_seed::<sr25519::Public>("Ferdie//stash"),
 				],
 				1000.into(),
-				get_account_id_from_seed::<sr25519::Public>("Alice"),
 			)
 		},
 		// Bootnodes
-		vec![],
+		Vec::new(),
 		// Telemetry
 		None,
 		// Protocol ID
@@ -334,19 +336,19 @@ pub fn lego_local_config() -> ChainSpec {
 		Some(properties),
 		// Extensions
 		Extensions {
-			relay_chain: "rococo-local".into(), // You MUST set this to the correct network!
+			relay_chain: "polkadot-local".into(), // You MUST set this to the correct network!
 			para_id: 1000,
 		},
 	)
 }
 
-pub fn lego_config() -> LegoChainSpec {
+pub fn lego_config() -> ChainSpec {
 	let mut properties = sc_chain_spec::Properties::new();
 	properties.insert("ss58Format".into(), 2007.into());
 	properties.insert("tokenSymbol".into(), "LEGO".into());
 	properties.insert("tokenDecimals".into(), 12.into());
 
-	LegoChainSpec::from_genesis(
+	ChainSpec::from_genesis(
 		// Name
 		"Lego",
 		// ID
@@ -400,52 +402,4 @@ pub fn lego_config() -> LegoChainSpec {
 		// Extensions
 		Extensions { relay_chain: "rococo-local".into(), para_id: 2000u32 },
 	)
-}
-
-fn lego_genesis(
-	invulnerables: Vec<(AccountId, AuraId)>,
-	endowed_accounts: Vec<AccountId>,
-	id: ParaId,
-	root_key: AccountId,
-) -> lego_runtime::GenesisConfig {
-	lego_runtime::GenesisConfig {
-		system: lego_runtime::SystemConfig {
-			code: lego_runtime::WASM_BINARY
-				.expect("WASM binary was not build, please build it!")
-				.to_vec(),
-		},
-		balances: lego_runtime::BalancesConfig {
-			balances: endowed_accounts
-			.iter()
-			.cloned()
-			// .map(|k| (k, 1 << 60))
-			.map()
-			.collect(),
-		},
-		sudo: lego_runtime::SudoConfig { key: root_key },
-		parachain_info: lego_runtime::ParachainInfoConfig { parachain_id: id },
-		collator_selection: lego_runtime::CollatorSelectionConfig {
-			invulnerables: invulnerables.iter().cloned().map(|(acc, _)| acc).collect(),
-			candidacy_bond: 1_600_000,
-			..Default::default()
-		},
-		session: lego_runtime::SessionConfig {
-			keys: invulnerables
-				.into_iter()
-				.map(|(acc, aura)| {
-					(
-						acc.clone(),                  // account id
-						acc,                          // validator id
-						lego_session_keys(aura), // session keys
-					)
-				})
-				.collect(),
-		},
-		// no need to pass anything to aura, in fact it will panic if we do. Session will take care
-		// of this.
-		aura: Default::default(),
-		aura_ext: Default::default(),
-		parachain_system: Default::default(),
-		// funding: FundingConfig::default(),
-	}
 }

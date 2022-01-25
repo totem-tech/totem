@@ -8,17 +8,13 @@ include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 
 mod totem;
 
-use smallvec::smallvec;
 use sp_api::impl_runtime_apis;
-// use sp_core::{crypto::KeyTypeId, OpaqueMetadata};
 use sp_core::OpaqueMetadata;
 use sp_runtime::{
 	create_runtime_str, generic, impl_opaque_keys,
-	// traits::{AccountIdLookup, BlakeTwo256, Block as BlockT, IdentifyAccount, Verify},
 	traits::{AccountIdLookup, BlakeTwo256, Block as BlockT},
 	transaction_validity::{TransactionSource, TransactionValidity},
 	ApplyExtrinsicResult, 
-	// MultiSignature,
 };
 
 use sp_std::prelude::*;
@@ -28,23 +24,17 @@ use sp_version::RuntimeVersion;
 
 use frame_support::{
 	construct_runtime, match_type, parameter_types,
-	// traits::{Everything, Nothing},
-	traits::{EnsureOneOf, Everything, IsInVec, Randomness},
-	// weights::{
-	// 	constants::{BlockExecutionWeight, ExtrinsicBaseWeight, WEIGHT_PER_SECOND},
-	// 	DispatchClass, IdentityFee, Weight, WeightToFeeCoefficient, WeightToFeeCoefficients,
-	// 	WeightToFeePolynomial,
-	// },
+	// traits::{Everything, IsInVec, Randomness},
+	traits::{Everything},
 	weights::{
 		constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
 		DispatchClass, IdentityFee, Weight,
 	},
-	// PalletId,
-	StorageValue,
+	// StorageValue,
 };
 use frame_system::{
 	limits::{BlockLength, BlockWeights},
-	EnsureRoot,
+	EnsureOneOf, EnsureRoot,
 };
 // Added
 pub use pallet_balances_totem::Call as BalancesCall;
@@ -57,7 +47,6 @@ pub use sp_runtime::BuildStorage;
 // pub use sp_runtime::{MultiAddress, Perbill, Permill};
 pub use sp_runtime::{Perbill, Permill};
 
-//Added
 use parachains_common::{
 	impls::{AssetsFrom, NonZeroIssuance},
 	AssetId,
@@ -70,18 +59,9 @@ use xcm_executor::traits::JustTry;
 
 
 // XCM imports
-// use pallet_xcm::XcmPassthrough;
 use pallet_xcm::{EnsureXcm, IsMajorityOfBody, XcmPassthrough};
 use polkadot_parachain::primitives::Sibling;
 use xcm::latest::prelude::*;
-// use xcm_builder::{
-// 	AccountId32Aliases, AllowTopLevelPaidExecutionFrom, AllowUnpaidExecutionFrom, CurrencyAdapter,
-// 	EnsureXcmOrigin, FixedWeightBounds, IsConcrete, LocationInverter, NativeAsset, ParentIsDefault, ParentAsSuperuser,
-// 	RelayChainAsNative, SiblingParachainAsNative, SiblingParachainConvertsVia,
-// 	SignedAccountId32AsNative, SignedToAccountId32, SovereignSignedViaLocation, TakeWeightCredit,
-// 	UsingComponents,
-// };
-// use xcm_executor::{Config, XcmExecutor};
 use xcm_builder::{
 	AccountId32Aliases, AllowTopLevelPaidExecutionFrom, AllowUnpaidExecutionFrom, CurrencyAdapter,
 	EnsureXcmOrigin, FixedWeightBounds, IsConcrete, LocationInverter, NativeAsset,
@@ -91,7 +71,7 @@ use xcm_builder::{
 };
 use xcm_executor::{Config, XcmExecutor};
 
-// use polkadot_runtime_common::{BlockHashCount, RocksDbWeight, SlowAdjustingFeeUpdate};
+pub type SessionHandlers = ();
 
 impl_opaque_keys! {
 	pub struct SessionKeys {
@@ -231,7 +211,6 @@ impl frame_system::Config for Runtime {
 	type SS58Prefix = SS58Prefix;
 	/// The action to take on a Runtime Upgrade
 	type OnSetCode = cumulus_pallet_parachain_system::ParachainSetCode<Self>;
-	type MaxConsumers = frame_support::traits::ConstU32<16>;
 }
 
 parameter_types! {
@@ -271,8 +250,6 @@ impl pallet_balances_totem::Config for Runtime {
 }
 
 parameter_types! {
-	/// Relay Chain `TransactionByteFee` / 10
-	// pub const TransactionByteFee: Balance = 10 * MICROUNIT;
 	pub const OperationalFeeMultiplier: u8 = 5;
 }
 
@@ -321,7 +298,7 @@ parameter_types! {
 	pub const RelayNetwork: NetworkId = NetworkId::Polkadot;
 	pub RelayChainOrigin: Origin = cumulus_pallet_xcm::Origin::Relay.into();
 	pub Ancestry: MultiLocation = Parachain(ParachainInfo::parachain_id().into()).into();
-	pub CheckingAccount: AccountId = PolkadotXcm::check_account()
+	pub CheckingAccount: AccountId = PolkadotXcm::check_account();
 }
 
 /// Type for specifying how a `MultiLocation` can be converted into an `AccountId`. This is used
@@ -359,7 +336,7 @@ pub type FungiblesTransactor = FungiblesAdapter<
 	ConvertedConcreteAssetId<
 		AssetId,
 		u64,
-		AsPrefixedGeneralIndex<StatemintAssetsPalletLocation, AssetId, JustTry>,
+		AsPrefixedGeneralIndex<LegoLocation, AssetId, JustTry>,
 		JustTry,
 	>,
 	// Convert an XCM MultiLocation into a local account id:
@@ -416,8 +393,8 @@ match_type! {
 }
 
 match_type! {
-	pub type Statemint: impl Contains<MultiLocation> = {
-		MultiLocation { parents: 1, interior: X1(Parachain(1000)) }
+	pub type Lego: impl Contains<MultiLocation> = {
+		MultiLocation { parents: 1, interior: X1(Parachain(2000)) }
 	};
 }
 
@@ -426,7 +403,7 @@ pub type Barrier = (
 	AllowTopLevelPaidExecutionFrom<Everything>,
 	AllowUnpaidExecutionFrom<ParentOrParentsExecutivePlurality>,
 	// ^^^ Parent and its exec plurality get free execution
-	AllowUnpaidExecutionFrom<Statemint>,
+	AllowUnpaidExecutionFrom<Lego>,
 	// Expected responses are OK.
 	AllowKnownQueryResponses<PolkadotXcm>,
 	// Subscriptions for version tracking are OK.
@@ -434,14 +411,10 @@ pub type Barrier = (
 );
 
 parameter_types! {
-	pub StatemintLocation: MultiLocation = MultiLocation::new(1, X1(Parachain(1000)));
-	// ALWAYS ensure that the index in PalletInstance stays up-to-date with
-	// Statemint's Assets pallet index
-	pub StatemintAssetsPalletLocation: MultiLocation =
-		MultiLocation::new(1, X2(Parachain(1000), PalletInstance(50)));
+	pub LegoLocation: MultiLocation = MultiLocation::new(1, X1(Parachain(2000)));
 }
 
-pub type Reserves = (NativeAsset, AssetsFrom<StatemintLocation>);
+pub type Reserves = (NativeAsset, AssetsFrom<LegoLocation>);
 
 pub struct XcmConfig;
 impl Config for XcmConfig {
@@ -505,15 +478,12 @@ impl cumulus_pallet_xcmp_queue::Config for Runtime {
 	type XcmExecutor = XcmExecutor<XcmConfig>;
 	type ChannelInfo = ParachainSystem;
 	type VersionWrapper = ();
-	// type ExecuteOverweightOrigin = EnsureRoot<AccountId>;
-	type ExecuteOverweightOrigin = frame_system::EnsureRoot<AccountId>;;
 }
 
 impl cumulus_pallet_dmp_queue::Config for Runtime {
 	type Event = Event;
 	type XcmExecutor = XcmExecutor<XcmConfig>;
-	// type ExecuteOverweightOrigin = EnsureRoot<AccountId>;
-	type ExecuteOverweightOrigin = frame_system::EnsureRoot<AccountId>;
+	type ExecuteOverweightOrigin = EnsureRoot<AccountId>;
 }
 
 impl cumulus_ping::Config for Runtime {
@@ -525,7 +495,6 @@ impl cumulus_ping::Config for Runtime {
 
 parameter_types! {
 	pub const AssetDeposit: Balance = 1 * UNIT;
-	pub const AssetAccountDeposit: Balance = 1 * UNIT;
 	pub const ApprovalDeposit: Balance = 100 * MILLIUNIT;
 	pub const AssetsStringLimit: u32 = 50;
 	pub const MetadataDepositBase: Balance = 1 * UNIT;
@@ -535,9 +504,11 @@ parameter_types! {
 }
 
 /// A majority of the Unit body from Rococo over XCM is our required administration origin.
-pub type AdminOrigin =
-	EnsureOneOf<EnsureRoot<AccountId>, EnsureXcm<IsMajorityOfBody<RocLocation, UnitBody>>>;
-
+pub type AdminOrigin = EnsureOneOf<
+	AccountId,
+	EnsureRoot<AccountId>,
+	EnsureXcm<IsMajorityOfBody<RelayLocation, UnitBody>>,
+>;
 impl pallet_assets::Config for Runtime {
 	type Event = Event;
 	type Balance = u64;
@@ -552,7 +523,6 @@ impl pallet_assets::Config for Runtime {
 	type Freezer = ();
 	type Extra = ();
 	type WeightInfo = pallet_assets::weights::SubstrateWeight<Runtime>;
-	type AssetAccountDeposit = AssetAccountDeposit;
 }
 
 impl pallet_aura::Config for Runtime {
@@ -592,86 +562,67 @@ construct_runtime!{
 		PolkadotXcm: pallet_xcm::{Pallet, Call, Event<T>, Origin} = 51,
 		CumulusXcm: cumulus_pallet_xcm::{Pallet, Call, Event<T>, Origin} = 52,
 		DmpQueue: cumulus_pallet_dmp_queue::{Pallet, Call, Storage, Event<T>} = 53,
-
-		Spambot: cumulus_ping::{Pallet, Call, Storage, Event<T>} = 60,
-
+		
 		// Totem
-		Accounting: pallet_accounting::{Pallet, Call, Storage, Event<T>} = 90,
-		// Archive: pallet_archive::{Pallet, Call, Storage, Event<T>} = 91,
-		// Bonsai: pallet_bonsai::{Pallet, Call, Storage, Event<T>} = 92,
-		// Escrow: pallet_escrow::{Pallet, Call, Storage, Event<T>} = 93,
-		// Funding: pallet_funding::{Pallet, Call, Storage, Event<T>, Config<T>} = 94,
-		// Orders: pallet_orders::{Pallet, Call, Storage, Event<T>} = 95,
-		// Prefunding: pallet_prefunding::{Pallet, Call, Storage, Event<T>} = 96,
-		// Teams: pallet_teams::{Pallet, Call, Storage, Event<T>} = 97,
-		// Timekeeping: pallet_timekeeping::{Pallet, Call, Storage, Event<T>} = 98,
-		// Transfer: pallet_transfer::{Pallet, Call, Storage, Event<T>} = 99,
+		Accounting: pallet_accounting::{Pallet, Call, Storage, Event<T>} = 60,
+		// Archive: pallet_archive::{Pallet, Call, Storage, Event<T>} = 61,
+		// Bonsai: pallet_bonsai::{Pallet, Call, Storage, Event<T>} = 62,
+		// Escrow: pallet_escrow::{Pallet, Call, Storage, Event<T>} = 63,
+		// Funding: pallet_funding::{Pallet, Call, Storage, Event<T>, Config<T>} = 64,
+		// Orders: pallet_orders::{Pallet, Call, Storage, Event<T>} = 65,
+		// Prefunding: pallet_prefunding::{Pallet, Call, Storage, Event<T>} = 66,
+		// Teams: pallet_teams::{Pallet, Call, Storage, Event<T>} = 67,
+		// Timekeeping: pallet_timekeeping::{Pallet, Call, Storage, Event<T>} = 68,
+		// Transfer: pallet_transfer::{Pallet, Call, Storage, Event<T>} = 69,
+
+		Spambot: cumulus_ping::{Pallet, Call, Storage, Event<T>} = 99,
 	}
 }
 
 /// Alias to 512-bit hash when used in the context of a transaction signature on the chain.
 // pub type Signature = MultiSignature;
 pub type Signature = sp_runtime::MultiSignature;
-
 /// Some way of identifying an account on the chain. We intentionally make it equivalent
 /// to the public key of our transaction signing scheme.
-// pub type AccountId = <<Signature as Verify>::Signer as IdentifyAccount>::AccountId;
 pub type AccountId = <<Signature as sp_runtime::traits::Verify>::Signer as sp_runtime::traits::IdentifyAccount>::AccountId;
-
 /// Balance of an account.
 pub type Balance = u128;
-
 /// Index of a transaction in the chain.
 pub type Index = u32;
-
 /// A hash of some data used by the chain.
 pub type Hash = sp_core::H256;
-
 /// An index to a block.
 pub type BlockNumber = u32;
-
 /// The address format for describing accounts.
-// pub type Address = MultiAddress<AccountId, ()>;
 pub type Address = sp_runtime::MultiAddress<AccountId, ()>;
-
 /// Block header type as expected by this runtime.
 pub type Header = generic::Header<BlockNumber, BlakeTwo256>;
-
 /// Block type as expected by this runtime.
 pub type Block = generic::Block<Header, UncheckedExtrinsic>;
-
 /// A Block signed with a Justification
 pub type SignedBlock = generic::SignedBlock<Block>;
-
 /// BlockId type as expected by this runtime.
 pub type BlockId = generic::BlockId<Block>;
-
 /// The SignedExtension to the basic transaction logic.
 pub type SignedExtra = (
-	frame_system::CheckNonZeroSender<Runtime>,
 	frame_system::CheckSpecVersion<Runtime>,
-	// frame_system::CheckTxVersion<Runtime>,
 	frame_system::CheckGenesis<Runtime>,
 	frame_system::CheckEra<Runtime>,
 	frame_system::CheckNonce<Runtime>,
 	frame_system::CheckWeight<Runtime>,
 	pallet_transaction_payment::ChargeTransactionPayment<Runtime>,
 );
-
 /// Unchecked extrinsic type as expected by this runtime.
 pub type UncheckedExtrinsic = generic::UncheckedExtrinsic<Address, Call, Signature, SignedExtra>;
-
 /// Extrinsic type that has already been checked.
 pub type CheckedExtrinsic = generic::CheckedExtrinsic<AccountId, Call, SignedExtra>;
-
 /// Executive: handles dispatch to the various modules.
 pub type Executive = frame_executive::Executive<
 	Runtime,
 	Block,
 	frame_system::ChainContext<Runtime>,
 	Runtime,
-	AllPalletsWithSystem,
-	// OnRuntimeUpgrade,
+	AllPallets,
 	RemoveCollectiveFlip,
 >;
 
@@ -786,8 +737,8 @@ impl_runtime_apis! {
 	}
 
 	impl cumulus_primitives_core::CollectCollationInfo<Block> for Runtime {
-		fn collect_collation_info(header: &<Block as BlockT>::Header) -> cumulus_primitives_core::CollationInfo {
-			ParachainSystem::collect_collation_info(header)
+		fn collect_collation_info() -> cumulus_primitives_core::CollationInfo {
+			ParachainSystem::collect_collation_info()
 		}
 	}
 }

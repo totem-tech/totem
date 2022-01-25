@@ -27,7 +27,7 @@ use xcm::latest::{AssetId, Fungibility::Fungible, MultiAsset, MultiLocation};
 use xcm_executor::traits::FilterAssetLocation;
 
 /// Type alias to conveniently refer to the `Currency::NegativeImbalance` associated type.
-pub type NegativeImbalance<T> = <pallet_balances::Pallet<T> as Currency<
+pub type NegativeImbalance<T> = <pallet_balances_totem::Pallet<T> as Currency<
 	<T as frame_system::Config>::AccountId,
 >>::NegativeImbalance;
 
@@ -38,16 +38,16 @@ pub type AccountIdOf<R> = <R as frame_system::Config>::AccountId;
 pub struct ToStakingPot<R>(PhantomData<R>);
 impl<R> OnUnbalanced<NegativeImbalance<R>> for ToStakingPot<R>
 where
-	R: pallet_balances::Config + pallet_collator_selection::Config,
+	R: pallet_balances_totem::Config + pallet_collator_selection::Config,
 	AccountIdOf<R>:
 		From<polkadot_primitives::v1::AccountId> + Into<polkadot_primitives::v1::AccountId>,
-	<R as frame_system::Config>::Event: From<pallet_balances::Event<R>>,
+	<R as frame_system::Config>::Event: From<pallet_balances_totem::Event<R>>,
 {
 	fn on_nonzero_unbalanced(amount: NegativeImbalance<R>) {
 		let numeric_amount = amount.peek();
 		let staking_pot = <pallet_collator_selection::Pallet<R>>::account_id();
-		<pallet_balances::Pallet<R>>::resolve_creating(&staking_pot, amount);
-		<frame_system::Pallet<R>>::deposit_event(pallet_balances::Event::Deposit {
+		<pallet_balances_totem::Pallet<R>>::resolve_creating(&staking_pot, amount);
+		<frame_system::Pallet<R>>::deposit_event(pallet_balances_totem::Event::Deposit {
 			who: staking_pot,
 			amount: numeric_amount,
 		});
@@ -59,10 +59,10 @@ where
 pub struct DealWithFees<R>(PhantomData<R>);
 impl<R> OnUnbalanced<NegativeImbalance<R>> for DealWithFees<R>
 where
-	R: pallet_balances::Config + pallet_collator_selection::Config,
+	R: pallet_balances_totem::Config + pallet_collator_selection::Config,
 	AccountIdOf<R>:
 		From<polkadot_primitives::v1::AccountId> + Into<polkadot_primitives::v1::AccountId>,
-	<R as frame_system::Config>::Event: From<pallet_balances::Event<R>>,
+	<R as frame_system::Config>::Event: From<pallet_balances_totem::Event<R>>,
 {
 	fn on_unbalanceds<B>(mut fees_then_tips: impl Iterator<Item = NegativeImbalance<R>>) {
 		if let Some(mut fees) = fees_then_tips.next() {
@@ -84,10 +84,9 @@ where
 		From<polkadot_primitives::v1::AccountId> + Into<polkadot_primitives::v1::AccountId>,
 {
 	fn handle_credit(credit: CreditOf<AccountIdOf<R>, pallet_assets::Pallet<R>>) {
-		if let Some(author) = pallet_authorship::Pallet::<R>::author() {
-			// In case of error: Will drop the result triggering the `OnDrop` of the imbalance.
-			let _ = pallet_assets::Pallet::<R>::resolve(&author, credit);
-		}
+		let author = pallet_authorship::Pallet::<R>::author();
+		// In case of error: Will drop the result triggering the `OnDrop` of the imbalance.
+		let _ = pallet_assets::Pallet::<R>::resolve(&author, credit);
 	}
 }
 
@@ -179,7 +178,6 @@ mod tests {
 		type SystemWeightInfo = ();
 		type SS58Prefix = ();
 		type OnSetCode = ();
-		type MaxConsumers = frame_support::traits::ConstU32<16>;
 	}
 
 	impl pallet_balances::Config for Test {
