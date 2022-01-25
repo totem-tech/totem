@@ -46,6 +46,15 @@ where
 	fn on_nonzero_unbalanced(amount: NegativeImbalance<R>) {
 		let numeric_amount = amount.peek();
 		let staking_pot = <pallet_collator_selection::Pallet<R>>::account_id();
+		
+		// Totem accounting:
+		// let actual_fee = T::TransactionConverter::convert(numeric_amount);
+
+		// if let Err(_e) = T::Accounting::distribute_fees_rewards(actual_fee, staking_pot.clone()) {
+    	// 	// This should not happen, because there is no way the fees can overflow
+    	// 	// when converting i128 -> u128
+		// }
+
 		<pallet_balances_totem::Pallet<R>>::resolve_creating(&staking_pot, amount);
 		<frame_system::Pallet<R>>::deposit_event(pallet_balances_totem::Event::Deposit {
 			who: staking_pot,
@@ -87,6 +96,20 @@ where
 		let author = pallet_authorship::Pallet::<R>::author();
 		// In case of error: Will drop the result triggering the `OnDrop` of the imbalance.
 		let _ = pallet_assets::Pallet::<R>::resolve(&author, credit);
+
+		// Totem accounting:
+
+		// NOTE as the above can fail we need a way to determine if it failed or not.
+		// In the case of a failure the fees should be sent to a burned account of some kind
+		// rather than distributing as fees.
+
+		// let actual_fee = T::TransactionConverter::convert(credit);
+
+		// if let Err(_e) = T::Accounting::distribute_fees_rewards(actual_fee, author) {
+    	// 	// This should not happen, because there is no way the fees can overflow
+    	// 	// when converting i128 -> u128
+		// }
+
 	}
 }
 

@@ -80,6 +80,14 @@ impl Posting for Test {
         unimplemented!()
     }
 
+    fn account_for_burnt_fees(f: CoinAmount, p: AccountId) -> DispatchResultWithPostInfo {
+        unimplemented!()
+    }
+    
+    fn distribute_fees_rewards(f: CoinAmount, p: AccountId) -> DispatchResultWithPostInfo {
+        unimplemented!()
+    }
+
     fn get_escrow_account() -> AccountId {
         unimplemented!()
     }
