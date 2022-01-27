@@ -59,7 +59,7 @@ fn load_spec(id: &str) -> std::result::Result<Box<dyn sc_service::ChainSpec>, St
 	Ok(match id {
 		"lego-dev" => Box::new(chain_spec::lego_development_config()),
 		"lego-local" => Box::new(chain_spec::lego_local_config()),
-		"" | "lego-genesis" => Box::new(chain_spec::lego_config()),
+		"" | "lego" => Box::new(chain_spec::lego_config()),
 		path => {
 			let chain_spec = chain_spec::LegoChainSpec::from_json_file(path.into())?;
 				Box::new(chain_spec)
