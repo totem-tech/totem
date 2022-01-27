@@ -81,7 +81,7 @@ LABEL description="Multistage Docker image for Totem Live Accounting: a platform
 	totem.live.image.source="https://gitlab.com/totem-tech/totem/totem_builder.Dockerfile" \
 	totem.live.image.documentation="https://gitlab.com/totem-tech/totem"
 
-COPY --from=builder /totem/target/release/"${chain}" /usr/local/bin/
+COPY --from=builder /totem/target/release/"${chain}" /usr/local/bin
 
 RUN useradd -m -u 1000 -U -s /bin/sh -d /totem totem && \
 	mkdir -p /data /totem/.local/share && \
@@ -89,11 +89,10 @@ RUN useradd -m -u 1000 -U -s /bin/sh -d /totem totem && \
 	ln -s /data /totem/.local/share/totem
 
 # unclutter and minimize the attack surface
-RUN	rm -rf /usr/bin /usr/sbin /usr/share/man
+RUN	rm -rf /usr/bin /usr/sbin
 
 # Sanity checks
-RUN	ldd /usr/local/bin/"${chain}" && \
-	/usr/local/bin/"${chain}" --version
+RUN	/usr/local/bin/"${chain}" --version
 
 USER totem
 # default substrate/parachain and polkadot internal to parachain
