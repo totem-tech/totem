@@ -108,21 +108,25 @@ mod pallet {
     use sp_std::prelude::*;
 
     use totem_common::TryConvert;
-    use totem_primitives::accounting::{
-        Indicator, 
-        Posting, 
-        Record, 
-        Ledger,
-        B, 
-        A, 
-        P, 
-        I, 
-        X, 
-        CurrentAssets,
-        Sales,
-        OperatingExpenses, 
-        _0030_,
-    };
+    // use totem_primitives::accounting::{
+    //     Indicator, 
+    //     Posting, 
+    //     Record, 
+    //     Ledger,
+    //     B, 
+    //     A, 
+    //     P, 
+    //     I, 
+    //     X, 
+    //     CurrentAssets,
+    //     Sales,
+    //     OperatingExpenses,
+    //     Cogs,
+    //     Commissions,
+    //     _0009_, 
+    //     _0030_,
+    // };
+    use totem_primitives::accounting::*;
     
     use totem_primitives::{LedgerBalance, PostingIndex};
 
@@ -465,7 +469,108 @@ mod pallet {
                 Record {
                     primary_party: netfee_address.clone(),
                     counterparty: payer.clone(),
-                    ledger: Ledger::ProfitLoss(P::Income(I::Sales(Sales::SalesOfServices.clone()))), 
+                    ledger: Ledger::ProfitLoss(P::Income(I::Sales(Sales::NetwrkFeeIncome.clone()))), 
+                    amount: increase_amount,
+                    debit_credit: Indicator::Credit,
+                    reference_hash: fee_hash,
+                    changed_on_blocknumber: current_block,
+                    applicable_period_blocknumber: current_block_dupe,
+                },
+            ];
+
+            Self::handle_multiposting_amounts(&keys)
+        }
+        
+        /// This function handles burnt fee amounts when the fee rewards distribution fails.
+        fn account_for_burnt_fees(
+            fee: CurrencyBalanceOf<T>,
+            loser: T::AccountId,
+        ) -> DispatchResultWithPostInfo {
+            let (increase_amount, decrease_amount) = Self::increase_decrease_amounts(fee)?;
+            let current_block = frame_system::Pallet::<T>::block_number(); // For audit on change
+            let current_block_dupe = current_block; // Applicable period for accounting
+
+            let fee_hash: T::Hash = Self::get_pseudo_random_hash(loser.clone(), loser.clone());
+
+            let netfee_address: T::AccountId = Self::get_netfees_account();
+
+            // this is a single adjustment on the network fees account keeping the current balance correct,
+            // but also indicating 
+            let keys = [
+                Record {
+                    primary_party: netfee_address.clone(),
+                    counterparty: loser.clone(),
+                    ledger: Ledger::BalanceSheet(B::Assets(A::CurrentAssets(CurrentAssets::InternalBalance.clone()))),
+                    amount: decrease_amount,
+                    debit_credit: Indicator::Credit,
+                    reference_hash: fee_hash,
+                    changed_on_blocknumber: current_block,
+                    applicable_period_blocknumber: current_block_dupe,
+                },
+                Record {
+                    primary_party: netfee_address.clone(),
+                    counterparty: loser.clone(),
+                    ledger: Ledger::ProfitLoss(P::Expenses(X::OperatingExpenses(OperatingExpenses::CostOfGoodsSold(Cogs::CryptoBurnWriteDown.clone())))),
+                    amount: increase_amount,
+                    debit_credit: Indicator::Debit,
+                    reference_hash: fee_hash,
+                    changed_on_blocknumber: current_block,
+                    applicable_period_blocknumber: current_block_dupe,
+                },
+            ];
+
+            Self::handle_multiposting_amounts(&keys)
+        }
+
+        /// This function takes is used in the asset transaction payment pallet to payout validators and account for their gains.
+        fn distribute_fees_rewards(
+            fee: CurrencyBalanceOf<T>,
+            author: T::AccountId,
+        ) -> DispatchResultWithPostInfo {
+            let (increase_amount, decrease_amount) = Self::increase_decrease_amounts(fee)?;
+            let current_block = frame_system::Pallet::<T>::block_number(); // For audit on change
+            let current_block_dupe = current_block; // Applicable period for accounting
+
+            let fee_hash: T::Hash = Self::get_pseudo_random_hash(author.clone(), author.clone());
+
+            let netfee_address: T::AccountId = Self::get_netfees_account();
+
+            // This handles the payout to the block author
+            let keys = [
+                Record {
+                    primary_party: netfee_address.clone(),
+                    counterparty: author.clone(),
+                    ledger: Ledger::BalanceSheet(B::Assets(A::CurrentAssets(CurrentAssets::InternalBalance.clone()))),
+                    amount: decrease_amount,
+                    debit_credit: Indicator::Credit,
+                    reference_hash: fee_hash,
+                    changed_on_blocknumber: current_block,
+                    applicable_period_blocknumber: current_block_dupe,
+                },
+                Record {
+                    primary_party: netfee_address.clone(),
+                    counterparty: author.clone(),
+                    ledger: Ledger::ProfitLoss(P::Expenses(X::OperatingExpenses(OperatingExpenses::Commissions(_0009_::NetwrkValidationReward.clone())))),
+                    amount: increase_amount,
+                    debit_credit: Indicator::Debit,
+                    reference_hash: fee_hash,
+                    changed_on_blocknumber: current_block,
+                    applicable_period_blocknumber: current_block_dupe,
+                },
+                Record {
+                    primary_party: author.clone(),
+                    counterparty: netfee_address.clone(),
+                    ledger: Ledger::BalanceSheet(B::Assets(A::CurrentAssets(CurrentAssets::InternalBalance.clone()))),
+                    amount: increase_amount,
+                    debit_credit: Indicator::Debit,
+                    reference_hash: fee_hash,
+                    changed_on_blocknumber: current_block,
+                    applicable_period_blocknumber: current_block_dupe,
+                },
+                Record {
+                    primary_party: author.clone(),
+                    counterparty: netfee_address.clone(),
+                    ledger: Ledger::ProfitLoss(P::Income(I::Sales(Sales::NetwrkValidationIncome.clone()))), 
                     amount: increase_amount,
                     debit_credit: Indicator::Credit,
                     reference_hash: fee_hash,
