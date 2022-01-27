@@ -57,24 +57,12 @@ impl<T: sc_service::ChainSpec + 'static> IdentifyChain for T {
 
 fn load_spec(id: &str) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
 	Ok(match id {
-		// Lego Testnet for Local Polkadot Rococo
 		"lego-dev" => Box::new(chain_spec::lego_development_config()),
 		"lego-local" => Box::new(chain_spec::lego_local_config()),
-		// the chain spec as used for generating the genesis values
-		"lego-genesis" => Box::new(chain_spec::lego_config()),
-		// the main lego chain spec as used for syncing
-		// "lego" => Box::new(chain_spec::ChainSpec::from_json_bytes(
-		// 	&include_bytes!("../res/totem-lego-raw.json")[..],
-		// )?),
-		"" => Box::new(chain_spec::get_chain_spec()),
-		// Some other chain
+		"" | "lego-genesis" => Box::new(chain_spec::lego_config()),
 		path => {
-			let chain_spec = chain_spec::ChainSpec::from_json_file(path.into())?;
-			if chain_spec.is_lego() {
-				Box::new(chain_spec::ChainSpec::from_json_file(path.into())?)
-			} else {
+			let chain_spec = chain_spec::LegoChainSpec::from_json_file(path.into())?;
 				Box::new(chain_spec)
-			}
 		},
 	})
 }
@@ -114,14 +102,10 @@ impl SubstrateCli for Cli {
 		load_spec(id)
 	}
 
-	fn native_runtime_version(chain_spec: &Box<dyn ChainSpec>) -> &'static RuntimeVersion {
-			// if chain_spec.is_lego() {
+	fn native_runtime_version(_: &Box<dyn ChainSpec>) -> &'static RuntimeVersion {
 				&lego_runtime::VERSION
-			// } else {
-				// &rococo_parachain_runtime::VERSION
-			}
 	}
-
+}
 impl SubstrateCli for RelayChainCli {
 	fn impl_name() -> String {
 		"Totem Parachain Collator".into()
@@ -180,7 +164,7 @@ macro_rules! construct_async_run {
 			runner.async_run(|$config| {
 				let $components = new_partial::<lego_runtime::RuntimeApi, LegoRuntimeExecutor, _>(
 					&$config,
-					crate::service::lego_build_import_queue,
+					crate::service::lego_parachain_build_import_queue,
 				)?;
 				let task_manager = $components.task_manager;
 				{ $( $code )* }.map(|v| (v, task_manager))
@@ -260,9 +244,6 @@ pub fn run() -> Result<()> {
 			builder.with_profiling(sc_tracing::TracingReceiver::Log, "");
 			let _ = builder.init();
 
-			let spec = load_spec(&params.chain.clone().unwrap_or_default())?;
-			let state_version = Cli::native_runtime_version(&spec).state_version();
-
 			let block: crate::service::Block =
 				generate_genesis_block(&load_spec(&params.chain.clone().unwrap_or_default())?)?;
 			let raw_header = block.header().encode();
@@ -314,26 +295,6 @@ pub fn run() -> Result<()> {
 				You can enable it with `--features runtime-benchmarks`."
 					.into())
 			},
-			// Some(Subcommand::TryRuntime(cmd)) => {
-			// 	if cfg!(feature = "try-runtime") {
-			// 		// grab the task manager.
-			// 		let runner = cli.create_runner(cmd)?;
-			// 		let registry = &runner.config().prometheus_config.as_ref().map(|cfg| &cfg.registry);
-			// 		let task_manager =
-			// 			TaskManager::new(runner.config().tokio_handle.clone(), *registry)
-			// 				.map_err(|e| format!("Error: {:?}", e))?;
-	
-			// 		if runner.config().chain_spec.is_lego() {
-			// 			runner.async_run(|config| {
-			// 				Ok((cmd.run::<Block, LegoRuntimeExecutor>(config), task_manager))
-			// 			})
-			// 		} else {
-			// 			Err("Chain doesn't support try-runtime".into())
-			// 		}
-			// 	} else {
-			// 		Err("Try-runtime must be enabled by `--features try-runtime`.".into())
-			// 	}
-			// },
 		Some(Subcommand::Key(cmd)) => Ok(cmd.run(&cli)?),
 		None => {
 			let runner = cli.create_runner(&cli.run.normalize())?;
@@ -355,12 +316,8 @@ pub fn run() -> Result<()> {
 				let parachain_account =
 					AccountIdConversion::<polkadot_primitives::v0::AccountId>::into_account(&id);
 
-				let state_version =
-				RelayChainCli::native_runtime_version(&config.chain_spec).state_version();
-
 				let block: crate::service::Block =
-					generate_genesis_block(&config.chain_spec, state_version)
-						.map_err(|e| format!("{:?}", e))?;
+					generate_genesis_block(&config.chain_spec).map_err(|e| format!("{:?}", e))?;
 				let genesis_state = format!("0x{:?}", HexDisplay::from(&block.header().encode()));
 
 				let tokio_handle = config.tokio_handle.clone();
@@ -374,7 +331,7 @@ pub fn run() -> Result<()> {
 				info!("Is collating: {}", if config.role.is_authority() { "yes" } else { "no" });
 
 				// if config.chain_spec.is_lego() {
-					crate::service::start_lego_node::<
+					crate::service::start_lego_parachain_node::<
 						lego_runtime::RuntimeApi,
 						LegoRuntimeExecutor,
 					>(config, polkadot_config, id)
