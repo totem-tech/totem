@@ -67,6 +67,8 @@ pub enum Cogs {
     PurchasedIscount,
     /// P50_0001_D008,
     InventoryWriteDown,
+    // P50_0001_D009,
+    CryptoBurnWriteDown,
 }
 /// Charges In Out
 #[allow(non_camel_case_types)]
@@ -246,6 +248,8 @@ pub enum _0009_ {
     IntercompanyExpense,
     /// P50_0009_D002,
     IntercompanyIncome,
+    /// P50_0009_D003,
+    NetwrkValidationReward,
 }
 /// Marketing Programs
 #[allow(non_camel_case_types)]
@@ -1470,7 +1474,7 @@ pub enum Sales {
     SalesOfServices,
     /// P40_0002_C000,
     SalesOfGoods,
-    /// P40_0003_D000,
+    /// P40_0003_C000,
     SalesReturnsAndAllowances,
     /// P40_0004_C000,
     SalesDiscounts,
@@ -1479,6 +1483,10 @@ pub enum Sales {
     /// P40_0006_C000,
     CommissionBillable,
     /// P40_0007_C000,
+    NetwrkValidationIncome,
+    /// P40_0008_C000,
+    NetwrkFeeIncome,
+    /// P40_0009_C000,
     MiscellaneousIncome,
 }
 /// Other Income Interest Income
@@ -1576,7 +1584,7 @@ pub enum OtherComprehensiveIncome {
 #[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
 #[scale_info(capture_docs = "always")]
 pub enum OperatingExpenses {
-    CostofGoodsSold(Cogs),
+    CostOfGoodsSold(Cogs),
     // _0001_(Cogs),
     ChargesInOut(_0002_),
     // _0002_(_0002_),

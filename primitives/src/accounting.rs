@@ -36,7 +36,8 @@
 // along with Totem.  If not, see <http://www.gnu.org/licenses/>.
 
 mod chart_of_accounts;
-pub use chart_of_accounts::{Ledger, {CurrentAssets, Sales, OperatingExpenses, _0030_, B,A,P,I,X,}};
+// pub use chart_of_accounts::{Ledger, {CurrentAssets, Sales, OperatingExpenses, _0030_, B,A,P,I,X,Cogs,Commissions,_0009_}};
+pub use chart_of_accounts::{Ledger, *};
     
 use crate::LedgerBalance;
 use frame_support::{dispatch::EncodeLike, pallet_prelude::*};
@@ -59,6 +60,8 @@ pub trait Posting<AccountId, Hash, BlockNumber, CoinAmount> {
     ) -> DispatchResultWithPostInfo;
 
     fn account_for_fees(fee: CoinAmount, payer: AccountId) -> DispatchResultWithPostInfo;
+    fn account_for_burnt_fees(fee: CoinAmount, loser: AccountId) -> DispatchResultWithPostInfo;
+    fn distribute_fees_rewards(fee: CoinAmount, author: AccountId) -> DispatchResultWithPostInfo;
 
     fn get_escrow_account() -> AccountId;
     
@@ -124,6 +127,18 @@ impl<AccountId, Hash, BlockNumber, CoinAmount> Posting<AccountId, Hash, BlockNum
     }
 
     fn account_for_fees(_f: CoinAmount, _p: AccountId) -> DispatchResultWithPostInfo {
+        unimplemented!("Used as a mock, shouldn't be called")
+    }
+
+    fn account_for_burnt_fees(_f: CoinAmount, _p: AccountId) -> DispatchResultWithPostInfo {
+        unimplemented!("Used as a mock, shouldn't be called")
+    }
+    
+    fn distribute_fees_rewards(_f: CoinAmount, _p: AccountId) -> DispatchResultWithPostInfo {
+        unimplemented!("Used as a mock, shouldn't be called")
+    }
+
+    fn account_for_burnt_fees(_f: CoinAmount, _p: AccountId) -> DispatchResultWithPostInfo {
         unimplemented!("Used as a mock, shouldn't be called")
     }
 
