@@ -64,7 +64,7 @@ ARG PROFILE=release
 WORKDIR /totem
 COPY . /totem
 
-RUN cargo "${buildtype}" "--locked" "--${PROFILE}" "-p" "${chain}"
+RUN cargo ${buildtype} " --locked" " --"${PROFILE} " -p " ${chain}
 
 # This is the 2nd stage: a very small image where we copy the Totem binary."
 FROM docker.io/library/ubuntu:20.04
@@ -79,18 +79,18 @@ LABEL description="Multistage Docker image for Totem Live Accounting: a platform
 	totem.live.image.source="https://gitlab.com/totem-tech/totem/totem_builder.Dockerfile" \
 	totem.live.image.documentation="https://gitlab.com/totem-tech/totem"
 
-COPY --from=builder /totem/target/release/"${chain}" /usr/local/bin
+COPY --from=builder /totem/target/release/${chain} /usr/local/bin/${chain}
 
 RUN useradd -m -u 1000 -U -s /bin/sh -d /totem totem && \
 	mkdir -p /data /totem/.local/share && \
 	chown -R totem:totem /data && \
-	ln -s /data /totem/.local/share/"${chain}"
+	ln -s /data /totem/.local/share/${chain}
 
 # unclutter and minimize the attack surface
 RUN	rm -rf /usr/bin /usr/sbin
 
 # Sanity checks
-RUN	/usr/local/bin/"${chain}" --version
+RUN	./usr/local/bin/${chain} --version
 
 USER totem
 # default substrate/parachain and polkadot internal to parachain
@@ -98,4 +98,4 @@ EXPOSE 30333 9933 9944 9615 40333 9934 9945 9616
 
 VOLUME ["/data"]
 
-CMD ["/usr/local/bin/${chain}"]
+ENTRYPOINT ["/usr/local/bin/${chain}"]
