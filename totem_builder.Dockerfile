@@ -61,12 +61,10 @@ ARG buildtype
 ## constants
 ARG PROFILE=release
 
-ARG CHAINPATH=p
-
 WORKDIR /totem
 COPY . /totem
 
-RUN cargo "${buildtype}" "--locked" "--${PROFILE}" "-${CHAINPATH}" "${chain}"
+RUN cargo "${buildtype}" "--locked" "--${PROFILE}" "-p" "${chain}"
 
 # This is the 2nd stage: a very small image where we copy the Totem binary."
 FROM docker.io/library/ubuntu:20.04
@@ -86,7 +84,7 @@ COPY --from=builder /totem/target/release/"${chain}" /usr/local/bin
 RUN useradd -m -u 1000 -U -s /bin/sh -d /totem totem && \
 	mkdir -p /data /totem/.local/share && \
 	chown -R totem:totem /data && \
-	ln -s /data /totem/.local/share/totem
+	ln -s /data /totem/.local/share/"${chain}"
 
 # unclutter and minimize the attack surface
 RUN	rm -rf /usr/bin /usr/sbin
@@ -100,4 +98,4 @@ EXPOSE 30333 9933 9944 9615 40333 9934 9945 9616
 
 VOLUME ["/data"]
 
-ENTRYPOINT ["/usr/local/bin/${chain}"]
+CMD ["/usr/local/bin/${chain}"]
