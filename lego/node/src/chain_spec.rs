@@ -336,7 +336,7 @@ pub fn lego_config() -> LegoChainSpec {
 		Some(properties),
 		// Extensions
 		Extensions {
-			relay_chain: "rococo-local".into(), // You MUST set this to the correct network!
+			relay_chain: "rococo".into(), // You MUST set this to the correct network!
 			para_id: 2000,
 		},
 	)
