@@ -66,8 +66,8 @@ pub enum Cogs {
     /// P50_0001_D007,
     PurchasedIscount,
     /// P50_0001_D008,
+    /// P50_0001_D009,
     InventoryWriteDown,
-    // P50_0001_D009,
     CryptoBurnWriteDown,
 }
 /// Charges In Out
@@ -860,14 +860,6 @@ pub enum _0038_ {
     /// P50_0038_D001,
     UnusedLeave,
 }
-/// Property,plantandequipmentwrittenoff
-// #[allow(non_camel_case_types)]
-// #[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
-// #[scale_info(capture_docs = "always")]
-// pub enum _0039_ {
-//     /// P50_0039_D000,
-//     WriteOff(PropertyPlantEquipment),
-// }
 /// Other Miscellaneous Charges
 #[allow(non_camel_case_types)]
 #[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
@@ -1142,8 +1134,8 @@ pub enum CurrentAssets {
     LoanNotesFloatingFixedAmortisedCost,
     /// B10_0019_D000,
     /// B10_0019_D001,
+    /// B10_0019_D002,
     DerivativeFinInstr(Derivatives),
-    // B10_0019_D002,
 }
 /// CryptoCurrency
 #[allow(non_camel_case_types)]
@@ -1181,14 +1173,14 @@ pub enum Fungibility {
 pub enum Tokens {
     /// B11_4002_D000,
     /// B11_4003_D000,
+    /// B11_4007_C000,
     SmartContract(Fungibility),
-    // B11_4007_C000,
-    // B11_4008_C000,
+    /// B11_4008_C000,
     /// B11_4002_D001,
     /// B11_4003_D001,
+    /// B11_4007_C001,
     ThirdParty(Fungibility),
-    // B11_4007_C001,
-    // B11_4008_C001,
+    /// B11_4008_C001,
     /// B11_4004_D000,
     /// B11_4009_C000,
     LiquidityPoolPair,
@@ -1338,16 +1330,16 @@ pub enum CurrentLiabilities {
 pub enum Parties {
     /// B14_3009_D001,
     /// B20_0003_C000,
+    /// B20_0003_C001,
+    /// B20_0003_C002,
+    /// B21_1014_C000,
     RelatedParties,
-    // B20_0003_C001,
-    // B20_0003_C002,
-    // B21_1014_C000,
     /// B14_3009_D000,
     /// B20_0013_C000,
+    /// B20_0013_C001,
+    /// B20_0013_C002,
+    /// B21_1014_C001,
     NonRelatedParties,
-    // B20_0013_C001,
-    // B20_0013_C002,
-    // B21_1014_C001,
 }
 /// Derivative Financial Intruments
 /// Used In Current Liabilities And Non Current Liabilities
@@ -1357,16 +1349,16 @@ pub enum Parties {
 pub enum Derivatives {
     /// B14_3010_D000,
     /// B20_0019_C000,
+    /// B21_1016_C000,
     InterestRateSwaps,
-    // B21_1016_C000,
     /// B14_3010_D001,
     /// B20_0019_C001,
+    /// B21_1016_C001,
     CurrencyForwards,
-    // B21_1016_C001,
     /// B14_3010_D002,
     /// B20_0019_C002,
+    /// B21_1016_C002,
     CommodityForwards,
-    // B21_1016_C002,
 }
 #[allow(non_camel_case_types)]
 #[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
@@ -1430,7 +1422,7 @@ pub enum CapitalStock {
     /// B32_2003_D000,
     TreasuryShares,
 }
-// Fair Value Gains or Losses on Financial Assets at FVOCI
+/// Fair Value Gains or Losses on Financial Assets at FVOCI
 #[allow(non_camel_case_types)]
 #[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
 #[scale_info(capture_docs = "always")]
@@ -1584,130 +1576,130 @@ pub enum OtherComprehensiveIncome {
 #[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
 #[scale_info(capture_docs = "always")]
 pub enum OperatingExpenses {
+    /// _0001_(Cogs),
     CostOfGoodsSold(Cogs),
-    // _0001_(Cogs),
+    /// _0002_(_0002_),
     ChargesInOut(_0002_),
-    // _0002_(_0002_),
+    /// _0003_(_0003_),
     DepreciationDepletionAmortization(_0003_),
-    // _0003_(_0003_),
+    /// _0004_(_0004_),
     FieldTrials(_0004_),
-    // _0004_(_0004_),
+    /// _0005_(_0005_),
     Warranties(_0005_),
-    // _0005_(_0005_),
+    /// _0006_(_0006_),
     TaxCorporationTax(_0006_),
-    // _0006_(_0006_),
+    /// _0007_(_0007_),
     TaxFinesPenalties(_0007_),
-    // _0007_(_0007_),
+    /// _0008_(_0008_),
     Claims(_0008_),
-    // _0008_(_0008_),
+    /// _0009_(_0009_),
     Commissions(_0009_),
-    // _0009_(_0009_),
+    /// _0010_(_0010_),
     MarketingPrograms(_0010_),
-    // _0010_(_0010_),
+    /// _0011_(_0011_),
     ConsultingFees(_0011_),
-    // _0011_(_0011_),
+    /// _0012_(_0012_),
     Services(_0012_),
-    // _0012_(_0012_),
+    /// _0013_(_0013_),
     TravelExpenses(_0013_),
-    // _0013_(_0013_),
+    /// _0014_(_0014_),
     Hotels(_0014_),
-    // _0014_(_0014_),
+    /// _0015_(_0015_),
     MeetingsConferences(_0015_),
-    // _0015_(_0015_),
+    /// _0016_(_0016_),
     RestaurantMeals(_0016_),
-    // _0016_(_0016_),
+    /// _0017_(_0017_),
     OtherTravelExpenses(_0017_),
-    // _0017_(_0017_),
+    /// _0018_(_0018_),
     CostPooling(_0018_),
-    // _0018_(_0018_),
+    /// _0019_(_0019_),
     CarExpenses(_0019_),
-    // _0019_(_0019_),
+    /// _0020_(_0020_),
     Equipment(_0020_),
-    // _0020_(_0020_),
+    /// _0021_(_0021_),
     PlantMaintenance(_0021_),
-    // _0021_(_0021_),
+    /// _0022_(_0022_),
     PhonesTelecom(_0022_),
-    // _0022_(_0022_),
+    /// _0023_(_0023_),
     RentalLeases(_0023_),
-    // _0023_(_0023_),
+    /// _0024_(_0024_),
     RepairMaintenance(_0024_),
-    // _0024_(_0024_),
+    /// _0025_(_0025_),
     Supplies(_0025_),
-    // _0025_(_0025_),
+    /// _0026_(_0026_),
     Utilities(_0026_),
-    // _0026_(_0026_),
+    /// _0027_(_0027_),
     Insurance(_0027_),
-    // _0027_(_0027_),
+    /// _0028_(_0028_),
     CorporateGovernance(_0028_),
-    // _0028_(_0028_),
+    /// _0029_(_0029_),
     LegalFees(_0029_),
-    // _0029_(_0029_),
+    /// _0030_(_0030_),
     AdministrationCost(_0030_),
-    // _0030_(_0030_),
+    /// _0031_(_0031_),
     BadDebts(_0031_),
-    // _0031_(_0031_),
+    /// _0032_(_0032_),
     MiscellaneousExpenses(_0032_),
-    // _0032_(_0032_),
+    /// _0033_(_0033_),
     FinGuaranteeFees(_0033_),
-    // _0033_(_0033_),
+    /// _0034_(_0034_),
     RoyaltyExpenses(_0034_),
-    // _0034_(_0034_),
+    /// _0035_(_0035_),
     ExtraordinaryExpenses(_0035_),
-    // _0035_(_0035_),
+    /// _0036_(_0036_),
     ImpairmentLoss(_0036_),
-    // _0036_(_0036_),
+    /// _0038_(_0038_),
     Provisions(_0038_),
-    // _0038_(_0038_),
+    /// _0039_(_0039_),
     WriteOff(PropertyPlantEquipment),
-    // _0039_(_0039_),
 }
 #[allow(non_camel_case_types)]
 #[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
 #[scale_info(capture_docs = "always")]
 pub enum OtherOperatingExpenses {
+    /// _1001_(_1001_),
     OtherMiscellaneousCharges(_1001_),
-    // _1001_(_1001_),
 }
 #[allow(non_camel_case_types)]
 #[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
 #[scale_info(capture_docs = "always")]
 pub enum PersonnelCosts {
+    /// _2001_(_2001_),
     Salaries(_2001_),
-    // _2001_(_2001_),
+    /// _2002_(_2002_),
     ExpatExpenses(_2002_),
-    // _2002_(_2002_),
+    /// _2003_(_2003_),
     IncentivePlan(_2003_),
-    // _2003_(_2003_),
+    /// _2004_(_2004_),
     IncentivePlanOverhead(_2004_),
-    // _2004_(_2004_),
+    /// _2005_(_2005_),
     EmployeeServices(_2005_),
-    // _2005_(_2005_),
 }
 #[allow(non_camel_case_types)]
 #[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
 #[scale_info(capture_docs = "always")]
 pub enum FinanceCosts {
+    /// _3001_(_3001_),
     InterestExpense(_3001_),
-    // _3001_(_3001_),
 }
 #[allow(non_camel_case_types)]
 #[derive(Debug, Encode, Decode, Copy, Clone, Eq, PartialEq, TypeInfo)]
 #[scale_info(capture_docs = "always")]
 pub enum ControlAccounts {
+    /// C60_0001_000D,
     PurchaseControl,
-    // C60_0001_000D,
+    /// C60_0002_000D,
     SalesControl,
-    // C60_0002_000D,
+    /// C60_0003_000D,
     TaxControl,
-    // C60_0003_000D,
+    /// C60_0004_000D,
     EscrowedFundsControl,
-    // C60_0004_000D,
+    /// C60_0005_000D,
     BorrowingsControl,
-    // C60_0005_000D,
+    /// C60_0006_000D,
     DefiBorrowingsControl,
-    // C60_0006_000D,
+    /// C60_0007_000D,
     LiquidityPoolControl,
-    // C60_0007_000D,
 }
 /// Assets
 #[allow(non_camel_case_types)]
