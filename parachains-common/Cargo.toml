@@ -13,6 +13,10 @@ targets = ['x86_64-unknown-linux-gnu']
 codec = { package = 'parity-scale-codec', version = '2.3.0', features = ['derive'], default-features = false }
 scale-info = { version = '1.0.0', default-features = false, features = ['derive'] }
 
+# Totem dependencies
+totem-common = { path = '../common' }
+totem-primitives = { path = '../primitives' }
+
 # Substrate dependencies
 frame-support = { git = 'https://github.com/paritytech/substrate', version = '4.0.0-dev', branch = 'polkadot-v0.9.13', default-features = false }
 frame-system = { git = 'https://github.com/paritytech/substrate', version = '4.0.0-dev', branch = 'polkadot-v0.9.13', default-features = false }

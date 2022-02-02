@@ -38,7 +38,7 @@
 mod chart_of_accounts;
 // pub use chart_of_accounts::{Ledger, {CurrentAssets, Sales, OperatingExpenses, _0030_, B,A,P,I,X,Cogs,Commissions,_0009_}};
 pub use chart_of_accounts::{Ledger, *};
-    
+
 use crate::LedgerBalance;
 use frame_support::{dispatch::EncodeLike, pallet_prelude::*};
 use scale_info::TypeInfo;
@@ -64,7 +64,7 @@ pub trait Posting<AccountId, Hash, BlockNumber, CoinAmount> {
     fn distribute_fees_rewards(fee: CoinAmount, author: AccountId) -> DispatchResultWithPostInfo;
 
     fn get_escrow_account() -> AccountId;
-    
+
     fn get_netfees_account() -> AccountId;
 
     fn get_pseudo_random_hash(s: AccountId, r: AccountId) -> Hash;
@@ -133,12 +133,8 @@ impl<AccountId, Hash, BlockNumber, CoinAmount> Posting<AccountId, Hash, BlockNum
     fn account_for_burnt_fees(_f: CoinAmount, _p: AccountId) -> DispatchResultWithPostInfo {
         unimplemented!("Used as a mock, shouldn't be called")
     }
-    
-    fn distribute_fees_rewards(_f: CoinAmount, _p: AccountId) -> DispatchResultWithPostInfo {
-        unimplemented!("Used as a mock, shouldn't be called")
-    }
 
-    fn account_for_burnt_fees(_f: CoinAmount, _p: AccountId) -> DispatchResultWithPostInfo {
+    fn distribute_fees_rewards(_f: CoinAmount, _p: AccountId) -> DispatchResultWithPostInfo {
         unimplemented!("Used as a mock, shouldn't be called")
     }
 
