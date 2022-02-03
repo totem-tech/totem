@@ -35,7 +35,8 @@ use frame_support::{
 };
 use frame_system::{
 	limits::{BlockLength, BlockWeights},
-	EnsureOneOf, EnsureRoot,
+	// EnsureOneOf, 
+	EnsureRoot,
 };
 // Added
 pub use pallet_balances_totem::Call as BalancesCall;
@@ -48,19 +49,24 @@ pub use sp_runtime::BuildStorage;
 // pub use sp_runtime::{MultiAddress, Perbill, Permill};
 pub use sp_runtime::{Perbill, Permill};
 
-use parachains_common::{
-	impls::{AssetsFrom, NonZeroIssuance},
-	AssetId,
-};
+// use parachains_common::{
+// 	// impls::{AssetsFrom, NonZeroIssuance},
+// 	AssetId,
+// };
 use xcm_builder::{
-	AllowKnownQueryResponses, AllowSubscriptionsFrom, AsPrefixedGeneralIndex,
-	ConvertedConcreteAssetId, FungiblesAdapter,
+	AllowKnownQueryResponses, AllowSubscriptionsFrom, 
+	// AsPrefixedGeneralIndex,
+	// ConvertedConcreteAssetId, 
+	// FungiblesAdapter,
 };
-use xcm_executor::traits::JustTry;
+// use xcm_executor::traits::JustTry;
 
 
 // XCM imports
-use pallet_xcm::{EnsureXcm, IsMajorityOfBody, XcmPassthrough};
+use pallet_xcm::{
+	// EnsureXcm, 
+	// IsMajorityOfBody, 
+	XcmPassthrough};
 use polkadot_parachain::primitives::Sibling;
 use xcm::latest::prelude::*;
 use xcm_builder::{
@@ -340,30 +346,31 @@ pub type CurrencyTransactor = CurrencyAdapter<
 	(),
 >;
 
-/// Means for transacting assets besides the native currency on this chain.
-pub type FungiblesTransactor = FungiblesAdapter<
-	// Use this fungibles implementation:
-	Assets,
-	// Use this currency when it is a fungible asset matching the given location or name:
-	ConvertedConcreteAssetId<
-		AssetId,
-		u64,
-		AsPrefixedGeneralIndex<LegoLocation, AssetId, JustTry>,
-		JustTry,
-	>,
-	// Convert an XCM MultiLocation into a local account id:
-	LocationToAccountId,
-	// Our chain's account ID type (we can't get away without mentioning it explicitly):
-	AccountId,
-	// We only want to allow teleports of known assets. We use non-zero issuance as an indication
-	// that this asset is known.
-	NonZeroIssuance<AccountId, Assets>,
-	// The account to use for tracking teleports.
-	CheckingAccount,
->;
+// /// Means for transacting assets besides the native currency on this chain.
+// pub type FungiblesTransactor = FungiblesAdapter<
+// 	// Use this fungibles implementation:
+// 	Assets,
+// 	// Use this currency when it is a fungible asset matching the given location or name:
+// 	ConvertedConcreteAssetId<
+// 		AssetId,
+// 		u64,
+// 		AsPrefixedGeneralIndex<LegoLocation, AssetId, JustTry>,
+// 		JustTry,
+// 	>,
+// 	// Convert an XCM MultiLocation into a local account id:
+// 	LocationToAccountId,
+// 	// Our chain's account ID type (we can't get away without mentioning it explicitly):
+// 	AccountId,
+// 	// We only want to allow teleports of known assets. We use non-zero issuance as an indication
+// 	// that this asset is known.
+// 	NonZeroIssuance<AccountId, Assets>,
+// 	// The account to use for tracking teleports.
+// 	CheckingAccount,
+// >;
 
 /// Means for transacting assets on this chain.
-pub type AssetTransactors = (CurrencyTransactor, FungiblesTransactor);
+// pub type AssetTransactors = (CurrencyTransactor, FungiblesTransactor);
+pub type AssetTransactors = CurrencyTransactor;
 
 /// This is the type we use to convert an (incoming) XCM origin into a local `Origin` instance,
 /// ready for dispatching a transaction with Xcm's `Transact`. There is an `OriginKind` which can
@@ -426,7 +433,8 @@ parameter_types! {
 	pub LegoLocation: MultiLocation = MultiLocation::new(1, X1(Parachain(2000)));
 }
 
-pub type Reserves = (NativeAsset, AssetsFrom<LegoLocation>);
+// pub type Reserves = (NativeAsset, AssetsFrom<LegoLocation>);
+pub type Reserves = NativeAsset;
 
 pub struct XcmConfig;
 impl Config for XcmConfig {
@@ -505,37 +513,37 @@ impl cumulus_ping::Config for Runtime {
 	type XcmSender = XcmRouter;
 }
 
-parameter_types! {
-	pub const AssetDeposit: Balance = 1 * UNIT;
-	pub const ApprovalDeposit: Balance = 100 * MILLIUNIT;
-	pub const AssetsStringLimit: u32 = 50;
-	pub const MetadataDepositBase: Balance = 1 * UNIT;
-	pub const MetadataDepositPerByte: Balance = 10 * MILLIUNIT;
-	pub const UnitBody: BodyId = BodyId::Unit;
-	// pub const MaxAuthorities: u32 = 100_000; // Declared below
-}
+// parameter_types! {
+// 	pub const AssetDeposit: Balance = 1 * UNIT;
+// 	pub const ApprovalDeposit: Balance = 100 * MILLIUNIT;
+// 	pub const AssetsStringLimit: u32 = 50;
+// 	pub const MetadataDepositBase: Balance = 1 * UNIT;
+// 	pub const MetadataDepositPerByte: Balance = 10 * MILLIUNIT;
+// 	pub const UnitBody: BodyId = BodyId::Unit;
+// 	// pub const MaxAuthorities: u32 = 100_000; // Declared below
+// }
 
-/// A majority of the Unit body from Rococo over XCM is our required administration origin.
-pub type AdminOrigin = EnsureOneOf<
-	AccountId,
-	EnsureRoot<AccountId>,
-	EnsureXcm<IsMajorityOfBody<RelayLocation, UnitBody>>,
->;
-impl pallet_assets::Config for Runtime {
-	type Event = Event;
-	type Balance = u64;
-	type AssetId = AssetId;
-	type Currency = Balances;
-	type ForceOrigin = AdminOrigin;
-	type AssetDeposit = AssetDeposit;
-	type MetadataDepositBase = MetadataDepositBase;
-	type MetadataDepositPerByte = MetadataDepositPerByte;
-	type ApprovalDeposit = ApprovalDeposit;
-	type StringLimit = AssetsStringLimit;
-	type Freezer = ();
-	type Extra = ();
-	type WeightInfo = pallet_assets::weights::SubstrateWeight<Runtime>;
-}
+// /// A majority of the Unit body from Rococo over XCM is our required administration origin.
+// pub type AdminOrigin = EnsureOneOf<
+// 	AccountId,
+// 	EnsureRoot<AccountId>,
+// 	EnsureXcm<IsMajorityOfBody<RelayLocation, UnitBody>>,
+// >;
+// impl pallet_assets::Config for Runtime {
+// 	type Event = Event;
+// 	type Balance = u64;
+// 	type AssetId = AssetId;
+// 	type Currency = Balances;
+// 	type ForceOrigin = AdminOrigin;
+// 	type AssetDeposit = AssetDeposit;
+// 	type MetadataDepositBase = MetadataDepositBase;
+// 	type MetadataDepositPerByte = MetadataDepositPerByte;
+// 	type ApprovalDeposit = ApprovalDeposit;
+// 	type StringLimit = AssetsStringLimit;
+// 	type Freezer = ();
+// 	type Extra = ();
+// 	type WeightInfo = pallet_assets::weights::SubstrateWeight<Runtime>;
+// }
 
 parameter_types! {
 	pub const Period: u32 = 6 * HOURS;
@@ -611,7 +619,7 @@ construct_runtime!{
 
 		// Monetary stuff.
 		Balances: pallet_balances_totem::{Pallet, Call, Storage, Config<T>, Event<T>} = 30,
-		Assets: pallet_assets::{Pallet, Call, Storage, Event<T>} = 31,
+		// Assets: pallet_assets::{Pallet, Call, Storage, Event<T>} = 31,
 
 		// Collator support. The order of these 4 are important and shall not change.
 		Authorship: pallet_authorship::{Pallet, Call, Storage} = 40,
