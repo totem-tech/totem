@@ -5,40 +5,40 @@
 # Compile node, 
 #______________________________________________________________#
 
-# cargo build --release -p parachain-totem-lego-node
-# cargo build --release -p parachain-totem-wapex-node
-# cargo build --release -p parachain-totem-kapex-node
+# cargo build --release -p lego-node
+# cargo build --release -p wapex-node
+# cargo build --release -p kapex-node
 
 #______________________________________________________________#
 # Then extract the local version of the chainspec.
 # This will provide ther WASM blob that needs to be added to the readable chainspec
 #______________________________________________________________#
 
-# ./target/release/parachain-totem-lego-node build-spec --chain local > ./res/lego-local.json && \
-# ./target/release/parachain-totem-wapex-node build-spec --chain local > ./res/wapex-local.json && \
-# ./target/release/parachain-totem-kapex-node build-spec --chain local > ./res/kapex-local.json
+# ./target/release/lego-node build-spec --chain lego > ./res/lego-node-readable.json && \
+# ./target/release/wapex-node build-spec > ./res/wapex-node-readable.json && \
+# ./target/release/kapex-node build-spec > ./res/kapex-node-readable.json
 
 #______________________________________________________________#
 # Once added the next step is to convert the readable chainspec to raw format for inclusion in the runtime.
 #______________________________________________________________#
 
-# ./target/release/parachain-totem-lego-node build-spec --chain ./res/totem-lego-template.json --raw > ./res/totem-lego-raw-new.json && \
-# ./target/release/parachain-totem-wapex-node build-spec --chain ./res/totem-wapex-template.json --raw > ./res/totem-wapex-raw-new.json && \
-# ./target/release/parachain-totem-kapex-node build-spec --chain ./res/totem-kapex-template.json --raw > ./res/totem-kapex-raw-new.json
+# ./target/release/lego-node build-spec --chain ./res/lego-node-readable.json --raw > ./res/lego-node-raw-new.json && \
+# ./target/release/wapex-node build-spec --chain ./res/wapex-node-readable.json --raw > ./res/wapex-node-raw-new.json && \
+# ./target/release/kapex-node build-spec --chain ./res/kapex-node-readable.json --raw > ./res/kapex-node-raw-new.json
 
 #______________________________________________________________#
 # now the raw file is ready to be included in the runtime. Change the path in `command.rs`` to point to the raw version of the file.
 # Recompile the node and extract the genesis state and wasm blob.
 #______________________________________________________________#
 
-# ./target/release/parachain-totem-lego-node export-genesis-state > ./res/genesis-states/lego-genesis-state-new && \
-# ./target/release/parachain-totem-lego-node export-genesis-wasm > ./res/wasm-blobs/lego-genesis-wasm-new
+# ./target/release/lego-node export-genesis-state > ./res/genesis-states/lego-genesis-state-new && \
+# ./target/release/lego-node export-genesis-wasm > ./res/wasm-blobs/lego-genesis-wasm-new
 
-# ./target/release/parachain-totem-wapex-node export-genesis-state > ./res/genesis-states/wapex-genesis-state-new && \
-# ./target/release/parachain-totem-wapex-node export-genesis-wasm > ./res/wasm-blobs/wapex-genesis-wasm-new
+# ./target/release/wapex-node export-genesis-state > ./res/genesis-states/wapex-genesis-state-new && \
+# ./target/release/wapex-node export-genesis-wasm > ./res/wasm-blobs/wapex-genesis-wasm-new
 
-# ./target/release/parachain-totem-kapex-node export-genesis-state > ./res/genesis-states/kapex-genesis-state-new && \
-# ./target/release/parachain-totem-kapex-node export-genesis-wasm > ./res/wasm-blobs/kapex-genesis-wasm-new
+# ./target/release/kapex-node export-genesis-state > ./res/genesis-states/kapex-genesis-state-new && \
+# ./target/release/kapex-node export-genesis-wasm > ./res/wasm-blobs/kapex-genesis-wasm-new
 
 #______________________________________________________________#
 # Cleanup

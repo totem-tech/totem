@@ -308,7 +308,7 @@ pub fn lego_config() -> LegoChainSpec {
 				vec![
 					(
 						get_account_id_from_public("5CcEDRg5DpwhLs8e2gn1A9Yjv9pRKTbgadkYtur7WH6hMSZJ"),
-						2360000000000000000
+						2541818000000000000
 					),
 					(
 						get_account_id_from_public("5Fxc4SWjmAnJgQtDosmytWevznn2LMDjv2s7AUJ8EeU4CqYA"),

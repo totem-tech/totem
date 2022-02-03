@@ -57,9 +57,17 @@ impl<T: sc_service::ChainSpec + 'static> IdentifyChain for T {
 
 fn load_spec(id: &str) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
 	Ok(match id {
+		// Used for running a local test parachain using Alice authority
 		"lego-dev" => Box::new(chain_spec::lego_development_config()),
+		// Used for running a local test parachain using Alice and Bob Authorities
 		"lego-local" => Box::new(chain_spec::lego_local_config()),
-		"" | "lego" => Box::new(chain_spec::lego_config()),
+		// Used for building and checking the readable final chainspec based on the chain_spec.rs contents
+		"lego" => Box::new(chain_spec::lego_config()),
+		// Used for running the network from a raw chainspec file contained in the res directory
+		"" => Box::new(chain_spec::LegoChainSpec::from_json_bytes(
+			&include_bytes!("../../../res/lego-node-raw.json")[..],
+		)?),
+		// Used for running a network from a custom chainspec file
 		path => {
 			let chain_spec = chain_spec::LegoChainSpec::from_json_file(path.into())?;
 				Box::new(chain_spec)
