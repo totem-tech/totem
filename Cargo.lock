@@ -3412,8 +3412,6 @@ dependencies = [
  "hex-literal 0.3.4",
  "log",
  "pallet-accounting",
- "pallet-asset-tx-payment",
- "pallet-assets",
  "pallet-aura",
  "pallet-authorship",
  "pallet-balances-totem",
@@ -4730,37 +4728,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-asset-tx-payment"
-version = "4.0.0-dev"
-source = "git+https://github.com/paritytech/substrate?branch=polkadot-v0.9.13#afb74de23dfe2994e7ce38c0870efb9734e966f7"
-dependencies = [
- "frame-support",
- "frame-system",
- "pallet-transaction-payment",
- "parity-scale-codec",
- "scale-info",
- "serde",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
-name = "pallet-assets"
-version = "4.0.0-dev"
-source = "git+https://github.com/paritytech/substrate?branch=polkadot-v0.9.13#afb74de23dfe2994e7ce38c0870efb9734e966f7"
-dependencies = [
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "parity-scale-codec",
- "scale-info",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
 name = "pallet-aura"
 version = "4.0.0-dev"
 source = "git+https://github.com/paritytech/substrate?branch=polkadot-v0.9.13#afb74de23dfe2994e7ce38c0870efb9734e966f7"
@@ -5985,8 +5952,6 @@ dependencies = [
  "frame-executive",
  "frame-support",
  "frame-system",
- "pallet-asset-tx-payment",
- "pallet-assets",
  "pallet-authorship",
  "pallet-balances-totem",
  "pallet-collator-selection",

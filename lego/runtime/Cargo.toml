@@ -50,8 +50,8 @@ frame-system = { git = 'https://github.com/paritytech/substrate', version = '4.0
 # frame-system-benchmarking = { git = 'https://github.com/paritytech/substrate', version = '4.0.0-dev', branch = 'polkadot-v0.9.13', default-features = false }
 frame-system-rpc-runtime-api = { git = 'https://github.com/paritytech/substrate', version = '4.0.0-dev', branch = 'polkadot-v0.9.13', default-features = false }
 frame-try-runtime = { git = 'https://github.com/paritytech/substrate', version = '0.10.0-dev', branch = 'polkadot-v0.9.13', default-features = false }
-pallet-asset-tx-payment = { git = 'https://github.com/paritytech/substrate', version = '4.0.0-dev', branch = 'polkadot-v0.9.13', default-features = false }
-pallet-assets = { git = 'https://github.com/paritytech/substrate', version = '4.0.0-dev', branch = 'polkadot-v0.9.13', default-features = false }
+# pallet-asset-tx-payment = { git = 'https://github.com/paritytech/substrate', version = '4.0.0-dev', branch = 'polkadot-v0.9.13', default-features = false }
+# pallet-assets = { git = 'https://github.com/paritytech/substrate', version = '4.0.0-dev', branch = 'polkadot-v0.9.13', default-features = false }
 pallet-aura = { git = 'https://github.com/paritytech/substrate', version = '4.0.0-dev', branch = 'polkadot-v0.9.13', default-features = false }
 pallet-authorship = { git = 'https://github.com/paritytech/substrate', version = '4.0.0-dev', branch = 'polkadot-v0.9.13', default-features = false }
 pallet-session = { git = 'https://github.com/paritytech/substrate', version = '4.0.0-dev', branch = 'polkadot-v0.9.13', default-features = false }
@@ -118,8 +118,8 @@ std = [
 	# 'frame-system-benchmarking/std',
 	'frame-system-rpc-runtime-api/std',
 	'frame-try-runtime/std',
-	'pallet-assets/std',
-	'pallet-asset-tx-payment/std',
+	# 'pallet-assets/std',
+	# 'pallet-asset-tx-payment/std',
 	'pallet-aura/std',
 	'pallet-authorship/std',
 	'pallet-collator-selection/std',
