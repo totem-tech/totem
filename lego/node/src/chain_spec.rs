@@ -16,7 +16,7 @@ pub type LegoChainSpec =
 	#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, ChainSpecGroup, ChainSpecExtension)]
 	#[serde(deny_unknown_fields)]
 	pub struct Extensions {
-		/// The relay chain of the Parachain.
+		/// The relay chain of the Parachain (use the chainspec ID).
 		pub relay_chain: String,
 		/// The id of the Parachain.
 		pub para_id: u32,
@@ -163,7 +163,7 @@ pub fn lego_development_config() -> LegoChainSpec {
 						1000000000000
 					),
 				],
-				1000.into(),
+				2002.into(),
 				get_account_id_from_seed::<sr25519::Public>("Alice"),
 			)
 		},
@@ -177,8 +177,8 @@ pub fn lego_development_config() -> LegoChainSpec {
 		Some(properties),
 		// Extensions
 		Extensions {
-			relay_chain: "rococo-local".into(), // You MUST set this to the correct network!
-			para_id: 1000,
+			relay_chain: "rococo-totem-relaychain".into(), // You MUST set this to the correct relay chain id!
+			para_id: 2002,
 		},
 	)
 }
@@ -259,7 +259,7 @@ pub fn lego_local_config() -> LegoChainSpec {
 						1000000000000
 					),
 				],
-				1000.into(),
+				2001.into(),
 				get_account_id_from_seed::<sr25519::Public>("Alice"),
 			)
 		},
@@ -273,8 +273,8 @@ pub fn lego_local_config() -> LegoChainSpec {
 		Some(properties),
 		// Extensions
 		Extensions {
-			relay_chain: "rococo-local".into(), // You MUST set this to the correct network!
-			para_id: 1000,
+			relay_chain: "rococo-totem-relaychain".into(), // You MUST set this to the correct relay chain id!
+			para_id: 2001,
 		},
 	)
 }
@@ -290,7 +290,7 @@ pub fn lego_config() -> LegoChainSpec {
 		// Name
 		"Lego Parachain",
 		// ID
-		"lego_parachain",
+		"lego-parachain",
 		ChainType::Live,
 		move || {
 			lego_genesis(
@@ -336,7 +336,7 @@ pub fn lego_config() -> LegoChainSpec {
 		Some(properties),
 		// Extensions
 		Extensions {
-			relay_chain: "rococo".into(), // You MUST set this to the correct network!
+			relay_chain: "rococo-totem-relaychain".into(), // You MUST set this to the correct relay chain id!
 			para_id: 2000,
 		},
 	)
