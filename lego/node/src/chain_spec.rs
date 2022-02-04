@@ -177,7 +177,7 @@ pub fn lego_development_config() -> LegoChainSpec {
 		Some(properties),
 		// Extensions
 		Extensions {
-			relay_chain: "rococo-totem-relaychain".into(), // You MUST set this to the correct relay chain id!
+			relay_chain: "rococo".into(), // You MUST set this to the correct network - rococo - westend - kusama - polkadot
 			para_id: 2002,
 		},
 	)
@@ -273,7 +273,7 @@ pub fn lego_local_config() -> LegoChainSpec {
 		Some(properties),
 		// Extensions
 		Extensions {
-			relay_chain: "rococo-totem-relaychain".into(), // You MUST set this to the correct relay chain id!
+			relay_chain: "rococo".into(), // You MUST set this to the correct network - rococo - westend - kusama - polkadot
 			para_id: 2001,
 		},
 	)
@@ -336,7 +336,7 @@ pub fn lego_config() -> LegoChainSpec {
 		Some(properties),
 		// Extensions
 		Extensions {
-			relay_chain: "rococo-totem-relaychain".into(), // You MUST set this to the correct relay chain id!
+			relay_chain: "rococo".into(), // You MUST set this to the correct network - rococo - westend - kusama - polkadot
 			para_id: 2000,
 		},
 	)
